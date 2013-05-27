@@ -60,7 +60,7 @@ public class ListManager implements Serializable {
     }
     public ArrayList getItemList(String myCat) {
         ItemList myItemList = itemListMap.get(myCat);
-        ArrayList<String> myItemArrayList = myItemList.getListItems();
+        ArrayList<ListItem> myItemArrayList = myItemList.getListItems();
         return myItemArrayList;
     }
     public String[] getItemListArray(String myCat) {

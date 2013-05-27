@@ -25,29 +25,58 @@ import android.widget.Toast;
 
 public class FlipList extends Activity {
 	public final static String EXTRA_MESSAGE = "com.icanhasnom.FlipList.MESSAGE";
+	
     //ListManager myListMan = new ListManager();
 	ListManager myListMan;
+	
     HashMap<String, ListItem> checkListItems = new HashMap<String, ListItem>();
-    MyCustomAdapter dataAdapter = null;
-    Spinner spinner;
+    ArrayList<ItemList> currentItemList;
+    String selectedCategory;
+    String[] catList;
+    
+    MyCustomAdapter itemListDataAdapter;
+    ArrayAdapter<String> spinnerDataAdapter;
+    Spinner catSpinner;
+    
+    //Spinner catSpinner;
+    // ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, catList);
+    // MyCustomAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, catList);
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-        if(savedInstanceState != null) {
-        	myListMan = (ListManager) savedInstanceState.getSerializable("ListManager");
-        } else {
-        	myListMan = new ListManager();
-        }
+        restoreState(savedInstanceState);
+
         // Set this spinner up elsewhere so its not recreated every time we switch orientation
-        Spinner spinner = (Spinner) findViewById(R.id.catSpinner);
-        spinner.setOnItemSelectedListener(new SpinnerActivity());
+        // Commenting this out as i've moved it to the top. Maybe just declare up top and keep this here without type?
+        //Spinner spinner = (Spinner) findViewById(R.id.catSpinner);
+        
         
         addItemsOnSpinner();
         addItemsOnList();
         // Save instance state here?
+    }
+    
+    public void restoreState(Bundle savedInstanceState) {
+        if(savedInstanceState != null) {
+        	myListMan = (ListManager) savedInstanceState.getSerializable("ListManager");
+        	selectedCategory = String.valueOf(catSpinner.getSelectedItem());
+        	catSpinner = (Spinner) findViewById(R.id.catSpinner);
+        	catSpinner.setOnItemSelectedListener(new SpinnerActivity());
+        	ArrayList currentItemList = myListMan.getItemList(selectedCategory);
+        	itemListDataAdapter = new MyCustomAdapter(this, R.layout.activity_main, currentItemList);
+            spinnerDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, catList);
+        } else {
+        	myListMan = new ListManager();
+        	selectedCategory = String.valueOf(catSpinner.getSelectedItem());
+        	catSpinner = (Spinner) findViewById(R.id.catSpinner);
+        	catSpinner.setOnItemSelectedListener(new SpinnerActivity());
+        	ArrayList currentItemList = myListMan.getItemList(selectedCategory);
+        	itemListDataAdapter = new MyCustomAdapter(this, R.layout.activity_main, currentItemList);
+            spinnerDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, catList);
+        }
     }
     
     @Override
@@ -56,12 +85,12 @@ public class FlipList extends Activity {
     	super.onSaveInstanceState(savedInstanceState);
     }
     
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-    	super.onRestoreInstanceState(savedInstanceState);
-    	ListManager myListMan = (ListManager) savedInstanceState.getSerializable("ListManager");
-    	
-    }
+    //@Override
+    //public void onRestoreInstanceState(Bundle savedInstanceState) {
+    //	super.onRestoreInstanceState(savedInstanceState);
+    //	this.myListMan = (ListManager) savedInstanceState.getSerializable("ListManager");
+    //	
+    //}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -106,23 +135,26 @@ public class FlipList extends Activity {
     }
     
     public void addItemsOnSpinner() {
-        String[] catList = myListMan.getCategoryList();
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, catList);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        Spinner Items = (Spinner) findViewById(R.id.catSpinner);
-        Items.setAdapter(dataAdapter);
+        catList = myListMan.getCategoryList();
+
+        spinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        catSpinner.setAdapter(spinnerDataAdapter);
     }
     
     public void addItemsOnList() {
-    	Spinner catSpinner = (Spinner) findViewById(R.id.catSpinner);
-    	String selectedCategory = String.valueOf(catSpinner.getSelectedItem());
-    	ArrayList currentItemList = myListMan.getItemList(selectedCategory);
+    	//Spinner catSpinner = (Spinner) findViewById(R.id.catSpinner);
+    	selectedCategory = String.valueOf(catSpinner.getSelectedItem());
+    	
+    	//ArrayList<ItemList> currentItemList = myListMan.getItemList(selectedCategory);
+    	currentItemList = myListMan.getItemList(selectedCategory);
+    	
         //Iterator<ListItem> listItem = currentItemList.iterator();
         //Object[] listItemObjects = currentItemList.toArray();
         //String[] listItemArray = Arrays.copyOf(listItemObjects,  listItemObjects.length, String[].class);
-    	dataAdapter = new MyCustomAdapter(this, R.layout.activity_main, currentItemList);
+    	
+    	
     	ListView listView = (ListView) findViewById(R.id.itemList);
-    	listView.setAdapter(dataAdapter);
+    	listView.setAdapter(itemListDataAdapter);
     	
     	listView.setOnItemClickListener(new OnItemClickListener() {
     		public void onItemClick(AdapterView<?> parent, View view,
@@ -139,8 +171,7 @@ public class FlipList extends Activity {
     	 
     	private ArrayList<ListItem> itemList;
     	 
-    	public MyCustomAdapter(Context context, int textViewResourceId, 
-    		ArrayList<ListItem> itemList) {
+    	public MyCustomAdapter(Context context, int textViewResourceId, ArrayList<ListItem> itemList) {
     		super(context, textViewResourceId, itemList);
     		this.itemList = new ArrayList<ListItem>();
     		this.itemList.addAll(itemList);
