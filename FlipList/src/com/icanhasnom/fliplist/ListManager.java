@@ -13,7 +13,7 @@ import java.io.*;
  */
 public class ListManager implements Serializable {
     ArrayList<String> categoryList = new ArrayList<String>();
-    ArrayList itemList = new ArrayList();
+    ArrayList<ListItem> itemList = new ArrayList<ListItem>();
     Map<String,ItemList> itemListMap = new HashMap<String,ItemList>();
     String defaultCategory = "Default";
     String completedCategory = "Completed";
@@ -58,14 +58,14 @@ public class ListManager implements Serializable {
         retCatList = categoryList.toArray(retCatList);
         return retCatList;
     }
-    public ArrayList getItemList(String myCat) {
+    public ArrayList<ListItem> getItemList(String myCat) {
         ItemList myItemList = itemListMap.get(myCat);
         ArrayList<ListItem> myItemArrayList = myItemList.getListItems();
         return myItemArrayList;
     }
     public String[] getItemListArray(String myCat) {
         ItemList myItemList = itemListMap.get(myCat);
-        ArrayList<String> myItemArrayList = myItemList.getListItems();
+        ArrayList<ListItem> myItemArrayList = myItemList.getListItems();
         String[] myItemArray = new String[myItemArrayList.size()];
         myItemArray = myItemArrayList.toArray(myItemArray);
         return myItemArray;

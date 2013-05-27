@@ -19,7 +19,7 @@ public class ItemList implements Serializable {
         listName = ln;
     }
     
-    public ArrayList getListItems() {
+    public ArrayList<ListItem> getListItems() {
         return myItemList;
     }
     
