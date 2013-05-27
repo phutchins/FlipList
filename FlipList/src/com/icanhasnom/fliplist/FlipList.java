@@ -54,6 +54,7 @@ public class FlipList extends Activity {
         if(savedInstanceState != null) {
         	restoreState(savedInstanceState);
         } else {
+        	// Load saved data from somewhere, maybe SqlLite
         	myListMan = new ListManager();
         }
         
@@ -62,25 +63,13 @@ public class FlipList extends Activity {
     	
     	selectedCategory = String.valueOf(catSpinner.getSelectedItem());
     	ArrayList<ListItem> currentItemList = myListMan.getItemList("Default");
-    	Log.v(TAG, "onCreate: A");
     	
     	itemListDataAdapter = new MyCustomAdapter(this, R.layout.activity_main, currentItemList);
-    	Log.v(TAG, "onCreate: B");
     	catList = myListMan.getCategoryList();
-    	Log.v(TAG, "onCreate: C");
         spinnerDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, catList);
-        Log.v(TAG, "onCreate: D");
 
-        // Set this spinner up elsewhere so its not recreated every time we switch orientation
-        // Commenting this out as i've moved it to the top. Maybe just declare up top and keep this here without type?
-        //Spinner spinner = (Spinner) findViewById(R.id.catSpinner);
-        
-        
         addItemsOnSpinner();
-        Log.v(TAG, "onCreate: E");
         addItemsOnList();
-        Log.v(TAG, "onCreate: F");
-        // Save instance state here?
     }
     
     public void restoreState(Bundle savedInstanceState) {
