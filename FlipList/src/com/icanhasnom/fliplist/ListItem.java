@@ -13,26 +13,65 @@ import java.text.*;
 import java.io.*;
 
 public class ListItem implements Serializable {
-    public String description;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public int itemID;
+	public String description;
     public Date dueDate;
-    public String category;
+    public ArrayList<String> categories;
+    public String[] category;
     public Date createDate;
     public boolean isSelected;
     
-    public ListItem(String cat, String desc, Date due) {
+    java.text.DateFormat df = new SimpleDateFormat("MM/dd/yyy");
+    
+    public ListItem() {
+    }
+    public ListItem(String cat, String desc, int crDate, int due) throws ParseException {
         description = desc;
-        dueDate = due;
-        category = cat;
+        String dueDateString = "" + due;
+        dueDate = df.parse(dueDateString);
+        categories.add(cat);
         createDate = new Date();
-        isSelected = false;
+    }
+    public ListItem(String cat, String desc, Date due) {
+    	categories.add(cat);
+    	description = desc;
+    	dueDate = due;
+    	createDate = new Date();
+    }
+    public ListItem(int id, String cat, String desc, int crDate, int due) throws ParseException {
+    	itemID = id;
+        description = desc;
+        String dueDateString = "" + due;
+        dueDate = df.parse(dueDateString);
+        categories.add(cat);
+        String crDateString = "" + crDate;
+        createDate = df.parse(crDateString);
     }
     public String getDueDate() {
         DateFormat dateFormatter = DateFormat.getDateInstance();
         String dateUS = dateFormatter.format(dueDate);
         return dateUS;
     }
-    public void setDueDate(Date dd) {
-        dueDate = dd;
+    public void setDueDate(int dd) throws ParseException {
+    	String dueDateString = "" + dd;
+        dueDate = df.parse(dueDateString);
+    }
+    public void setCreateDate(int cd) throws ParseException {
+    	String createDateString = "" + cd;
+    	createDate = df.parse(createDateString);
+    }
+    public void setDescription(String d) {
+        description = d;
+    }
+    public void setID(int id) {
+    	itemID = id;
+    }
+    public int getID() {
+    	return itemID;
     }
     public boolean isSelected() {
     	return isSelected;
@@ -40,16 +79,18 @@ public class ListItem implements Serializable {
     public Date getCreateDate() {
         return createDate;
     }
-    public String getCategory() {
-        return category;
+    public ArrayList<String> getCategories() {
+        return categories;
     }
-    public void setCategory(String cat) {
-        category = cat;
+    // Maybe make this so it can accept more than one category at a time if comma separated
+    // ToDo: string to array to parse comma separated categories from DB
+    public void addCategory(String cat) {
+        categories.add(cat);
+    }
+    public void rmCategory(String cat) {
+    	categories.remove(cat);
     }
     public String getDescription() {
         return description;
-    }
-    public void setDescription(String d) {
-        description = d;
     }
 }

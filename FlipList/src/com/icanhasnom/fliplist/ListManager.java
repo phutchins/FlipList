@@ -4,15 +4,21 @@
  */
 package com.icanhasnom.fliplist;
 
+import java.text.ParseException;
 import java.util.*;
 import java.io.*;
+
+import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  *
  * @author flip
  */
-public class ListManager implements Serializable {
+public class ListManager implements Parcelable, Serializable {
     ArrayList<String> categoryList = new ArrayList<String>();
+    ArrayList<ListCategory> categoryObjList = new ArrayList<ListCategory>();
     ArrayList<ListItem> itemList = new ArrayList<ListItem>();
     Map<String,ItemList> itemListMap = new HashMap<String,ItemList>();
     String defaultCategory = "Default";
@@ -20,22 +26,39 @@ public class ListManager implements Serializable {
     String currentCategory;
     ItemList defaultList = new ItemList(defaultCategory);
     ItemList completedList = new ItemList(completedCategory);
+    DatabaseHandler db;
     
-    public ListManager() {
+    public ListManager(Context context) {
         itemListMap.put(defaultCategory, defaultList);
         categoryList.add(defaultCategory);
         itemListMap.put(completedCategory, completedList);
         categoryList.add(completedCategory);
         currentCategory = defaultCategory;
+        db = new DatabaseHandler(context);
+        
     }
-    public void addCategory(String newCat) {
+    public ListCategory addCategory(String newCat) {
+    	// Old
         itemListMap.put(newCat, new ItemList(newCat));
         categoryList.add(newCat);
+        ListCategory myCategory = new ListCategory(newCat, "default description", "default type");
+        return myCategory;
     }
-    public void addItem(String curCategory, String description, Date dueDate) {
+    public void addObjCategory(ListCategory newCatObj) {
+    	// New
+    	String catName = newCatObj.getName();
+    	categoryObjList.add(newCatObj);
+    	itemListMap.put(catName, new ItemList(catName));
+    }
+    public ArrayList<ListCategory> getCategoryObjList() {
+    	return categoryObjList;
+    }
+    public ListItem addItem(String curCategory, String description, Date dueDate) {
         ItemList myList = itemListMap.get(curCategory);
         ListItem myItem = new ListItem(curCategory, description, dueDate);
+        
         myList.addListItem(myItem);
+        return myItem;
     }
     public void moveItem(ListItem myItem, String fromList, String toList) {
         ItemList myFromList = itemListMap.get(fromList);
@@ -54,13 +77,19 @@ public class ListManager implements Serializable {
         }
     }
     public String[] getCategoryList() {
-        String[] retCatList = new String[categoryList.size()];
-        retCatList = categoryList.toArray(retCatList);
+        //String[] retCatList = new String[categoryList.size()];
+        //retCatList = categoryList.toArray(retCatList);
+    	int catCount = db.getCategoriesCount();
+    	String[] retCatList = new String[catCount];
+    	List<ListCategory> retCatListObjs = db.getAllCategories();
+    	retCatListObjs.toArray(retCatList);
         return retCatList;
     }
-    public ArrayList<ListItem> getItemList(String myCat) {
-        ItemList myItemList = itemListMap.get(myCat);
-        ArrayList<ListItem> myItemArrayList = myItemList.getListItems();
+    public ArrayList<ListItem> getItemList(String myCat) throws NumberFormatException, ParseException {
+        //ItemList myItemList = itemListMap.get(myCat);
+        //ArrayList<ListItem> myItemArrayList = myItemList.getListItems();
+    	int catID = db.getCategoryID(myCat);
+    	ArrayList<ListItem> myItemArrayList = (ArrayList<ListItem>) db.getAllItemsFromCategory(catID);
         return myItemArrayList;
     }
     public String[] getItemListArray(String myCat) {
@@ -76,4 +105,12 @@ public class ListManager implements Serializable {
     public void setCurrentCategory(String curCat) {
     	currentCategory = curCat;
     }
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	public void writeToParcel(Parcel arg0, int arg1) {
+		// TODO Auto-generated method stub
+		
+	}
 }

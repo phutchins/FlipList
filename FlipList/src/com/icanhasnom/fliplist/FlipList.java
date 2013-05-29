@@ -1,15 +1,18 @@
 package com.icanhasnom.fliplist;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -23,6 +26,17 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
+
+// ToDo
+// Make list items clickable to display more info and have edit button
+// Make settings menu -
+//    Default category setting
+//    Choose what values are displayed for list item on main screen
+//    Default list type (grocery, todo, etc...)
+// Format list item list display to show tiny date below description to leave more room for actual description
+// Ability to make custom filters (maybe create as a category
+// Ability to assign multiple categories to tasks
+
 
 public class FlipList extends Activity {
 	public final static String EXTRA_MESSAGE = "com.icanhasnom.FlipList.MESSAGE";
@@ -41,28 +55,35 @@ public class FlipList extends Activity {
     Spinner catSpinner;
     
     EditText editText;
-    
-    //Spinner catSpinner;
-    //ArrayAdapter<String> spinnerDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, catList);
-    //MyCustomAdapter listDataAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, catList);
+    DatabaseHandler db;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        db = new DatabaseHandler(this);
+        
         if(savedInstanceState != null) {
         	restoreState(savedInstanceState);
         } else {
         	// Load saved data from somewhere, maybe SqlLite
-        	myListMan = new ListManager();
+        	myListMan = new ListManager(this);
         }
         
     	catSpinner = (Spinner) findViewById(R.id.catSpinner);
     	catSpinner.setOnItemSelectedListener(new SpinnerActivity());
-    	
     	selectedCategory = String.valueOf(catSpinner.getSelectedItem());
-    	ArrayList<ListItem> currentItemList = myListMan.getItemList("Default");
+    	
+		try {
+			currentItemList = myListMan.getItemList("Default");
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	
     	itemListDataAdapter = new MyCustomAdapter(this, R.layout.activity_main, currentItemList);
     	catList = myListMan.getCategoryList();
@@ -81,18 +102,31 @@ public class FlipList extends Activity {
     	savedInstanceState.putSerializable("ListManager", myListMan);
     	super.onSaveInstanceState(savedInstanceState);
     }
-    
-    //@Override
-    //public void onRestoreInstanceState(Bundle savedInstanceState) {
-    //	super.onRestoreInstanceState(savedInstanceState);
-    //	this.myListMan = (ListManager) savedInstanceState.getSerializable("ListManager");
-    //	
-    //}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
+    }
+    
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch (item.getItemId()) {
+    	case R.id.menu_add_edit_cat:
+    		Intent addEditCatIntent = new Intent(this, AddEditCatActivity.class);
+    		String[] catList = myListMan.getCategoryList();
+    		ArrayList<ListCategory> catObjList = myListMan.getCategoryObjList();
+    		// Probably serialize the myListMan object instead? or just fetch categories from the db?
+    		addEditCatIntent.putExtra("catObjList", catObjList);
+    		this.startActivity(addEditCatIntent);
+    		break;
+    	case R.id.menu_settings:
+    		//open settings menu
+    		return true;
+    	default:
+    		return super.onOptionsItemSelected(item);
+    	}
+    	return true;
+    	
     }
     
     public class SpinnerActivity extends Activity implements OnItemSelectedListener {
@@ -128,7 +162,8 @@ public class FlipList extends Activity {
        
        Log.v(TAG, "mySaveButtonAction: (below selectedCategory assignment)");
        
-       myListMan.addItem(selectedCategory, description, dueDate);
+       ListItem myItem = myListMan.addItem(selectedCategory, description, dueDate);
+       db.addItem(myItem);
        addItemsOnList();
        editText.setText("");
     }
@@ -140,18 +175,19 @@ public class FlipList extends Activity {
         catSpinner.setAdapter(spinnerDataAdapter);
     }
     
-    public void addItemsOnList() {
-    	//Spinner catSpinner = (Spinner) findViewById(R.id.catSpinner);
+    public void addItemsOnList()  {
+
     	selectedCategory = String.valueOf(catSpinner.getSelectedItem());
-    	currentItemList = myListMan.getItemList(selectedCategory);
+    	try {
+			currentItemList = myListMan.getItemList(selectedCategory);
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	itemListDataAdapter = new MyCustomAdapter(this, android.R.layout.simple_spinner_item, currentItemList);
-    	//ArrayList<ItemList> currentItemList = myListMan.getItemList(selectedCategory);
-    	
-    	
-        //Iterator<ListItem> listItem = currentItemList.iterator();
-        //Object[] listItemObjects = currentItemList.toArray();
-        //String[] listItemArray = Arrays.copyOf(listItemObjects,  listItemObjects.length, String[].class);
-    	
     	
     	ListView listView = (ListView) findViewById(R.id.itemList);
     	listView.setAdapter(itemListDataAdapter);

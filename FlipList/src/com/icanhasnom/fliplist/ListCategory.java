@@ -11,10 +11,48 @@ import java.io.*;
  * @author flip
  */
 public class ListCategory implements Serializable {
-    String myCat = new String();
-    
-    
-    public ListCategory(String cat) {
-        myCat = cat;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	int catID;
+	String name;
+    String description;
+    String type;
+    public ListCategory() {
+    }
+    public ListCategory(int catID, String catName, String catDesc, String catType) {
+        name = catName;
+        description = catDesc;
+        type = catType;
+    }
+    public ListCategory(String catName, String catDesc, String catType) {
+    	name = catName;
+    	description = catDesc;
+    	type = catType;
+    }
+    public void setID(int id) {
+    	catID = id;
+    }
+    public int getID() {
+    	return catID;
+    }
+    public void setName(String catName) {
+    	name = catName;
+    }
+    public void setDescription(String catDesc) {
+    	description = catDesc;
+    }
+    public void setType(String catType) {
+    	type = catType;
+    }
+    public String getName() {
+    	return name;
+    }
+    public String getDescription() {
+    	return description;
+    }
+    public String getType() {
+    	return type;
     }
 }
