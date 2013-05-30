@@ -76,14 +76,19 @@ public class ListManager implements Parcelable, Serializable {
             myToList.addListItem(myItem);
         }
     }
-    public String[] getCategoryList() {
-        //String[] retCatList = new String[categoryList.size()];
-        //retCatList = categoryList.toArray(retCatList);
-    	int catCount = db.getCategoriesCount();
-    	String[] retCatList = new String[catCount];
-    	List<ListCategory> retCatListObjs = db.getAllCategories();
-    	retCatListObjs.toArray(retCatList);
-        return retCatList;
+    public ArrayList<ListCategory> getCategoryList() {
+    	ArrayList<ListCategory> retCatListObjs = db.getAllCategories();
+        return retCatListObjs;
+    }
+    public String[] getCategoryListStrings() {
+    	ArrayList<ListCategory> retCatList = db.getAllCategories();
+    	String[] catListStrings = new String[retCatList.size()];
+    	int index = 0;
+    	for (ListCategory value : retCatList) {
+    		catListStrings[index] = (String) value.getName();
+    		index++;
+    	}
+    	return catListStrings;
     }
     public ArrayList<ListItem> getItemList(String myCat) throws NumberFormatException, ParseException {
         //ItemList myItemList = itemListMap.get(myCat);

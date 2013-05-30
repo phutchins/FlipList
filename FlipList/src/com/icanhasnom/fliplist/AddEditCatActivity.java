@@ -43,12 +43,14 @@ public class AddEditCatActivity extends Activity {
 		
 		//catList = getIntent().getExtras().getStringArray("catList");
 		
-		categoryList = new ArrayList<ListCategory>();
+		//categoryList = new ArrayList<ListCategory>();
 		
-		ListCategory listCat1 = new ListCategory("Desc", "Other", "todo");
-		ListCategory listCat2 = new ListCategory("Something", "another one", "Grocery List");
-		categoryList.add(listCat1);
-		categoryList.add(listCat2);
+		categoryList = db.getAllCategories();
+		
+		//ListCategory listCat1 = new ListCategory("Desc", "Other", "todo");
+		//ListCategory listCat2 = new ListCategory("Something", "another one", "Grocery List");
+		//categoryList.add(listCat1);
+		//categoryList.add(listCat2);
 		
 		addItemsOnEditList();
 		

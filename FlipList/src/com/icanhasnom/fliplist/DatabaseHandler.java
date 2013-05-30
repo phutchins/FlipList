@@ -15,7 +15,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "listManager";
@@ -54,8 +54,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_ITEM_DUE_DATE + " NUMERIC," + KEY_ITEM_CREATE_DATE 
 				+ " NUMERIC" + ")";
 		
+		String CREATE_DEFAULT_CATEGORY = "insert into " + TABLE_CATEGORIES + "(" + KEY_CAT_ID + "," + KEY_CAT_NAME + ","
+                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + ") values(1, 'Default', 'Default Category','default')";
 		db.execSQL(CREATE_CATEGORIES_TABLE);
 		db.execSQL(CREATE_ITEMS_TABLE);
+		db.execSQL(CREATE_DEFAULT_CATEGORY);
 	}
 		
 	// Upgrading database
@@ -119,8 +122,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		// return item
 		return item;
 	}
-	public List<ListCategory> getAllCategories() {
-		List<ListCategory> categoryList = new ArrayList<ListCategory>();
+	public ArrayList<ListCategory> getAllCategories() {
+		ArrayList<ListCategory> categoryList = new ArrayList<ListCategory>();
 		// Select All Query
 		String selectQuery = "SELECT * FROM " + TABLE_CATEGORIES;
 		
@@ -144,8 +147,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		// return contact list
 		return categoryList;
 	}
-	public List<ListItem> getAllItems() throws NumberFormatException, ParseException {
-		List<ListItem> itemList = new ArrayList<ListItem>();
+	public ArrayList<ListItem> getAllItems() throws NumberFormatException, ParseException {
+		ArrayList<ListItem> itemList = new ArrayList<ListItem>();
 		// Select All Query
 		String selectQuery = "SELECT * FROM " + TABLE_ITEMS;
 		
@@ -170,8 +173,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		// return contact list
 		return itemList;
 	}
-	public List<ListItem> getAllItemsFromCategory(int catID) throws NumberFormatException, ParseException {
-		List<ListItem> itemList = new ArrayList<ListItem>();
+	public ArrayList<ListItem> getAllItemsFromCategory(int catID) throws NumberFormatException, ParseException {
+		ArrayList<ListItem> itemList = new ArrayList<ListItem>();
 		// Select All Query
 		String selectQuery = "SELECT * FROM " + TABLE_ITEMS + " WHERE " + KEY_ITEM_CATS + " = " + catID;
 		
@@ -214,14 +217,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	
 	public int getCategoryID(String catName) {
 		// Fix this DB query to pull cat id using the name
-		String catIdQuery = "SELECT * FROM " + TABLE_CATEGORIES + " WHERE " + KEY_CAT_NAME + " = ?";
+		String catIdQuery = "SELECT * FROM " + TABLE_CATEGORIES + " WHERE " + KEY_CAT_NAME + " = 'Default'";
 		SQLiteDatabase db = this.getReadableDatabase();
-		Cursor cursor = db.rawQuery(catIdQuery, new String[] { catName });
-		String catID = "0";
+		Cursor cursor = db.rawQuery(catIdQuery, null);
+		int catID = 0;
 		if (cursor != null)
 			cursor.moveToFirst();
 		try {
-			catID = cursor.getString(0);
+			catID = Integer.parseInt(cursor.getString(0));
 		} catch (CursorIndexOutOfBoundsException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -229,7 +232,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 		
 		// return count
-		return Integer.parseInt(catID);
+		return catID;
 	}
 	public int getItemsCount() {
 		String countQuery = "SELECT * FROM " + TABLE_ITEMS;

@@ -86,7 +86,7 @@ public class FlipList extends Activity {
 		}
     	
     	itemListDataAdapter = new MyCustomAdapter(this, R.layout.activity_main, currentItemList);
-    	catList = myListMan.getCategoryList();
+    	catList = myListMan.getCategoryListStrings();
         spinnerDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, catList);
 
         addItemsOnSpinner();
@@ -113,7 +113,7 @@ public class FlipList extends Activity {
     	switch (item.getItemId()) {
     	case R.id.menu_add_edit_cat:
     		Intent addEditCatIntent = new Intent(this, AddEditCatActivity.class);
-    		String[] catList = myListMan.getCategoryList();
+    		String[] catList = myListMan.getCategoryListStrings();
     		ArrayList<ListCategory> catObjList = myListMan.getCategoryObjList();
     		// Probably serialize the myListMan object instead? or just fetch categories from the db?
     		addEditCatIntent.putExtra("catObjList", catObjList);
@@ -169,7 +169,7 @@ public class FlipList extends Activity {
     }
     
     public void addItemsOnSpinner() {
-        catList = myListMan.getCategoryList();
+        catList = myListMan.getCategoryListStrings();
         spinnerDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, catList);
         spinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         catSpinner.setAdapter(spinnerDataAdapter);
