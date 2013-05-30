@@ -9,11 +9,13 @@ import java.util.List;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "listManager";
@@ -212,14 +214,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	
 	public int getCategoryID(String catName) {
 		// Fix this DB query to pull cat id using the name
-		String catIdQuery = "SELECT " + KEY_CAT_ID + " as _id FROM " + TABLE_CATEGORIES + KEY_CAT_NAME + " =?";
+		String catIdQuery = "SELECT * FROM " + TABLE_CATEGORIES + " WHERE " + KEY_CAT_NAME + " = ?";
 		SQLiteDatabase db = this.getReadableDatabase();
-		Cursor cursor = db.rawQuery(catIdQuery, null);
-		int catID = cursor.getInt(0);
+		Cursor cursor = db.rawQuery(catIdQuery, new String[] { catName });
+		String catID = "0";
+		if (cursor != null)
+			cursor.moveToFirst();
+		try {
+			catID = cursor.getString(0);
+		} catch (CursorIndexOutOfBoundsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		cursor.close();
 		
 		// return count
-		return catID;
+		return Integer.parseInt(catID);
 	}
 	public int getItemsCount() {
 		String countQuery = "SELECT * FROM " + TABLE_ITEMS;

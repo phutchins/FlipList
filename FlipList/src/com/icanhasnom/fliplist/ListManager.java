@@ -88,6 +88,7 @@ public class ListManager implements Parcelable, Serializable {
     public ArrayList<ListItem> getItemList(String myCat) throws NumberFormatException, ParseException {
         //ItemList myItemList = itemListMap.get(myCat);
         //ArrayList<ListItem> myItemArrayList = myItemList.getListItems();
+    	// ** FIgure out why this is breaking below, should i really be using the id to get the cat? **
     	int catID = db.getCategoryID(myCat);
     	ArrayList<ListItem> myItemArrayList = (ArrayList<ListItem>) db.getAllItemsFromCategory(catID);
         return myItemArrayList;
