@@ -37,12 +37,15 @@ public class ListManager implements Parcelable, Serializable {
         db = new DatabaseHandler(context);
         
     }
-    public ListCategory addCategory(String newCat) {
+    public ListCategory addCategory(String catName, String catDescription, int catTypeID) {
     	// Old
-        itemListMap.put(newCat, new ItemList(newCat));
-        categoryList.add(newCat);
-        ListCategory myCategory = new ListCategory(newCat, "default description", "default type");
-        return myCategory;
+        //itemListMap.put(newCat, new ItemList(newCat));
+        //categoryList.add(newCat);
+        //ListCategory myCategory = new ListCategory(newCat, "default description", "default type");
+    	ListCategory myNewListCategory = new ListCategory(catName, catDescription, catTypeID);
+    	db.addCategory(myNewListCategory);
+    	
+        return myNewListCategory;
     }
     public void addObjCategory(ListCategory newCatObj) {
     	// New
@@ -53,9 +56,9 @@ public class ListManager implements Parcelable, Serializable {
     public ArrayList<ListCategory> getCategoryObjList() {
     	return categoryObjList;
     }
-    public ListItem addItem(String curCategory, String description, Date dueDate) {
+    public ListItem addItem(String curCategory, String name, String description, Date dueDate) {
         ItemList myList = itemListMap.get(curCategory);
-        ListItem myItem = new ListItem(curCategory, description, dueDate);
+        ListItem myItem = new ListItem(curCategory, name, description, dueDate);
         
         myList.addListItem(myItem);
         return myItem;

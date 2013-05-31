@@ -139,30 +139,19 @@ public class FlipList extends Activity {
     	}
     }
     
-    public void mySaveCatButtonAction(View view) {
-    	//Need to find out when an Intent is needed
-    	//This uses SaveCatActivity class that is not currently used
-    	//Intent intent = new Intent(this, SaveCatActivity.class);
-    	EditText editText = (EditText) findViewById(R.id.editText);
-    	String message = editText.getText().toString();
-    	//intent.putExtra(EXTRA_MESSAGE, message);
-        myListMan.addCategory(message);
-        addItemsOnSpinner();
-        addItemsOnList();
-        editText.setText("");
-    }
-    
     public void mySaveButtonAction(View view) {
        Date dueDate = new Date();
        editText = (EditText) findViewById(R.id.editText);
-       String description = editText.getText().toString();
+       String name = editText.getText().toString();
+       //String description = editText.getText().toString();
+       String description = "";
        
        catSpinner = (Spinner) findViewById(R.id.catSpinner);
        selectedCategory = String.valueOf(catSpinner.getSelectedItem());
        
        Log.v(TAG, "mySaveButtonAction: (below selectedCategory assignment)");
        
-       ListItem myItem = myListMan.addItem(selectedCategory, description, dueDate);
+       ListItem myItem = myListMan.addItem(selectedCategory, name, description, dueDate);
        db.addItem(myItem);
        addItemsOnList();
        editText.setText("");

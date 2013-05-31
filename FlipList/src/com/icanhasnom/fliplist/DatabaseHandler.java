@@ -15,10 +15,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 6;
 	
 	// Database Name
-	private static final String DATABASE_NAME = "listManager";
+	private static final String DATABASE_NAME = "fliplist";
 	
 	// Categories Table
 	private static final String TABLE_CATEGORIES = "categories";
@@ -30,13 +30,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	
 	// Items Table
 	private static final String TABLE_ITEMS = "items";
-	// Items Table Columns Names
+	// Items Table Column Names
 	private static final String KEY_ITEM_ID = "id";
 	private static final String KEY_ITEM_NAME = "name";
 	private static final String KEY_ITEM_DESC = "desc";
 	private static final String KEY_ITEM_CATS = "cats";
 	private static final String KEY_ITEM_DUE_DATE = "due_date";
 	private static final String KEY_ITEM_CREATE_DATE = "create_date";
+	
+	
+	// Types Table
+	private static final String TABLE_CATEGORY_TYPES = "types";
+	// Types Table Column Names
+	private static final String KEY_TYPE_ID = "id";
+	private static final String KEY_TYPE_NAME = "name";
+	private static final String KEY_TYPE_DESC = "desc";
+	
 	
 	public DatabaseHandler(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -49,16 +58,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_CAT_ID + " INTEGER PRIMARY KEY," + KEY_CAT_NAME + " TEXT," 
 				+ KEY_CAT_DESC + " TEXT," + KEY_CAT_TYPE + " TEXT" + ")";
 		String CREATE_ITEMS_TABLE = "CREATE TABLE " + TABLE_ITEMS + "("
-				+ KEY_ITEM_ID + " INTEGER PRIMARY KEY,"
+				+ KEY_ITEM_ID + " INTEGER PRIMARY KEY," + KEY_ITEM_NAME + " TEXT,"
 				+ KEY_ITEM_DESC + " TEXT," + KEY_ITEM_CATS + " TEXT,"
 				+ KEY_ITEM_DUE_DATE + " NUMERIC," + KEY_ITEM_CREATE_DATE 
 				+ " NUMERIC" + ")";
+		String CREATE_TYPES_TABLE = "CREATE TABLE " + TABLE_CATEGORY_TYPES + "("
+				+ KEY_TYPE_ID + " INTEGER PRIMARY KEY," + KEY_TYPE_NAME + " TEXT,"
+				+ KEY_TYPE_DESC + " TEXT" + ")";
 		
 		String CREATE_DEFAULT_CATEGORY = "insert into " + TABLE_CATEGORIES + "(" + KEY_CAT_ID + "," + KEY_CAT_NAME + ","
-                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + ") values(1, 'Default', 'Default Category','default')";
+                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + ") values(1, 'Default', 'Default Category','1')";
+		
+		String CREATE_TYPE_GENERIC = "insert into " + TABLE_CATEGORY_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
+				+ KEY_TYPE_DESC + ") values(0, 'Generic', 'Generic items')";
+		String CREATE_TYPE_GROCERY = "insert into " + TABLE_CATEGORY_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
+				+ KEY_TYPE_DESC + ") values(1, 'Grocery List', 'List used for grocery items')";
+		String CREATE_TYPE_TODO = "insert into " + TABLE_CATEGORY_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
+				+ KEY_TYPE_DESC + ") values(2, 'ToDo', 'Tasks that you need to complete')";
+		
 		db.execSQL(CREATE_CATEGORIES_TABLE);
 		db.execSQL(CREATE_ITEMS_TABLE);
+		db.execSQL(CREATE_TYPES_TABLE);
 		db.execSQL(CREATE_DEFAULT_CATEGORY);
+		db.execSQL(CREATE_TYPE_GENERIC);
+		db.execSQL(CREATE_TYPE_GROCERY);
+		db.execSQL(CREATE_TYPE_TODO);
 	}
 		
 	// Upgrading database
@@ -67,6 +91,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		// Drop older table if existed
 		db.execSQL("DROP TABLE  IF EXISTS " + TABLE_CATEGORIES);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEMS);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY_TYPES);
 			
 		onCreate(db);
 	}
@@ -86,6 +111,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		
 		ContentValues values = new ContentValues();
 		values.put(KEY_ITEM_DESC, item.getDescription());
+		values.put(KEY_ITEM_NAME, item.getName());
 		values.put(KEY_ITEM_CATS, item.getCategories().toString());
 		values.put(KEY_ITEM_CREATE_DATE, item.getCreateDate().toString());
 		values.put(KEY_ITEM_DUE_DATE, item.getDueDate());
@@ -103,22 +129,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			cursor.moveToFirst();
 		
 		ListCategory category = new ListCategory(Integer.parseInt(cursor.getString(0)),
-				cursor.getString(1), cursor.getString(2), cursor.getString(3));
+				cursor.getString(1), cursor.getString(2), Integer.parseInt(cursor.getString(3)));
 		// return category
 		return category;
 	}
 	public ListItem getItem(int id) throws NumberFormatException, ParseException {
 		SQLiteDatabase db = this.getReadableDatabase();
 		
-		Cursor cursor = db.query(TABLE_ITEMS, new String[] { KEY_ITEM_ID,
+		Cursor cursor = db.query(TABLE_ITEMS, new String[] { KEY_ITEM_ID, KEY_ITEM_NAME,
 				KEY_ITEM_DESC, KEY_ITEM_CATS, KEY_ITEM_CREATE_DATE, KEY_ITEM_DUE_DATE }, KEY_ITEM_ID
 				+ "?", new String[] { String.valueOf(id) }, null, null, null, null);
 		if (cursor != null)
 			cursor.moveToFirst();
 		
 		ListItem item = new ListItem(Integer.parseInt(cursor.getString(0)),
-				cursor.getString(1), cursor.getString(2), Integer.parseInt(cursor.getString(3)),
-				Integer.parseInt(cursor.getString(4)));
+				cursor.getString(1), cursor.getString(2), cursor.getString(3), Integer.parseInt(cursor.getString(4)),
+				Integer.parseInt(cursor.getString(5)));
 		// return item
 		return item;
 	}
@@ -137,7 +163,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				category.setID(Integer.parseInt(cursor.getString(0)));
 				category.setName(cursor.getString(1));
 				category.setDescription(cursor.getString(2));
-				category.setType(cursor.getString(3));
+				category.setType(Integer.parseInt(cursor.getString(3)));
 				// Adding category to list
 				categoryList.add(category);
 			} while (cursor.moveToNext());
@@ -146,6 +172,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		
 		// return contact list
 		return categoryList;
+	}
+	public ArrayList<CategoryType> getAllTypes() {
+		ArrayList<CategoryType> typeList = new ArrayList<CategoryType>();
+		// Select All Query
+		String selectQuery = "SELECT * FROM " + TABLE_CATEGORY_TYPES;
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				CategoryType type = new CategoryType();
+				type.setID(Integer.parseInt(cursor.getString(0)));
+				type.setName(cursor.getString(1));
+				type.setDescription(cursor.getString(2));
+
+				// Adding type to list
+				typeList.add(type);
+			} while (cursor.moveToNext());
+		}
+		db.close();
+		
+		// return contact list
+		return typeList;
 	}
 	public ArrayList<ListItem> getAllItems() throws NumberFormatException, ParseException {
 		ArrayList<ListItem> itemList = new ArrayList<ListItem>();
@@ -160,10 +211,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			do {
 				ListItem item = new ListItem();
 				item.setID(Integer.parseInt(cursor.getString(0)));
-				item.setDescription(cursor.getString(1));
-				item.addCategory(cursor.getString(2));
-				item.setCreateDate(Integer.parseInt(cursor.getString(3)));
-				item.setDueDate(Integer.parseInt(cursor.getString(4)));
+				item.setName(cursor.getString(1));
+				item.setDescription(cursor.getString(2));
+				item.addCategory(cursor.getString(3));
+				item.setCreateDate(Integer.parseInt(cursor.getString(4)));
+				item.setDueDate(Integer.parseInt(cursor.getString(5)));
 				// Adding category to list
 				itemList.add(item);
 			} while (cursor.moveToNext());
@@ -186,10 +238,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			do {
 				ListItem item = new ListItem();
 				item.setID(Integer.parseInt(cursor.getString(0)));
-				item.setDescription(cursor.getString(1));
-				item.addCategory(cursor.getString(2));
-				item.setCreateDate(Integer.parseInt(cursor.getString(3)));
-				item.setDueDate(Integer.parseInt(cursor.getString(4)));
+				item.setName(cursor.getString(1));
+				item.setDescription(cursor.getString(2));
+				item.addCategory(cursor.getString(3));
+				item.setCreateDate(Integer.parseInt(cursor.getString(4)));
+				item.setDueDate(Integer.parseInt(cursor.getString(5)));
 				// Adding category to list
 				itemList.add(item);
 			} while (cursor.moveToNext());
@@ -247,6 +300,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
+		values.put(KEY_ITEM_NAME, item.getName());
 		values.put(KEY_ITEM_DESC, item.getDescription());
 		values.put(KEY_ITEM_CATS, item.getCategories().toString());
 		values.put(KEY_ITEM_DUE_DATE, item.getDueDate());

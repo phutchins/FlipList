@@ -18,15 +18,15 @@ public class ListCategory implements Serializable {
 	int catID;
 	String name;
     String description;
-    String type;
+    int type;
     public ListCategory() {
     }
-    public ListCategory(int catID, String catName, String catDesc, String catType) {
+    public ListCategory(int catID, String catName, String catDesc, int catType) {
         name = catName;
         description = catDesc;
         type = catType;
     }
-    public ListCategory(String catName, String catDesc, String catType) {
+    public ListCategory(String catName, String catDesc, int catType) {
     	name = catName;
     	description = catDesc;
     	type = catType;
@@ -43,7 +43,7 @@ public class ListCategory implements Serializable {
     public void setDescription(String catDesc) {
     	description = catDesc;
     }
-    public void setType(String catType) {
+    public void setType(int catType) {
     	type = catType;
     }
     public String getName() {
@@ -52,7 +52,7 @@ public class ListCategory implements Serializable {
     public String getDescription() {
     	return description;
     }
-    public String getType() {
+    public int getType() {
     	return type;
     }
 }

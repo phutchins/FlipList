@@ -18,6 +18,7 @@ public class ListItem implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	public int itemID;
+	public String name;
 	public String description;
     public Date dueDate;
     public ArrayList<String> categories;
@@ -29,21 +30,24 @@ public class ListItem implements Serializable {
     
     public ListItem() {
     }
-    public ListItem(String cat, String desc, int crDate, int due) throws ParseException {
-        description = desc;
+    public ListItem(String cat, String n, String desc, int crDate, int due) throws ParseException {
+    	name = n;
+    	description = desc;
         String dueDateString = "" + due;
         dueDate = df.parse(dueDateString);
         categories.add(cat);
         createDate = new Date();
     }
-    public ListItem(String cat, String desc, Date due) {
+    public ListItem(String cat, String n, String desc, Date due) {
+    	name = n;
     	categories.add(cat);
     	description = desc;
     	dueDate = due;
     	createDate = new Date();
     }
-    public ListItem(int id, String cat, String desc, int crDate, int due) throws ParseException {
+    public ListItem(int id, String cat, String n, String desc, int crDate, int due) throws ParseException {
     	itemID = id;
+    	name = n;
         description = desc;
         String dueDateString = "" + due;
         dueDate = df.parse(dueDateString);
@@ -66,6 +70,12 @@ public class ListItem implements Serializable {
     }
     public void setDescription(String d) {
         description = d;
+    }
+    public void setName(String n) {
+    	name = n;
+    }
+    public String getName() {
+    	return name;
     }
     public void setID(int id) {
     	itemID = id;
