@@ -15,7 +15,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
-	private static final int DATABASE_VERSION = 6;
+	private static final int DATABASE_VERSION = 8;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
@@ -37,6 +37,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_ITEM_CATS = "cats";
 	private static final String KEY_ITEM_DUE_DATE = "due_date";
 	private static final String KEY_ITEM_CREATE_DATE = "create_date";
+	
+	// Settings Table
+	private static final String TABLE_SETTINGS = "settings";
+	// Settings Table Column Names
+	private static final String KEY_SETTINGS_ID = "id";
+	private static final String KEY_SETTINGS_NAME = "name";
+	private static final String KEY_SETTINGS_VAL1 = "val1";
+	private static final String KEY_SETTINGS_VAL2 = "val2";
 	
 	
 	// Types Table
@@ -65,9 +73,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String CREATE_TYPES_TABLE = "CREATE TABLE " + TABLE_CATEGORY_TYPES + "("
 				+ KEY_TYPE_ID + " INTEGER PRIMARY KEY," + KEY_TYPE_NAME + " TEXT,"
 				+ KEY_TYPE_DESC + " TEXT" + ")";
+		String CREATE_SETTINGS_TABLE = "CREATE TABLE " + TABLE_SETTINGS + "("
+				+ KEY_SETTINGS_ID + " INTEGER PRIMARY KEY," + KEY_SETTINGS_NAME + " TEXT,"
+				+ KEY_SETTINGS_VAL1 + " TEXT," + KEY_SETTINGS_VAL2 + " TEXT" + ")";
 		
 		String CREATE_DEFAULT_CATEGORY = "insert into " + TABLE_CATEGORIES + "(" + KEY_CAT_ID + "," + KEY_CAT_NAME + ","
                 + KEY_CAT_DESC + "," + KEY_CAT_TYPE + ") values(1, 'Default', 'Default Category','1')";
+		String CREATE_COMPLETED_CATEGORY = "insert into " + TABLE_CATEGORIES + "(" + KEY_CAT_ID + "," + KEY_CAT_NAME + ","
+                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + ") values(2, 'Completed', 'Completed Category','1')";
 		
 		String CREATE_TYPE_GENERIC = "insert into " + TABLE_CATEGORY_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
 				+ KEY_TYPE_DESC + ") values(0, 'Generic', 'Generic items')";
@@ -75,14 +88,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_TYPE_DESC + ") values(1, 'Grocery List', 'List used for grocery items')";
 		String CREATE_TYPE_TODO = "insert into " + TABLE_CATEGORY_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
 				+ KEY_TYPE_DESC + ") values(2, 'ToDo', 'Tasks that you need to complete')";
+		String CREATE_SETTING_DEFCAT = "insert into " + TABLE_SETTINGS + "(" + KEY_SETTINGS_ID + "," + KEY_SETTINGS_NAME + ","
+				+ KEY_SETTINGS_VAL1 + "," + KEY_SETTINGS_VAL2 + ") values(0, 'defaultCategory', '1', 'unused')";
 		
 		db.execSQL(CREATE_CATEGORIES_TABLE);
 		db.execSQL(CREATE_ITEMS_TABLE);
 		db.execSQL(CREATE_TYPES_TABLE);
+		db.execSQL(CREATE_SETTINGS_TABLE);
 		db.execSQL(CREATE_DEFAULT_CATEGORY);
+		db.execSQL(CREATE_COMPLETED_CATEGORY);
 		db.execSQL(CREATE_TYPE_GENERIC);
 		db.execSQL(CREATE_TYPE_GROCERY);
 		db.execSQL(CREATE_TYPE_TODO);
+		db.execSQL(CREATE_SETTING_DEFCAT);
 	}
 		
 	// Upgrading database
@@ -92,8 +110,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL("DROP TABLE  IF EXISTS " + TABLE_CATEGORIES);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEMS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY_TYPES);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
 			
 		onCreate(db);
+	}
+	public int getDefaultCatID() {
+		SQLiteDatabase db = this.getReadableDatabase();
+		
+		Cursor cursor = db.query(TABLE_SETTINGS, new String[] { KEY_SETTINGS_NAME, 
+				KEY_SETTINGS_VAL1 }, KEY_SETTINGS_NAME + "=?",
+				new String[] { String.valueOf("defaultCategory") }, null, null, null, null);
+		if (cursor != null)
+			cursor.moveToFirst();
+		return Integer.parseInt(cursor.getString(1));
 	}
 	public void addCategory(ListCategory category) {
 		SQLiteDatabase db = this.getWritableDatabase();
@@ -125,6 +154,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
 				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE }, KEY_CAT_ID + "=?",
 				new String[] { String.valueOf(id) }, null, null, null, null);
+		if (cursor != null)
+			cursor.moveToFirst();
+		
+		ListCategory category = new ListCategory(Integer.parseInt(cursor.getString(0)),
+				cursor.getString(1), cursor.getString(2), Integer.parseInt(cursor.getString(3)));
+		// return category
+		return category;
+	}
+	public ListCategory getCategoryByName(String catName) {
+		SQLiteDatabase db = this.getReadableDatabase();
+		
+		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
+				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE }, KEY_CAT_NAME + "=?",
+				new String[] { catName }, null, null, null, null);
 		if (cursor != null)
 			cursor.moveToFirst();
 		

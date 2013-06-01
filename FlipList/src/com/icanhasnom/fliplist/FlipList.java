@@ -23,6 +23,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
@@ -44,15 +45,18 @@ public class FlipList extends Activity {
 	
     //ListManager myListMan = new ListManager();
 	ListManager myListMan;
+	int defaultCatID;
 	
     HashMap<String, ListItem> checkListItems = new HashMap<String, ListItem>();
     ArrayList<ListItem> currentItemList;
     String selectedCategory;
-    String[] catList;
+    ArrayList<ListCategory> catList;
     
     MyCustomAdapter itemListDataAdapter;
-    ArrayAdapter<String> spinnerDataAdapter;
+    // ArrayAdapter<String> spinnerDataAdapter;
+    MyCatSpinnerCustomAdapter catSpinnerDataAdapter;
     Spinner catSpinner;
+    ListCategory currentCategory;
     
     EditText editText;
     DatabaseHandler db;
@@ -61,6 +65,10 @@ public class FlipList extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        // Fix this, its returning null
+        //defaultCatID = db.getDefaultCatID();
+        defaultCatID = 1;
         
         db = new DatabaseHandler(this);
         
@@ -73,10 +81,10 @@ public class FlipList extends Activity {
         
     	catSpinner = (Spinner) findViewById(R.id.catSpinner);
     	catSpinner.setOnItemSelectedListener(new SpinnerActivity());
-    	selectedCategory = String.valueOf(catSpinner.getSelectedItem());
+    	//selectedCategory = String.valueOf(catSpinner.getSelectedItem());
     	
 		try {
-			currentItemList = myListMan.getItemList("Default");
+			currentItemList = myListMan.getItemList(defaultCatID);
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -85,9 +93,9 @@ public class FlipList extends Activity {
 			e.printStackTrace();
 		}
     	
-    	itemListDataAdapter = new MyCustomAdapter(this, R.layout.activity_main, currentItemList);
-    	catList = myListMan.getCategoryListStrings();
-        spinnerDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, catList);
+    	//itemListDataAdapter = new MyCustomAdapter(this, R.layout.activity_main, currentItemList);
+    	//catList = myListMan.getCategoryList();
+        //spinnerDataAdapter = (MyCatSpinnerCustomAdapter) new ArrayAdapter<ListCategory>(this, android.R.layout.simple_spinner_item, catList);
 
         addItemsOnSpinner();
         addItemsOnList();
@@ -114,7 +122,7 @@ public class FlipList extends Activity {
     	case R.id.menu_add_edit_cat:
     		Intent addEditCatIntent = new Intent(this, AddEditCatActivity.class);
     		String[] catList = myListMan.getCategoryListStrings();
-    		ArrayList<ListCategory> catObjList = myListMan.getCategoryObjList();
+    		ArrayList<ListCategory> catObjList = myListMan.getCategoryList();
     		// Probably serialize the myListMan object instead? or just fetch categories from the db?
     		addEditCatIntent.putExtra("catObjList", catObjList);
     		this.startActivity(addEditCatIntent);
@@ -131,7 +139,7 @@ public class FlipList extends Activity {
     
     public class SpinnerActivity extends Activity implements OnItemSelectedListener {
     	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-    		String itemSelected = (String) parent.getItemAtPosition(pos);
+    		// String itemSelected = (String) parent.getItemAtPosition(pos);
     		addItemsOnList();
     	}
     	public void onNothingSelected(AdapterView<?> parent) {
@@ -144,31 +152,42 @@ public class FlipList extends Activity {
        editText = (EditText) findViewById(R.id.editText);
        String name = editText.getText().toString();
        //String description = editText.getText().toString();
-       String description = "";
+       String description = "blank";
        
        catSpinner = (Spinner) findViewById(R.id.catSpinner);
-       selectedCategory = String.valueOf(catSpinner.getSelectedItem());
+       //selectedCategory = String.valueOf(catSpinner.getSelectedItem());
+       //ListCategory selectedCategoryObj = (ListCategory) catSpinner.getTag();
+       int position = catSpinner.getSelectedItemPosition();
+       ListCategory selectedCategory = (ListCategory) catSpinner.getItemAtPosition(position);
        
        Log.v(TAG, "mySaveButtonAction: (below selectedCategory assignment)");
+       Log.v(TAG, "Position: " + position);
+       Log.v(TAG, "selectedCategoryObj Name: " + selectedCategory.getName());
        
-       ListItem myItem = myListMan.addItem(selectedCategory, name, description, dueDate);
-       db.addItem(myItem);
+       int catID = selectedCategory.getID();
+       ListItem myItem = myListMan.addItem(catID, name, description, dueDate);
+       Log.v(TAG, "Added Item: " + myItem.getName());
+
        addItemsOnList();
        editText.setText("");
     }
     
     public void addItemsOnSpinner() {
-        catList = myListMan.getCategoryListStrings();
-        spinnerDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, catList);
-        spinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        catSpinner.setAdapter(spinnerDataAdapter);
+        catList = myListMan.getCategoryList();
+        catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, android.R.layout.simple_spinner_dropdown_item, catList);
+        catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        catSpinner.setAdapter(catSpinnerDataAdapter);
     }
     
     public void addItemsOnList()  {
 
     	selectedCategory = String.valueOf(catSpinner.getSelectedItem());
+    	int position = catSpinner.getSelectedItemPosition();
+    	// Set this globally using the global spinner listener so we only have to do it once
+    	ListCategory selectedCategory = (ListCategory) catSpinner.getItemAtPosition(position);
+    	int catID = selectedCategory.getID();
     	try {
-			currentItemList = myListMan.getItemList(selectedCategory);
+			currentItemList = myListMan.getItemList(catID);
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -176,7 +195,7 @@ public class FlipList extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	itemListDataAdapter = new MyCustomAdapter(this, android.R.layout.simple_spinner_item, currentItemList);
+    	itemListDataAdapter = new MyCustomAdapter(this, R.layout.list_layout, currentItemList);
     	
     	ListView listView = (ListView) findViewById(R.id.itemList);
     	listView.setAdapter(itemListDataAdapter);
@@ -192,6 +211,81 @@ public class FlipList extends Activity {
     		}
     	});
     }
+    
+    private class MyCatSpinnerCustomAdapter extends ArrayAdapter<ListCategory> {
+      	 
+    	private ArrayList<ListCategory> categoryList;
+    	//private Activity context;
+    	//private Context context;
+    	 
+    	public MyCatSpinnerCustomAdapter(Context context, int textViewResourceId, ArrayList<ListCategory> categoryList) {
+    		super(context, textViewResourceId, categoryList);
+    		//this.context = context;
+    		this.categoryList = new ArrayList<ListCategory>();
+    		this.categoryList.addAll(categoryList);
+    	}
+    	
+    	private class ViewHolder {
+    		TextView cat_list_text_view;
+    	}
+    	
+    	public View getDropDownView(int position, View convertView, ViewGroup parent) {
+    		return getCustomView(position, convertView, parent);
+    	}
+    	public View getView(int position, View convertView, ViewGroup parent) {
+    		return getCustomView(position, convertView, parent);
+    	}
+    	 
+    	public View getCustomView(int position, View convertView, ViewGroup parent) {
+
+    		ViewHolder holder = null;
+    		Log.v("ConvertView", String.valueOf(position));
+    	 
+    		if (convertView == null) {
+    			LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    			convertView = vi.inflate(R.layout.activity_main_cat_spinner, null);
+    	 
+    			holder = new ViewHolder();
+    			holder.cat_list_text_view = (TextView) convertView.findViewById(R.id.activity_main_spinner_layout);
+    			//holder.name = (CheckBox) convertView.findViewById(R.id.checkBox1);
+    			convertView.setTag(holder);
+    	 
+    			holder.cat_list_text_view.setOnClickListener( new View.OnClickListener() {  
+    				public void onClick(View v) {  
+    					//CheckBox cb = (CheckBox) v ;  
+    					//ListItem item = (ListItem) cb.getTag();
+    					//Spinner catSpinner = (Spinner) findViewById(R.id.catSpinner);
+    					//String catSelected = String.valueOf(catSpinner.getSelectedItem());
+    					//String itemDescription = item.getDescription();
+    					//Toast.makeText(getApplicationContext(), "Completed: " + itemDescription, Toast.LENGTH_LONG).show();
+    					//item.setSelected(cb.isChecked());
+    					// Use this onClick to send the user to the edit screen for the clicked category
+    					TextView tv = (TextView) v;
+    					ListCategory lc = (ListCategory) tv.getTag();
+    					currentCategory = lc;
+    					addItemsOnList();
+    				}  
+    			});  
+    		} else {
+    			holder = (ViewHolder) convertView.getTag();
+    		}
+    	 
+    		ListCategory category = categoryList.get(position);
+    		holder.cat_list_text_view.setText(category.getName());
+    		holder.cat_list_text_view.setTag(category);
+    		Log.v(TAG, "Category Name: "+ category.getName());
+    		return convertView;
+    	}
+    	 
+	}
+    
+    public class editListItem {
+    	// Make this send the item to edit to the edit view/layout
+    	public editListItem(ListItem item) {
+    		// grab the item to be edited
+    	}
+    }
+    
     private class MyCustomAdapter extends ArrayAdapter<ListItem> {
     	 
     	private ArrayList<ListItem> itemList;

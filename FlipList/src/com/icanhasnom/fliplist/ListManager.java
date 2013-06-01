@@ -11,6 +11,7 @@ import java.io.*;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 /**
  *
@@ -21,6 +22,9 @@ public class ListManager implements Parcelable, Serializable {
     ArrayList<ListCategory> categoryObjList = new ArrayList<ListCategory>();
     ArrayList<ListItem> itemList = new ArrayList<ListItem>();
     Map<String,ItemList> itemListMap = new HashMap<String,ItemList>();
+    //Map<String,ListCategory> categoryListMap = new HashMap<String,ListCategory>();
+    // Do we need a item list map of categories so we can retrieve by id instead of hitting the DB each time?
+    // How should we handle items that are on more than one list? Use foreach to add to each item list?
     String defaultCategory = "Default";
     String completedCategory = "Completed";
     String currentCategory;
@@ -33,6 +37,7 @@ public class ListManager implements Parcelable, Serializable {
         categoryList.add(defaultCategory);
         itemListMap.put(completedCategory, completedList);
         categoryList.add(completedCategory);
+
         currentCategory = defaultCategory;
         db = new DatabaseHandler(context);
         
@@ -53,14 +58,12 @@ public class ListManager implements Parcelable, Serializable {
     	categoryObjList.add(newCatObj);
     	itemListMap.put(catName, new ItemList(catName));
     }
-    public ArrayList<ListCategory> getCategoryObjList() {
-    	return categoryObjList;
-    }
-    public ListItem addItem(String curCategory, String name, String description, Date dueDate) {
+    public ListItem addItem(int curCategory, String name, String description, Date dueDate) {
         ItemList myList = itemListMap.get(curCategory);
         ListItem myItem = new ListItem(curCategory, name, description, dueDate);
-        
+        db.addItem(myItem);
         myList.addListItem(myItem);
+        Log.v("ListItem.addItem", "Added Item: " + myItem.getName() + " To Category: " + db.getCategory(curCategory));
         return myItem;
     }
     public void moveItem(ListItem myItem, String fromList, String toList) {
@@ -93,11 +96,11 @@ public class ListManager implements Parcelable, Serializable {
     	}
     	return catListStrings;
     }
-    public ArrayList<ListItem> getItemList(String myCat) throws NumberFormatException, ParseException {
+    public ArrayList<ListItem> getItemList(int catID) throws NumberFormatException, ParseException {
         //ItemList myItemList = itemListMap.get(myCat);
         //ArrayList<ListItem> myItemArrayList = myItemList.getListItems();
     	// ** FIgure out why this is breaking below, should i really be using the id to get the cat? **
-    	int catID = db.getCategoryID(myCat);
+
     	ArrayList<ListItem> myItemArrayList = (ArrayList<ListItem>) db.getAllItemsFromCategory(catID);
         return myItemArrayList;
     }

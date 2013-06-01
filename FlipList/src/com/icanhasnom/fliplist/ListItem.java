@@ -12,6 +12,8 @@ import java.util.*;
 import java.text.*;
 import java.io.*;
 
+import android.util.Log;
+
 public class ListItem implements Serializable {
     /**
 	 * 
@@ -21,8 +23,7 @@ public class ListItem implements Serializable {
 	public String name;
 	public String description;
     public Date dueDate;
-    public ArrayList<String> categories;
-    public String[] category;
+    public ArrayList<String> categories = new ArrayList<String>();
     public Date createDate;
     public boolean isSelected;
     
@@ -38,10 +39,21 @@ public class ListItem implements Serializable {
         categories.add(cat);
         createDate = new Date();
     }
-    public ListItem(String cat, String n, String desc, Date due) {
+    public ListItem(int cat, String n, String desc, Date due) {
     	name = n;
-    	categories.add(cat);
-    	description = desc;
+    	Log.v("ListItem Constructor", "Category: " + cat);
+    	Log.v("ListItem Constructor", "Name: " + n);
+    	Log.v("ListItem Constructor", "Description: " + desc);
+    	Log.v("ListItem Constructor", "Due Date: " + due);
+    	String catString = cat + "";
+    	Log.v("ListItem Constructor", "Category is: " + catString);
+    	//categories.add(catString);
+    	categories.add("1");
+    	if (desc != null) {
+    		description = desc;
+    	} else {
+    		description = "";
+    	}
     	dueDate = due;
     	createDate = new Date();
     }
