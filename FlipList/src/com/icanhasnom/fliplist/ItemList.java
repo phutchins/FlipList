@@ -12,11 +12,15 @@ import java.io.*;
  * @author flip
  */
 public class ItemList implements Serializable {
-    String listName = new String();
+    public String listName = new String();
+    public int listID;
     ArrayList<ListItem> myItemList = new ArrayList<ListItem>();
     
     public ItemList(String ln) {
         listName = ln;
+    }
+    public ItemList(int lid) {
+    	listID = lid;
     }
     
     public ArrayList<ListItem> getListItems() {

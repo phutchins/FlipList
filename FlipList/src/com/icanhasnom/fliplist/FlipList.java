@@ -48,8 +48,8 @@ public class FlipList extends Activity {
 	int defaultCatID;
 	
     HashMap<String, ListItem> checkListItems = new HashMap<String, ListItem>();
-    ArrayList<ListItem> currentItemList;
-    String selectedCategory;
+    ItemList currentItemList;
+    ListCategory selectedCategory;
     ArrayList<ListCategory> catList;
     
     MyCustomAdapter itemListDataAdapter;
@@ -121,7 +121,7 @@ public class FlipList extends Activity {
     	switch (item.getItemId()) {
     	case R.id.menu_add_edit_cat:
     		Intent addEditCatIntent = new Intent(this, AddEditCatActivity.class);
-    		String[] catList = myListMan.getCategoryListStrings();
+    		// String[] catList = myListMan.getCategoryListStrings();
     		ArrayList<ListCategory> catObjList = myListMan.getCategoryList();
     		// Probably serialize the myListMan object instead? or just fetch categories from the db?
     		addEditCatIntent.putExtra("catObjList", catObjList);
@@ -180,14 +180,22 @@ public class FlipList extends Activity {
     }
     
     public void addItemsOnList()  {
-
-    	selectedCategory = String.valueOf(catSpinner.getSelectedItem());
+    	ListCategory selectedCategory;
+    	ArrayList<ListItem> itemListArrayList = new ArrayList<ListItem>();
+    	// String selectedCategoryString = selectedCategory.getName();
+    	// TODO: Fix selected category here? Put some extra logging...
     	int position = catSpinner.getSelectedItemPosition();
+    	Log.v("FlipList.addItemsOnList", "position: " + position);
     	// Set this globally using the global spinner listener so we only have to do it once
-    	ListCategory selectedCategory = (ListCategory) catSpinner.getItemAtPosition(position);
+    	selectedCategory = (ListCategory) catSpinner.getItemAtPosition(position);
+    	// Line below works
+    	Log.v("FlipList.addItemsOnList", "selectedCategory: " + selectedCategory.getName());
     	int catID = selectedCategory.getID();
+    	Log.v("FlipList.addItemsOnList", "catID: " + catID);
     	try {
-			currentItemList = myListMan.getItemList(catID);
+			ItemList currentItemList = myListMan.getItemList(catID);
+			itemListArrayList = currentItemList.getListItems();
+			Log.v("FlipList.addItemsOnList", "currentItemList name" + currentItemList.listName);
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -195,14 +203,13 @@ public class FlipList extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	itemListDataAdapter = new MyCustomAdapter(this, R.layout.list_layout, currentItemList);
+    	itemListDataAdapter = new MyCustomAdapter(this, R.layout.list_layout, itemListArrayList);
     	
     	ListView listView = (ListView) findViewById(R.id.itemList);
     	listView.setAdapter(itemListDataAdapter);
     	
     	listView.setOnItemClickListener(new OnItemClickListener() {
-    		public void onItemClick(AdapterView<?> parent, View view,
-    		int position, long id) {
+    		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
     			// When clicked, show a toast with the TextView text
     			ListItem item = (ListItem) parent.getItemAtPosition(position);
     			Toast.makeText(getApplicationContext(),
