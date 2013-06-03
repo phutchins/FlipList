@@ -17,7 +17,7 @@ import android.util.Log;
  *
  * @author flip
  */
-public class ListManager implements Parcelable, Serializable {
+public class ListManager implements Serializable {
     ArrayList<String> categoryList = new ArrayList<String>();
     ArrayList<ListCategory> categoryObjList = new ArrayList<ListCategory>();
     ArrayList<ListItem> itemList = new ArrayList<ListItem>();
@@ -87,11 +87,15 @@ public class ListManager implements Parcelable, Serializable {
             myToList.addListItem(myItem);
         }
     }
-    public void completeItem(ListItem myItem, String fromList) {
+    public void completeItem(ListItem myItem, int fromList) {
         ItemList myFromList = itemListMap.get(fromList);
-        ItemList myToList = itemListMap.get("Completed");
+        // TODO: Put this into settings and make a settings class to cache settings
+        int completedListID = 2;
+        ItemList myToList = itemListMap.get(completedListID);
+        Log.v("ListManager.completeItem", "myFromList Name: " + myFromList.getName());
+        Log.v("ListManager.completeItem", "myToList Name: " + myToList.getName());
         myFromList.removeListItem(myItem);
-        if (fromList != "Completed") {
+        if (fromList != completedListID) {
             myToList.addListItem(myItem);
         }
     }

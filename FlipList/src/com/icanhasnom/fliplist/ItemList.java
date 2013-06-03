@@ -19,6 +19,12 @@ public class ItemList implements Serializable {
     public ItemList(String ln) {
         listName = ln;
     }
+    public String getName() {
+    	return listName;
+    }
+    public void setName(String ln) {
+    	listName = ln;
+    }
     public ItemList(int lid) {
     	listID = lid;
     }

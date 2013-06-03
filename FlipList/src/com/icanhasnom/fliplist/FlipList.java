@@ -258,19 +258,11 @@ public class FlipList extends Activity {
     			convertView.setTag(holder);
     	 
     			holder.cat_list_text_view.setOnClickListener( new View.OnClickListener() {  
-    				public void onClick(View v) {  
-    					//CheckBox cb = (CheckBox) v ;  
-    					//ListItem item = (ListItem) cb.getTag();
-    					//Spinner catSpinner = (Spinner) findViewById(R.id.catSpinner);
-    					//String catSelected = String.valueOf(catSpinner.getSelectedItem());
-    					//String itemDescription = item.getDescription();
-    					//Toast.makeText(getApplicationContext(), "Completed: " + itemDescription, Toast.LENGTH_LONG).show();
-    					//item.setSelected(cb.isChecked());
-    					// Use this onClick to send the user to the edit screen for the clicked category
+    				public void onClick(View v) {
     					TextView tv = (TextView) v;
     					ListCategory lc = (ListCategory) tv.getTag();
     					currentCategory = lc;
-    					addItemsOnList();
+    					//addItemsOnList();
     				}  
     			});  
     		} else {
@@ -328,10 +320,10 @@ public class FlipList extends Activity {
     					CheckBox cb = (CheckBox) v ;  
     					ListItem item = (ListItem) cb.getTag();
     					Spinner catSpinner = (Spinner) findViewById(R.id.catSpinner);
-    					String catSelected = String.valueOf(catSpinner.getSelectedItem());
+    					ListCategory catSelectedObj = (ListCategory) catSpinner.getSelectedItem();
+    					int catSelected = catSelectedObj.getID();
     					String itemDescription = item.getDescription();
     					Toast.makeText(getApplicationContext(), "Completed: " + itemDescription, Toast.LENGTH_LONG).show();
-    					//item.setSelected(cb.isChecked());
     					myListMan.completeItem(item, catSelected);
     					addItemsOnList();
     				}  
@@ -343,7 +335,7 @@ public class FlipList extends Activity {
     	 
     		ListItem item = itemList.get(position);
     		holder.code.setText(" (" +  item.getDueDate() + ")");
-    		holder.name.setText(item.getDescription());
+    		holder.name.setText(item.getName());
     		holder.name.setChecked(item.isSelected());
     		holder.name.setTag(item);
     	 
