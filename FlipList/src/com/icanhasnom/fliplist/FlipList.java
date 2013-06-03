@@ -140,6 +140,7 @@ public class FlipList extends Activity {
     public class SpinnerActivity extends Activity implements OnItemSelectedListener {
     	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
     		// String itemSelected = (String) parent.getItemAtPosition(pos);
+    		Log.v("FlipList.SpinnerActivity", "Inside SpinnerActivity");
     		addItemsOnList();
     	}
     	public void onNothingSelected(AdapterView<?> parent) {
@@ -174,8 +175,10 @@ public class FlipList extends Activity {
     
     public void addItemsOnSpinner() {
         catList = myListMan.getCategoryList();
-        catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, android.R.layout.simple_spinner_dropdown_item, catList);
-        catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.activity_main_cat_spinner, catList);
+        // TODO fix this so that clicking the dropdown works again. Maybe try R.layout.
+        // catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        catSpinnerDataAdapter.setDropDownViewResource(R.layout.activity_main_cat_spinner);
         catSpinner.setAdapter(catSpinnerDataAdapter);
     }
     
@@ -253,7 +256,7 @@ public class FlipList extends Activity {
     			convertView = vi.inflate(R.layout.activity_main_cat_spinner, null);
     	 
     			holder = new ViewHolder();
-    			holder.cat_list_text_view = (TextView) convertView.findViewById(R.id.activity_main_spinner_layout);
+    			holder.cat_list_text_view = (TextView) convertView.findViewById(R.id.activity_main_spinner_textview);
     			//holder.name = (CheckBox) convertView.findViewById(R.id.checkBox1);
     			convertView.setTag(holder);
     	 
@@ -262,7 +265,8 @@ public class FlipList extends Activity {
     					TextView tv = (TextView) v;
     					ListCategory lc = (ListCategory) tv.getTag();
     					currentCategory = lc;
-    					//addItemsOnList();
+    					addItemsOnList();
+    					Log.v("FlipList.MySpinnerCustomAdapterListener", "Inside adapter listener");
     				}  
     			});  
     		} else {
@@ -296,8 +300,8 @@ public class FlipList extends Activity {
     	}
     	 
     	private class ViewHolder {
-    		TextView code;
-    		CheckBox name;
+    		TextView itemName;
+    		CheckBox itemCheckBox;
     	}
     	 
     	@Override
@@ -311,11 +315,12 @@ public class FlipList extends Activity {
     			convertView = vi.inflate(R.layout.list_layout, null);
     	 
     			holder = new ViewHolder();
-    			holder.code = (TextView) convertView.findViewById(R.id.code);
-    			holder.name = (CheckBox) convertView.findViewById(R.id.checkBox1);
+    			holder.itemCheckBox = (CheckBox) convertView.findViewById(R.id.itemCheckBox);
+    			holder.itemName = (TextView) convertView.findViewById(R.id.itemName);
+    			
     			convertView.setTag(holder);
     	 
-    			holder.name.setOnClickListener( new View.OnClickListener() {  
+    			holder.itemCheckBox.setOnClickListener( new View.OnClickListener() {  
     				public void onClick(View v) {  
     					CheckBox cb = (CheckBox) v ;  
     					ListItem item = (ListItem) cb.getTag();
@@ -334,10 +339,10 @@ public class FlipList extends Activity {
     		}
     	 
     		ListItem item = itemList.get(position);
-    		holder.code.setText(" (" +  item.getDueDate() + ")");
-    		holder.name.setText(item.getName());
-    		holder.name.setChecked(item.isSelected());
-    		holder.name.setTag(item);
+    		holder.itemName.setText(item.getName() + " (" +  item.getDueDate() + ")");
+    		holder.itemCheckBox.setText("");
+    		//holder.name.setChecked(item.isSelected());
+    		holder.itemCheckBox.setTag(item);
     	 
     		return convertView;
     	 

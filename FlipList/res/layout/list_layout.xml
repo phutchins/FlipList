@@ -6,7 +6,7 @@
     android:padding="6dip" >
 
     <CheckBox
-        android:id="@+id/checkBox1"
+        android:id="@+id/itemCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -15,12 +15,12 @@
         android:text="@string/check_box" />
  
     <TextView
-        android:id="@+id/code"
+        android:id="@+id/itemName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/checkBox1"
-        android:layout_alignBottom="@+id/checkBox1"
-        android:layout_toRightOf="@+id/checkBox1"
+        android:layout_alignBaseline="@+id/itemCheckBox"
+        android:layout_alignBottom="@+id/itemCheckBox"
+        android:layout_toRightOf="@+id/itemCheckBox"
         android:text="@string/text_view" />
     
 
