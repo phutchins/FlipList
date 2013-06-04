@@ -140,7 +140,7 @@ public class FlipList extends Activity {
     public class SpinnerActivity extends Activity implements OnItemSelectedListener {
     	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
     		// String itemSelected = (String) parent.getItemAtPosition(pos);
-    		Log.v("FlipList.SpinnerActivity", "Inside SpinnerActivity");
+    		Log.v("FlipList.SpinnerActivity", "Inside SpinnerActivity 2");
     		addItemsOnList();
     	}
     	public void onNothingSelected(AdapterView<?> parent) {
