@@ -327,7 +327,8 @@ public class FlipList extends Activity {
     					ListCategory catSelectedObj = (ListCategory) catSpinner.getSelectedItem();
     					int catSelected = catSelectedObj.getID();
     					String itemDescription = item.getDescription();
-    					Toast.makeText(getApplicationContext(), "Completed: " + itemDescription, Toast.LENGTH_LONG).show();
+    					String itemName = item.getName();
+    					Toast.makeText(getApplicationContext(), "Completed: " + itemName, Toast.LENGTH_LONG).show();
     					myListMan.completeItem(item, catSelected);
     					addItemsOnList();
     				}  
