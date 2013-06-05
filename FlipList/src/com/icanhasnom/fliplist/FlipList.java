@@ -8,6 +8,7 @@ import java.util.HashMap;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -140,8 +141,11 @@ public class FlipList extends Activity {
     public class SpinnerActivity extends Activity implements OnItemSelectedListener {
     	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
     		// String itemSelected = (String) parent.getItemAtPosition(pos);
-    		Log.v("FlipList.SpinnerActivity", "Inside SpinnerActivity 2");
+    		Log.v("FlipList.SpinnerActivity", "Inside SpinnerActivity");
+    		// Do stuff with clicked category here
     		addItemsOnList();
+    		// Refresh spinner here?
+    		
     	}
     	public void onNothingSelected(AdapterView<?> parent) {
     		// Nothing here yet
@@ -175,11 +179,16 @@ public class FlipList extends Activity {
     
     public void addItemsOnSpinner() {
         catList = myListMan.getCategoryList();
-        catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.activity_main_cat_spinner, catList);
+        Resources res = getResources();
+        catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.activity_main_cat_spinner, catList, res);
         // TODO fix this so that clicking the dropdown works again. Maybe try R.layout.
-        // catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        catSpinnerDataAdapter.setDropDownViewResource(R.layout.activity_main_cat_spinner);
+        catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // catSpinnerDataAdapter.setDropDownViewResource(R.layout.activity_main_cat_spinner);
         catSpinner.setAdapter(catSpinnerDataAdapter);
+        catSpinner.setOnItemSelectedListener(new SpinnerActivity());
+        
+        // Run this to update spinner
+        catSpinnerDataAdapter.notifyDataSetChanged();
     }
     
     public void addItemsOnList()  {
@@ -197,8 +206,9 @@ public class FlipList extends Activity {
     	Log.v("FlipList.addItemsOnList", "catID: " + catID);
     	try {
 			ItemList currentItemList = myListMan.getItemList(catID);
+			Log.v("FlipList.addItemsOnList", "catID: " + catID);
 			itemListArrayList = currentItemList.getListItems();
-			Log.v("FlipList.addItemsOnList", "currentItemList name" + currentItemList.listName);
+			Log.v("FlipList.addItemsOnList", "currentItemList name " + currentItemList.listName);
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -215,6 +225,7 @@ public class FlipList extends Activity {
     		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
     			// When clicked, show a toast with the TextView text
     			ListItem item = (ListItem) parent.getItemAtPosition(position);
+    			Log.v("FlipList.addItemsOnList.setOnItemClickListener", "position: " + position + " id " + id);
     			Toast.makeText(getApplicationContext(),
     					"Clicked on Row: " + item.getDescription(), 
     					Toast.LENGTH_LONG).show();
@@ -225,18 +236,33 @@ public class FlipList extends Activity {
     private class MyCatSpinnerCustomAdapter extends ArrayAdapter<ListCategory> {
       	 
     	private ArrayList<ListCategory> categoryList;
-    	//private Activity context;
+    	private Activity activity;
+    	// res could be used for populating images
+    	public Resources res;
+    	LayoutInflater inflater;
+    	
     	//private Context context;
     	 
-    	public MyCatSpinnerCustomAdapter(Context context, int textViewResourceId, ArrayList<ListCategory> categoryList) {
-    		super(context, textViewResourceId, categoryList);
+    	public MyCatSpinnerCustomAdapter(
+    			FlipList activitySpinner, 
+    			int textViewResourceId, 
+    			ArrayList<ListCategory> objects, 
+    			Resources resLocal
+    			) 
+    	{
+    		super(activitySpinner, textViewResourceId, objects);
     		//this.context = context;
-    		this.categoryList = new ArrayList<ListCategory>();
-    		this.categoryList.addAll(categoryList);
+    		categoryList = (ArrayList<ListCategory>) objects;
+    		res = resLocal;
+    		activity = activitySpinner;
+    		//this.categoryList = new ArrayList<ListCategory>();
+    		//this.categoryList.addAll(categoryList);
+    		
+    		inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     	}
     	
     	private class ViewHolder {
-    		TextView cat_list_text_view;
+    		TextView catName;
     	}
     	
     	public View getDropDownView(int position, View convertView, ViewGroup parent) {
@@ -248,34 +274,52 @@ public class FlipList extends Activity {
     	 
     	public View getCustomView(int position, View convertView, ViewGroup parent) {
 
-    		ViewHolder holder = null;
-    		Log.v("ConvertView", String.valueOf(position));
+    		ViewHolder holder;
+    		
+    		//View holder = inflater.inflate(R.layout.activity_main_cat_spinner, parent, false);
+    		Log.v("FlipList.getCustomView", "position: " + String.valueOf(position));
     	 
     		if (convertView == null) {
-    			LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    			convertView = vi.inflate(R.layout.activity_main_cat_spinner, null);
-    	 
+    			
+    			
+    			convertView = inflater.inflate(R.layout.activity_main_cat_spinner, null);
     			holder = new ViewHolder();
-    			holder.cat_list_text_view = (TextView) convertView.findViewById(R.id.activity_main_spinner_textview);
+    			holder.catName = (TextView) convertView.findViewById(R.id.cat_spinner_text);
     			//holder.name = (CheckBox) convertView.findViewById(R.id.checkBox1);
     			convertView.setTag(holder);
     	 
-    			holder.cat_list_text_view.setOnClickListener( new View.OnClickListener() {  
-    				public void onClick(View v) {
-    					TextView tv = (TextView) v;
-    					ListCategory lc = (ListCategory) tv.getTag();
-    					currentCategory = lc;
-    					addItemsOnList();
-    					Log.v("FlipList.MySpinnerCustomAdapterListener", "Inside adapter listener");
-    				}  
-    			});  
+    		//	holder.catName.setOnItemSelectedListener( new OnItemSelectedListener() {  
+    		//		public void onItemSelected(View v) {
+    		//			TextView tv = (TextView) v;
+    		//			ListCategory lc = (ListCategory) tv.getTag();
+    		//			currentCategory = lc;
+    		//			addItemsOnList();
+    		//			Log.v("FlipList.MySpinnerCustomAdapterListener", "Inside adapter listener");
+    		//		}
+
+			//		public void onItemSelected(AdapterView<?> parentView, View v, int position, long id) {
+    		//			TextView tv = (TextView) v;
+    		//			ListCategory lc = (ListCategory) tv.getTag();
+    		//			currentCategory = lc;
+    		//			addItemsOnList();
+    		//			Log.v("FlipList.MySpinnerCustomAdapterListener", "Inside adapter listener");
+			//		}
+
+			//		public void onNothingSelected(AdapterView<?> arg0) {
+			//			// TODO Auto-generated method stub
+			//			
+			//		}  
+    		//	});  
     		} else {
     			holder = (ViewHolder) convertView.getTag();
     		}
     	 
+    		
     		ListCategory category = categoryList.get(position);
-    		holder.cat_list_text_view.setText(category.getName());
-    		holder.cat_list_text_view.setTag(category);
+    		Log.v("getCustomView", "category Name: " + category.getName());
+    		Log.v("getCUstomView", "category ID: " + category.getID());
+    		holder.catName.setText(category.getName());
+    		holder.catName.setTag(category);
     		Log.v(TAG, "Category Name: "+ category.getName());
     		return convertView;
     	}
