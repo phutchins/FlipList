@@ -227,7 +227,7 @@ public class FlipList extends Activity {
     			ListItem item = (ListItem) parent.getItemAtPosition(position);
     			Log.v("FlipList.addItemsOnList.setOnItemClickListener", "position: " + position + " id " + id);
     			Toast.makeText(getApplicationContext(),
-    					"Clicked on Row: " + item.getDescription(), 
+    					"Clicked on Row: " + item.getName(), 
     					Toast.LENGTH_LONG).show();
     		}
     	});
@@ -240,8 +240,6 @@ public class FlipList extends Activity {
     	// res could be used for populating images
     	public Resources res;
     	LayoutInflater inflater;
-    	
-    	//private Context context;
     	 
     	public MyCatSpinnerCustomAdapter(
     			FlipList activitySpinner, 
@@ -251,76 +249,33 @@ public class FlipList extends Activity {
     			) 
     	{
     		super(activitySpinner, textViewResourceId, objects);
-    		//this.context = context;
     		categoryList = (ArrayList<ListCategory>) objects;
     		res = resLocal;
     		activity = activitySpinner;
-    		//this.categoryList = new ArrayList<ListCategory>();
-    		//this.categoryList.addAll(categoryList);
-    		
     		inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     	}
-    	
     	private class ViewHolder {
     		TextView catName;
     	}
-    	
     	public View getDropDownView(int position, View convertView, ViewGroup parent) {
     		return getCustomView(position, convertView, parent);
     	}
     	public View getView(int position, View convertView, ViewGroup parent) {
     		return getCustomView(position, convertView, parent);
     	}
-    	 
     	public View getCustomView(int position, View convertView, ViewGroup parent) {
-
     		ViewHolder holder;
-    		
-    		//View holder = inflater.inflate(R.layout.activity_main_cat_spinner, parent, false);
-    		Log.v("FlipList.getCustomView", "position: " + String.valueOf(position));
-    	 
     		if (convertView == null) {
-    			
-    			
     			convertView = inflater.inflate(R.layout.activity_main_cat_spinner, null);
     			holder = new ViewHolder();
     			holder.catName = (TextView) convertView.findViewById(R.id.cat_spinner_text);
-    			//holder.name = (CheckBox) convertView.findViewById(R.id.checkBox1);
     			convertView.setTag(holder);
-    	 
-    		//	holder.catName.setOnItemSelectedListener( new OnItemSelectedListener() {  
-    		//		public void onItemSelected(View v) {
-    		//			TextView tv = (TextView) v;
-    		//			ListCategory lc = (ListCategory) tv.getTag();
-    		//			currentCategory = lc;
-    		//			addItemsOnList();
-    		//			Log.v("FlipList.MySpinnerCustomAdapterListener", "Inside adapter listener");
-    		//		}
-
-			//		public void onItemSelected(AdapterView<?> parentView, View v, int position, long id) {
-    		//			TextView tv = (TextView) v;
-    		//			ListCategory lc = (ListCategory) tv.getTag();
-    		//			currentCategory = lc;
-    		//			addItemsOnList();
-    		//			Log.v("FlipList.MySpinnerCustomAdapterListener", "Inside adapter listener");
-			//		}
-
-			//		public void onNothingSelected(AdapterView<?> arg0) {
-			//			// TODO Auto-generated method stub
-			//			
-			//		}  
-    		//	});  
     		} else {
     			holder = (ViewHolder) convertView.getTag();
     		}
-    	 
-    		
     		ListCategory category = categoryList.get(position);
-    		Log.v("getCustomView", "category Name: " + category.getName());
-    		Log.v("getCUstomView", "category ID: " + category.getID());
     		holder.catName.setText(category.getName());
     		holder.catName.setTag(category);
-    		Log.v(TAG, "Category Name: "+ category.getName());
     		return convertView;
     	}
     	 
@@ -385,7 +340,6 @@ public class FlipList extends Activity {
     		ListItem item = itemList.get(position);
     		holder.itemName.setText(item.getName() + " (" +  item.getDueDate() + ")");
     		holder.itemCheckBox.setText("");
-    		//holder.name.setChecked(item.isSelected());
     		holder.itemCheckBox.setTag(item);
     	 
     		return convertView;
