@@ -31,13 +31,34 @@ import android.util.Log;
 
 // ToDo
 // Make list items clickable to display more info and have edit button
+// Ability to assign multiple categories to tasks
+// Format list item list display to show tiny date below description to leave more room for actual description
+
+// UI Design
+// Make 3 tabs, one for category list, one for task list, one for something else
+//   like its done in the tunein android app
+// Make buttons smoother
+// Add swipe sideways from category to category?
+// Third tab could be Item Edit or Add screen. If you select an item it slides over to
+//    the right and you can edit. If nothing is selected and you swipe, it lets you add one.
+
+// Settings Design
 // Make settings menu -
 //    Default category setting
 //    Choose what values are displayed for list item on main screen
 //    Default list type (grocery, todo, etc...)
-// Format list item list display to show tiny date below description to leave more room for actual description
-// Ability to make custom filters (maybe create as a category
-// Ability to assign multiple categories to tasks
+
+
+// Filter Design (Acts as a categoryList item?)
+//   Ability to make custom filters
+
+// Widget Design
+// Make widget class that does only one category (for grocery list etc...)
+
+// Types Design
+// Make certain list types change the defaults for items added
+//   Grocery List type would not have a date by default and no reminders
+//   Have it learn common items and group them by section in store
 
 
 public class FlipList extends Activity {
