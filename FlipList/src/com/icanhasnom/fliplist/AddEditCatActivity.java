@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
+import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -22,91 +22,100 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.support.v4.app.NavUtils;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 
 public class AddEditCatActivity extends Activity {
 	ListCategory currentCategory;
 	MyCatListCustomAdapter catListDataAdapter;
-	//ArrayList<ListCategory> categoryList;
-	//String[] catList;
-	
-	// Create some dummy category objects in the list
+
 	ArrayList<ListCategory> categoryList;
 	DatabaseHandler db;
 	ListManager myListMan = new ListManager(this);
 	
 	Spinner typeSpinner;
-	SpinAdapter adapter;
+	MyTypeSpinnerCustomAdapter adapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_edit_cat_list);
-		
-        db = new DatabaseHandler(this);
-		
+
 		//catList = getIntent().getExtras().getStringArray("catList");
 		
-		//categoryList = new ArrayList<ListCategory>();
-		
-		categoryList = db.getAllCategories();
-		
-		//ListCategory listCat1 = new ListCategory("Desc", "Other", "todo");
-		//ListCategory listCat2 = new ListCategory("Something", "another one", "Grocery List");
-		//categoryList.add(listCat1);
-		//categoryList.add(listCat2);
-		
+        categoryList = myListMan.getCategoryList();
 		addItemsOnEditList();
 		
 		// Show the Up button in the action bar.
 		setupActionBar();
+		
 		// Set up category list and add an add new category item to the top of the list
 		// Create listener that gets category to edit or new category selection
 		// Send that selection to the edit layout and display layout
 	}
-	
+	public void myAddNewCategoryAction(View view) {
+    	// Create blank new category to add to the list so there is an option to add new at the top
+    	ListCategory newCategory = new ListCategory();
+    	newCategory.setIsNew();
+    	newCategory.setName("+ Add New Category");
+    	newCategory.setType(myListMan.defaultTypeID);
+    	
+    	addEditCategory(newCategory);
+	}
 	public void addEditCategory(ListCategory lc) {
-		
+		// TODO: Do I need to pass in the ListCategory? or just use the global currentCategory
 		setContentView(R.layout.activity_add_edit_cat);
+		boolean isNew = currentCategory.isNew();
+		Log.v("addEditCategory", "isNew: " + isNew);
 		
+		// Get all of the View Objects
+		CheckedTextView pageTitle = (CheckedTextView) findViewById(R.id.catNameOrNewCat);
 		EditText catName = (EditText) findViewById(R.id.cat_edit_name);
 		EditText catDesc = (EditText) findViewById(R.id.cat_edit_desc);
-		Spinner catType = (Spinner) findViewById(R.id.cat_type_spinner);
+		// Make this catID a hidden text field or something to store the value
+		EditText catID = (EditText) findViewById(R.id.cat_edit_id);
+		typeSpinner = (Spinner) findViewById(R.id.cat_type_spinner);
+		
+		// Populate type spinner and select the categories type (will be default if new)
+		addTypesToSpinner();
+		typeSpinner.setSelection(currentCategory.getType());
 		
 		// fill out layout variables using the currentCategory object
-		catName.setText(currentCategory.getName());
-		catDesc.setText(currentCategory.getDescription());
-		
-		addTypesToSpinner();
-		
-		catType.setSelection(currentCategory.getType());
-		
-		// Get list of types
-		// Populate Spinner with types
-		
+		if (isNew) {
+			pageTitle.setText("New Category");
+		} else {
+			pageTitle.setText("Edit Category");
+			catName.setText(currentCategory.getName());
+			catDesc.setText(currentCategory.getDescription());
+			//Log.v("addEditCategory", "lc.getID(): " + lc.getID());
+			//Log.v("addEditCategory", "currentCategory.getID(): " + currentCategory.getID());
+			catID.setText(String.valueOf(currentCategory.getID()));
+		}
 	}
 	
     public void addTypesToSpinner() {
-        ArrayList<CategoryType> myTypeList = db.getAllTypes();
+        ArrayList<CategoryType> myTypeList = myListMan.getCategoryTypesList();
         typeSpinner = (Spinner) findViewById(R.id.cat_type_spinner);
-        ArrayAdapter<CategoryType> myTypeAdapter = new SpinAdapter(this, android.R.layout.simple_spinner_item, myTypeList);
-        //ArrayAdapter<CategoryType> myTypeAdapter = new ArrayAdapter<CategoryType>(this, android.R.layout.simple_spinner_item, myTypeList);
+        ArrayAdapter<CategoryType> myTypeAdapter = new MyTypeSpinnerCustomAdapter(this, R.layout.activity_add_edit_cat, myTypeList);
+        myTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeSpinner.setAdapter(myTypeAdapter);
-        
-        //spinnerDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, myTypeList);
-        //spinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //catSpinner.setAdapter(spinnerDataAdapter);
     }
     
-    public class SpinAdapter extends ArrayAdapter<CategoryType>{
-    	private Context context;
+    public class MyTypeSpinnerCustomAdapter extends ArrayAdapter<CategoryType>{
+    	private Activity activity;
+    	//private Context context;
     	private ArrayList<CategoryType> myTypes;
+    	LayoutInflater inflater;
     	
-    	public SpinAdapter(Context context, int textViewResourceId, ArrayList<CategoryType> myTypes) {
-    		super(context, textViewResourceId, myTypes);
-    		this.context = context;
+    	public MyTypeSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<CategoryType> myTypes) {
+    		super(activitySpinner, textViewResourceId, myTypes);
+    		this.activity = activitySpinner;
     		this.myTypes = myTypes;
+    		inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    	}
+    	private class ViewHolder {
+    		TextView typeName;
     	}
     	public int getCount() {
     		return myTypes.size();
@@ -118,29 +127,40 @@ public class AddEditCatActivity extends Activity {
     		return position;
     	}
     	
-    	@Override
     	public View getDropDownView(int position, View convertView, ViewGroup parent) {
-    		TextView label = new TextView(context);
-    		label.setTextColor(Color.BLACK);
-    		label.setText(myTypes.get(position).getName());
-    		Log.e("TypeSpinner", myTypes.get(position).getName());
-    		return label;
+    		return getCustomView(position, convertView, parent);
+    	}
+    	public View getView(int position, View convertView, ViewGroup parent) {
+    		return getCustomView(position, convertView, parent);
+    	}
+    	
+    	public View getCustomView(int position, View convertView, ViewGroup parent) {
+    		ViewHolder holder;
+    		if (convertView == null) {
+    			convertView = inflater.inflate(R.layout.activity_type_spinner, null);
+    			holder = new ViewHolder();
+    			holder.typeName = (TextView) convertView.findViewById(R.id.type_spinner_text);
+    			convertView.setTag(holder);
+    		} else {
+    			holder = (ViewHolder) convertView.getTag();
+    		}
+    		//TextView label = (TextView) convertView.findViewById(R.id.type_spinner_text);
+    		CategoryType type = myTypes.get(position);
+    		holder.typeName.setTextColor(Color.BLACK);
+    		holder.typeName.setText(myTypes.get(position).getName());
+    		holder.typeName.setTag(type);
+    		Log.v("TypeSpinner", myTypes.get(position).getName());
+    		return convertView;
     	}
     }
 	
     public void addItemsOnEditList() {
-
-    	//selectedCategory = String.valueOf(catSpinner.getSelectedItem());
-    	//currentItemList = myListMan.getItemList(selectedCategory);
-    	//ListManager myListMan = ListManager.getInstance();
-    	
+    	// Populate the Category List
     	catListDataAdapter = new MyCatListCustomAdapter(this, R.layout.activity_add_edit_cat_list, categoryList);
-    	
-    	// Add an add new category button here
-    	
     	ListView listView = (ListView) findViewById(R.id.itemAddEditList);
     	listView.setAdapter(catListDataAdapter);
     	
+    	// Set up the onClick event for each of the list items
     	listView.setOnItemClickListener(new OnItemClickListener() {
     		public void onItemClick(AdapterView<?> parent, View view,
     		int position, long id) {
@@ -153,20 +173,7 @@ public class AddEditCatActivity extends Activity {
     	});
     }
     
-    public void mySaveCatButtonAction(View view) {
-    	EditText editCategoryNameText = (EditText) findViewById(R.id.cat_edit_name);
-    	String categoryName = editCategoryNameText.getText().toString();
-    	EditText editCategoryDescText = (EditText) findViewById(R.id.cat_edit_desc);
-    	String categoryDesc = editCategoryDescText.getText().toString();
-    	Spinner typeSpinner = (Spinner) findViewById(R.id.cat_type_spinner);
-    	CategoryType categoryType = (CategoryType) typeSpinner.getTag();
-    	int categoryTypeID = categoryType.getID();
-    	
-    	ListCategory myNewCat = myListMan.addCategory(categoryName, categoryDesc, categoryTypeID);
-    	
-    	// Maybe find a way to have the newly created category be displayed once you're
-    	// sent back to the main screen
-    }
+
 	
     private class MyCatListCustomAdapter extends ArrayAdapter<ListCategory> {
    	 
@@ -180,7 +187,6 @@ public class AddEditCatActivity extends Activity {
     	
     	private class ViewHolder {
     		TextView cat_list_text_view;
-    		//CheckBox name;
     	}
     	 
     	@Override
@@ -195,21 +201,16 @@ public class AddEditCatActivity extends Activity {
     	 
     			holder = new ViewHolder();
     			holder.cat_list_text_view = (TextView) convertView.findViewById(R.id.cat_list_text_view);
-    			//holder.name = (CheckBox) convertView.findViewById(R.id.checkBox1);
+
     			convertView.setTag(holder);
     	 
     			holder.cat_list_text_view.setOnClickListener( new View.OnClickListener() {  
     				public void onClick(View v) {  
-    					//CheckBox cb = (CheckBox) v ;  
-    					//ListItem item = (ListItem) cb.getTag();
-    					//Spinner catSpinner = (Spinner) findViewById(R.id.catSpinner);
-    					//String catSelected = String.valueOf(catSpinner.getSelectedItem());
-    					//String itemDescription = item.getDescription();
-    					//Toast.makeText(getApplicationContext(), "Completed: " + itemDescription, Toast.LENGTH_LONG).show();
-    					//item.setSelected(cb.isChecked());
     					// Use this onClick to send the user to the edit screen for the clicked category
     					TextView tv = (TextView) v;
     					ListCategory lc = (ListCategory) tv.getTag();
+    					
+    					// TODO: Probably only need one of these
     					currentCategory = lc;
     					addEditCategory(lc);
     				}  
@@ -220,7 +221,17 @@ public class AddEditCatActivity extends Activity {
     		}
     	 
     		ListCategory category = categoryList.get(position);
-    		holder.cat_list_text_view.setText(category.getDescription() + "(" + category.getType() + ")");
+    		// TODO: Make a function in ListManager to get and hold the category type names in memory
+    		int categoryTypeID = category.getType();
+    		//String categoryDescription = category.getDescription();
+    		String categoryName = category.getName();
+    		String categoryTypeName = myListMan.getCategoryTypeName(categoryTypeID);
+    		
+    		Log.v("MyCatListCustomAdapter", "categoryTypeID:" + categoryTypeID);
+    		Log.v("MyCatListCustomAdapter", "category.getDescription(): " + category.getDescription());
+    		Log.v("MyCatListCustomAdapter", "myListMan.getCategoryTypeName(): " + myListMan.getCategoryTypeName(categoryTypeID));
+    		
+    		holder.cat_list_text_view.setText(categoryName + "(" + categoryTypeName + ")");
     		holder.cat_list_text_view.setTag(category);
     	 
     		return convertView;
@@ -261,5 +272,41 @@ public class AddEditCatActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+    public void mySaveCatButtonAction(View view) {
+    	CategoryType categoryType;
+    	
+    	EditText editCategoryIdNumber = (EditText) findViewById(R.id.cat_edit_id);
+    	int categoryID = Integer.parseInt(editCategoryIdNumber.getText().toString());
+    	EditText editCategoryNameText = (EditText) findViewById(R.id.cat_edit_name);
+    	String categoryName = editCategoryNameText.getText().toString();
+    	EditText editCategoryDescText = (EditText) findViewById(R.id.cat_edit_desc);
+    	String categoryDesc = editCategoryDescText.getText().toString();
+    	Spinner typeSpinner = (Spinner) findViewById(R.id.cat_type_spinner);
+    	// Get the object of selected Type in the spinner
+    	
+    	//CategoryType categoryType = (CategoryType) typeSpinner.getTag();
+    	
+    	// TODO: Fix this
+    	int position = typeSpinner.getSelectedItemPosition();
+    	categoryType = (CategoryType) typeSpinner.getItemAtPosition(position);
+    	int categoryTypeID = categoryType.getID();
+    	
+    	Log.v("MySaveCatButtonAction", "categoryID: " + categoryID);
+    	Log.v("MySaveCatButtonAction", "categoryName: " + categoryName);
+    	Log.v("MySaveCatButtonAction", "categoryDesc: " + categoryDesc);
+    	Log.v("MySaveCatButtonAction", "categoryTypeID: " + categoryTypeID);
+    	
+    	ListCategory myNewCat = myListMan.addCategory(categoryName, categoryDesc, categoryTypeID);
+    	if (currentCategory.isNew()) {
+    		myNewCat.setID(categoryID);
+    		myListMan.addObjCategory(myNewCat);
+    	} else {
+    		myListMan.updateObjCategory(myNewCat);
+    	}
+    	
+		Intent flipList = new Intent(this, FlipList.class);
+		//flipList.putExtra("myNewCat", myNewCat);
+		this.startActivity(flipList);
+    }
 
 }

@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:onClick="myCatSaveButtonAction"
+        android:onClick="mySaveCatButtonAction"
         android:text="@string/save_button_text" />
 
     <CheckedTextView
@@ -74,5 +74,33 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:text="@string/cat_name_or_edit_text" />
+
+    <EditText
+        android:id="@+id/cat_edit_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/cat_edit_name"
+        android:layout_alignBottom="@+id/cat_edit_name"
+        android:layout_toRightOf="@+id/catNameOrNewCat"
+        android:ems="10"
+        android:hint="@string/text_view_cat_id_text"
+        android:inputType="number" />
+
+    <CheckedTextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/checkedTextView1"
+        android:layout_toRightOf="@+id/catNameOrNewCat"
+        android:text="@string/text_view_cat_id_text"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <Button
+        android:id="@+id/category_delete_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:text="Delete" />
 
 </RelativeLayout>

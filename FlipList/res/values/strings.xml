@@ -19,5 +19,7 @@
     <string name="title_activity_add_edit_cat">AddEditCatActivity</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="text_view_cat_id_text">ID</string>
+    <string name="add_new_category_text">Add New Category</string>
 
 </resources>

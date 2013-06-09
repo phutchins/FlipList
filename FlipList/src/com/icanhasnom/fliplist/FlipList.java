@@ -143,10 +143,8 @@ public class FlipList extends Activity {
     	switch (item.getItemId()) {
     	case R.id.menu_add_edit_cat:
     		Intent addEditCatIntent = new Intent(this, AddEditCatActivity.class);
-    		// String[] catList = myListMan.getCategoryListStrings();
-    		ArrayList<ListCategory> catObjList = myListMan.getCategoryList();
-    		// Probably serialize the myListMan object instead? or just fetch categories from the db?
-    		addEditCatIntent.putExtra("catObjList", catObjList);
+    		//ArrayList<ListCategory> catObjList = myListMan.getCategoryList();
+    		//addEditCatIntent.putExtra("catObjList", catObjList);
     		this.startActivity(addEditCatIntent);
     		break;
     	case R.id.menu_settings:
@@ -202,7 +200,6 @@ public class FlipList extends Activity {
         catList = myListMan.getCategoryList();
         Resources res = getResources();
         catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.activity_main_cat_spinner, catList, res);
-        // TODO fix this so that clicking the dropdown works again. Maybe try R.layout.
         catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // catSpinnerDataAdapter.setDropDownViewResource(R.layout.activity_main_cat_spinner);
         catSpinner.setAdapter(catSpinnerDataAdapter);
@@ -262,13 +259,7 @@ public class FlipList extends Activity {
     	public Resources res;
     	LayoutInflater inflater;
     	 
-    	public MyCatSpinnerCustomAdapter(
-    			FlipList activitySpinner, 
-    			int textViewResourceId, 
-    			ArrayList<ListCategory> objects, 
-    			Resources resLocal
-    			) 
-    	{
+    	public MyCatSpinnerCustomAdapter(FlipList activitySpinner, int textViewResourceId, ArrayList<ListCategory> objects, Resources resLocal) {
     		super(activitySpinner, textViewResourceId, objects);
     		categoryList = (ArrayList<ListCategory>) objects;
     		res = resLocal;

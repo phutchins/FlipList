@@ -19,6 +19,7 @@ public class ListCategory implements Serializable {
 	String name;
     String description;
     int type;
+    boolean isNew = false;
     public ListCategory() {
     }
     public ListCategory(int catID, String catName, String catDesc, int catType) {
@@ -54,5 +55,11 @@ public class ListCategory implements Serializable {
     }
     public int getType() {
     	return type;
+    }
+    public boolean isNew() {
+    	return isNew;
+    }
+    public void setIsNew() {
+    	isNew = true;
     }
 }
