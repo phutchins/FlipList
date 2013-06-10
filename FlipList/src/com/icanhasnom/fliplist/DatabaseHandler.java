@@ -16,7 +16,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
-	private static final int DATABASE_VERSION = 9;
+	private static final int DATABASE_VERSION = 13;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
@@ -80,9 +80,9 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				+ KEY_SETTINGS_VAL1 + " TEXT," + KEY_SETTINGS_VAL2 + " TEXT" + ")";
 		
 		String CREATE_DEFAULT_CATEGORY = "insert into " + TABLE_CATEGORIES + "(" + KEY_CAT_ID + "," + KEY_CAT_NAME + ","
-                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + ") values(1, 'Default', 'Default Category','0')";
+                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + ") values(0, 'Default', 'Default Category','0')";
 		String CREATE_COMPLETED_CATEGORY = "insert into " + TABLE_CATEGORIES + "(" + KEY_CAT_ID + "," + KEY_CAT_NAME + ","
-                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + ") values(2, 'Completed', 'Completed Category','0')";
+                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + ") values(1, 'Completed', 'Completed Category','0')";
 		
 		String CREATE_TYPE_GENERIC = "insert into " + TABLE_CATEGORY_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
 				+ KEY_TYPE_DESC + ") values(0, 'Generic', 'Generic items')";
@@ -110,7 +110,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		// Drop older table if existed
-		db.execSQL("DROP TABLE  IF EXISTS " + TABLE_CATEGORIES);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEMS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY_TYPES);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
@@ -134,6 +134,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_CAT_NAME, category.getName());
 		values.put(KEY_CAT_DESC, category.getDescription());
 		values.put(KEY_CAT_TYPE, category.getType());
+		
+		Log.v("addCategory", "DatabaseHandler.category.getName: " + category.getName());
 		
 		db.insert(TABLE_CATEGORIES, null, values);
 		db.close();
@@ -380,10 +382,12 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_CAT_NAME, category.getName());
 		values.put(KEY_CAT_DESC, category.getDescription().toString());
 		values.put(KEY_CAT_TYPE, category.getType());
-		
+		String keyID = String.valueOf(category.getID());
+		Log.v("updateCategory", "DatabaseHandler.updateCategory.keyID: " + keyID);
 		// updating row
-		return db.update(TABLE_CATEGORIES, values, KEY_CAT_ID + " = ?",
-				new String[] { String.valueOf(category.getID()) });
+		//return db.update(TABLE_CATEGORIES, values, KEY_CAT_ID + " = ?",
+		//		new String[] { String.valueOf(category.getID()) });
+		return db.update(TABLE_CATEGORIES, values, KEY_CAT_ID + " = " + keyID, null);
 	}
 	public void deleteItem(ListItem item) {
 		SQLiteDatabase db = this.getWritableDatabase();

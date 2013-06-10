@@ -33,32 +33,48 @@ public class ListManager implements Serializable {
     // How should we handle items that are on more than one list? Use foreach to add to each item list?
     
     // Get these from the settings table in the DB
-    public String defaultCategory = "Default";
-    public int defaultCategoryID = 1;
-    public String completedCategory = "Completed";
-    public int completedCategoryID = 2;
+    //public String defaultCategory = "Default";
+    //public int defaultCategoryID = 0;
+    //public String completedCategory = "Completed";
+    //public int completedCategoryID = 1;
     public int defaultTypeID = 0;
     public String defaultType = "Generic";
     
     // TODO: Still using these?
-    ItemList defaultList = new ItemList(defaultCategory);
-    ItemList completedList = new ItemList(completedCategory);
+    //ItemList defaultList = new ItemList(defaultCategory);
+    //ItemList completedList = new ItemList(completedCategory);
     
     DatabaseHandler db;
     
     // TODO: Do we use string currentCategory? Should this be changed to an object?
     //       obj might be useful if we're passing around the reference to myListMan
+    ListCategory currentCategoryObj;
     String currentCategory;
     
     public ListManager(Context context) {
-        itemListMap.put(defaultCategoryID, defaultList);
-        categoryList.add(defaultCategory);
-        itemListMap.put(completedCategoryID, completedList);
-        categoryList.add(completedCategory);
-
-        currentCategory = defaultCategory;
-        db = new DatabaseHandler(context);
-        
+        //itemListMap.put(defaultCategoryID, defaultList);
+        //categoryList.add(defaultCategory);
+        //itemListMap.put(completedCategoryID, completedList);
+        //categoryList.add(completedCategory);
+    	
+    	db = new DatabaseHandler(context);
+    	
+    	int currentCategoryID = db.getDefaultCatID();
+    	Log.v("ListManager", "constructor db.getDefaultCatID: " + currentCategoryID);
+    	currentCategoryObj = db.getCategory(currentCategoryID);
+    	currentCategory = currentCategoryObj.getName();
+    	
+    	buildItemListMap();
+    }
+    public void buildItemListMap() {
+    	ArrayList<ListCategory> categoryList = db.getAllCategories();
+    	for(int i = 0; i < categoryList.size(); i++) {
+    		itemListMap.clear();
+    		ListCategory curCat = (ListCategory) categoryList.get(i);
+    		int curCatID = curCat.getID();
+    		ItemList curList = new ItemList(curCat.getName());
+    		itemListMap.put(curCatID, curList);
+    	}	
     }
     
     // Adding Objects
@@ -74,7 +90,8 @@ public class ListManager implements Serializable {
     	Log.v("addCategory", "catID: " + catID);
     	Log.v("addCategory", "catName: " + catName);
     	// Add new category to itemListMap with key of id and value of category Name
-    	itemListMap.put(catID, new ItemList(catName));
+    	// TODO: this is broken, need to rebuild itemListMap
+    	buildItemListMap();
     	
         return myNewListCategory;
     }

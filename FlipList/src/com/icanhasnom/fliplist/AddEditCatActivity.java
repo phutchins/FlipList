@@ -30,9 +30,9 @@ public class AddEditCatActivity extends Activity {
 	ListCategory currentCategory;
 	MyCatListCustomAdapter catListDataAdapter;
 
+	ListManager myListMan;
 	ArrayList<ListCategory> categoryList;
-	DatabaseHandler db;
-	ListManager myListMan = new ListManager(this);
+	//DatabaseHandler db;
 	
 	Spinner typeSpinner;
 	MyTypeSpinnerCustomAdapter adapter;
@@ -44,7 +44,9 @@ public class AddEditCatActivity extends Activity {
 
 		//catList = getIntent().getExtras().getStringArray("catList");
 		
+		myListMan = new ListManager(this);
         categoryList = myListMan.getCategoryList();
+		
 		addItemsOnEditList();
 		
 		// Show the Up button in the action bar.
@@ -298,9 +300,11 @@ public class AddEditCatActivity extends Activity {
     	
     	ListCategory myNewCat = myListMan.addCategory(categoryName, categoryDesc, categoryTypeID);
     	if (currentCategory.isNew()) {
+    		Log.v("mySaveCatButtonAction", "Adding new category " + currentCategory.getName());
     		myNewCat.setID(categoryID);
     		myListMan.addObjCategory(myNewCat);
     	} else {
+    		Log.v("mySaveCatButtonAction", "Updating category " + currentCategory.getName());
     		myListMan.updateObjCategory(myNewCat);
     	}
     	
