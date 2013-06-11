@@ -72,13 +72,23 @@ public class ListItem implements Serializable {
         String dateUS = dateFormatter.format(dueDate);
         return dateUS;
     }
-    public void setDueDate(int dd) throws ParseException {
+    public void setDueDate(int dd) {
     	String dueDateString = "" + dd;
-        dueDate = df.parse(dueDateString);
+        try {
+			dueDate = df.parse(dueDateString);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
-    public void setCreateDate(int cd) throws ParseException {
+    public void setCreateDate(int cd) {
     	String createDateString = "" + cd;
-    	createDate = df.parse(createDateString);
+    	try {
+			createDate = df.parse(createDateString);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     public void setDescription(String d) {
         description = d;

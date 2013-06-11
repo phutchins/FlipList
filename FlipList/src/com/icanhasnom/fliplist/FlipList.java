@@ -71,14 +71,14 @@ public class FlipList extends Activity {
 	
     HashMap<String, ListItem> checkListItems = new HashMap<String, ListItem>();
     ItemList currentItemList;
-    ListCategory selectedCategory;
+    ListCategory currentCategory;
     ArrayList<ListCategory> catList;
+    ArrayList<ListItem> currentListItems;
     
     MyCustomAdapter itemListDataAdapter;
-    // ArrayAdapter<String> spinnerDataAdapter;
     MyCatSpinnerCustomAdapter catSpinnerDataAdapter;
+    
     Spinner catSpinner;
-    ListCategory currentCategory;
     
     EditText editText;
     DatabaseHandler db;
@@ -96,29 +96,27 @@ public class FlipList extends Activity {
         
         if(savedInstanceState != null) {
         	restoreState(savedInstanceState);
+        	Log.v("FlipList.onCreate", "Restoring saved instance state");
         } else {
         	// Load saved data from somewhere, maybe SqlLite
         	myListMan = new ListManager(this);
+        	Log.v("FlipList.onCreate", "Created new ListManager Object");
         }
         
     	catSpinner = (Spinner) findViewById(R.id.catSpinner);
     	catSpinner.setOnItemSelectedListener(new SpinnerActivity());
     	//selectedCategory = String.valueOf(catSpinner.getSelectedItem());
-    	
-		try {
-			currentItemList = myListMan.getItemList(defaultCatID);
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	
+
+		currentItemList = myListMan.getItemList(defaultCatID);
+
     	//itemListDataAdapter = new MyCustomAdapter(this, R.layout.activity_main, currentItemList);
     	//catList = myListMan.getCategoryList();
         //spinnerDataAdapter = (MyCatSpinnerCustomAdapter) new ArrayAdapter<ListCategory>(this, android.R.layout.simple_spinner_item, catList);
 
+		// Do we need this? Might come in handy later...
+		updateState();
+		
+		// Populate the screen
         addItemsOnSpinner();
         addItemsOnList();
     }
@@ -143,8 +141,6 @@ public class FlipList extends Activity {
     	switch (item.getItemId()) {
     	case R.id.menu_add_edit_cat:
     		Intent addEditCatIntent = new Intent(this, AddEditCatActivity.class);
-    		//ArrayList<ListCategory> catObjList = myListMan.getCategoryList();
-    		//addEditCatIntent.putExtra("catObjList", catObjList);
     		this.startActivity(addEditCatIntent);
     		break;
     	case R.id.menu_settings:
@@ -195,46 +191,45 @@ public class FlipList extends Activity {
        addItemsOnList();
        editText.setText("");
     }
-    
+    public void updateState() {
+    	// Use this later if needed
+    }
     public void addItemsOnSpinner() {
+    	// TODO: Do we need to set current selected category here?
         catList = myListMan.getCategoryList();
         Resources res = getResources();
+        
         catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.activity_main_cat_spinner, catList, res);
         catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // catSpinnerDataAdapter.setDropDownViewResource(R.layout.activity_main_cat_spinner);
+        
         catSpinner.setAdapter(catSpinnerDataAdapter);
         catSpinner.setOnItemSelectedListener(new SpinnerActivity());
+        
+        // Set the current category globally
+    	int position = catSpinner.getSelectedItemPosition();
+    	currentCategory = (ListCategory) catSpinner.getItemAtPosition(position);
         
         // Run this to update spinner
         catSpinnerDataAdapter.notifyDataSetChanged();
     }
     
     public void addItemsOnList()  {
-    	ListCategory selectedCategory;
-    	ArrayList<ListItem> itemListArrayList = new ArrayList<ListItem>();
-    	// String selectedCategoryString = selectedCategory.getName();
-    	// TODO: Fix selected category here? Put some extra logging...
-    	int position = catSpinner.getSelectedItemPosition();
-    	Log.v("FlipList.addItemsOnList", "position: " + position);
-    	// Set this globally using the global spinner listener so we only have to do it once
-    	selectedCategory = (ListCategory) catSpinner.getItemAtPosition(position);
     	// Line below works
-    	Log.v("FlipList.addItemsOnList", "selectedCategory: " + selectedCategory.getName());
-    	int catID = selectedCategory.getID();
+    	Log.v("FlipList.addItemsOnList", "selectedCategory: " + currentCategory.getName());
+    	int catID = currentCategory.getID();
+    	String catName = currentCategory.getName();
     	Log.v("FlipList.addItemsOnList", "catID: " + catID);
-    	try {
-			ItemList currentItemList = myListMan.getItemList(catID);
-			Log.v("FlipList.addItemsOnList", "catID: " + catID);
-			itemListArrayList = currentItemList.getListItems();
-			Log.v("FlipList.addItemsOnList", "currentItemList name " + currentItemList.listName);
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	itemListDataAdapter = new MyCustomAdapter(this, R.layout.list_layout, itemListArrayList);
+
+		currentItemList = myListMan.getItemList(catID);
+		Log.v("FlipList.addItemsOnList", "catID: " + catID);
+		Log.v("FlipList.addItemsOnList", "catName: " + catName);
+		Log.v("FlipList.addItemsOnList", "currentItemList: " + currentItemList.listID);
+		
+		currentListItems = currentItemList.getListItems();
+
+		Log.v("FlipList.addItemsOnList", "currentListItems.size(): " + currentListItems.size());
+
+    	itemListDataAdapter = new MyCustomAdapter(this, R.layout.list_layout, currentListItems);
     	
     	ListView listView = (ListView) findViewById(R.id.itemList);
     	listView.setAdapter(itemListDataAdapter);

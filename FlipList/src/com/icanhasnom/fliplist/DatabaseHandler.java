@@ -150,6 +150,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_ITEM_CREATE_DATE, item.getCreateDate().toString());
 		values.put(KEY_ITEM_DUE_DATE, item.getDueDate());
 		
+		Log.v("DatabaseHandler.addItem", "Adding Item " + item.getName() + " to the DB");
+		
 		db.insert(TABLE_ITEMS, null, values);
 		db.close();
 	}
@@ -264,14 +266,14 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		// return contact list
 		return itemList;
 	}
-	public ArrayList<ListItem> getAllItemsFromCategory(int catID) throws NumberFormatException, ParseException {
-		ArrayList<ListItem> itemList = new ArrayList<ListItem>();
+	public ItemList getItemList(int catID) {
+		ItemList itemList = new ItemList(catID);
 		// Select All Query
 		String selectQuery = "SELECT * FROM " + TABLE_ITEMS + " WHERE " + KEY_ITEM_CATS + " = " + catID;
 		
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
-		
+		Log.v("DatabaseHandler.getItemList", "Trying to get ItemList for catID: " + catID);
 		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {
@@ -282,8 +284,9 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				item.addCategory(cursor.getString(3));
 				item.setCreateDate(Integer.parseInt(cursor.getString(4)));
 				item.setDueDate(Integer.parseInt(cursor.getString(5)));
+				Log.v("DatabaseHandler", "getItemList - Getting item - Name (" + item.getName() + ")" + " ID: (" + item.getID() + ")");
 				// Adding category to list
-				itemList.add(item);
+				itemList.addListItem(item);
 			} while (cursor.moveToNext());
 		}
 		db.close();

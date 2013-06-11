@@ -277,16 +277,17 @@ public class AddEditCatActivity extends Activity {
     public void mySaveCatButtonAction(View view) {
     	CategoryType categoryType;
     	
+    	// Make this a hidden field
     	EditText editCategoryIdNumber = (EditText) findViewById(R.id.cat_edit_id);
     	int categoryID = Integer.parseInt(editCategoryIdNumber.getText().toString());
+    	
     	EditText editCategoryNameText = (EditText) findViewById(R.id.cat_edit_name);
     	String categoryName = editCategoryNameText.getText().toString();
+    	
     	EditText editCategoryDescText = (EditText) findViewById(R.id.cat_edit_desc);
     	String categoryDesc = editCategoryDescText.getText().toString();
-    	Spinner typeSpinner = (Spinner) findViewById(R.id.cat_type_spinner);
-    	// Get the object of selected Type in the spinner
     	
-    	//CategoryType categoryType = (CategoryType) typeSpinner.getTag();
+    	Spinner typeSpinner = (Spinner) findViewById(R.id.cat_type_spinner);
     	
     	// TODO: Fix this
     	int position = typeSpinner.getSelectedItemPosition();
@@ -298,11 +299,12 @@ public class AddEditCatActivity extends Activity {
     	Log.v("MySaveCatButtonAction", "categoryDesc: " + categoryDesc);
     	Log.v("MySaveCatButtonAction", "categoryTypeID: " + categoryTypeID);
     	
-    	ListCategory myNewCat = myListMan.addCategory(categoryName, categoryDesc, categoryTypeID);
+    	ListCategory myNewCat = new ListCategory(categoryName, categoryDesc, categoryTypeID);
+
     	if (currentCategory.isNew()) {
     		Log.v("AddEditCatActivity", "Adding new category " + currentCategory.getName());
     		myNewCat.setID(categoryID);
-    		myListMan.addObjCategory(myNewCat);
+    		myListMan.addCategory(myNewCat);
     	} else {
     		Log.v("AddEditCatActivity", "Updating category " + currentCategory.getName());
     		myListMan.updateObjCategory(myNewCat);
