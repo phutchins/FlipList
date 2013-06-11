@@ -105,7 +105,10 @@ public class ListManager implements Serializable {
     	itemListMap.put(catID, new ItemList(catName));
     }
     public ListItem addItem(int curCategory, String name, String description, Date dueDate) {
+    	// TODO: decide if i want to add it to the itemList or repopulate from the DB
+    	//       each time we add an item
         ItemList myList = itemListMap.get(curCategory);
+        
         ListItem myItem = new ListItem(curCategory, name, description, dueDate);
         db.addItem(myItem);
         Log.v("ListManager.addItem", "name: " + myItem.getName());
@@ -127,10 +130,10 @@ public class ListManager implements Serializable {
     // Updating Objects
     public void updateObjCategory(ListCategory catToUpdate) {
     	// update category in DB here & update category list (or pull from DB and refresh)
-    	int catID = catToUpdate.getID();
-    	String catName = catToUpdate.getName();
+    	//int catID = catToUpdate.getID();
+    	//String catName = catToUpdate.getName();
     	db.updateCategory(catToUpdate);
-    	itemListMap.put(catID, new ItemList(catName));
+    	//itemListMap.put(catID, new ItemList(catName));
     }
     public void moveItem(ListItem myItem, String fromList, String toList) {
         ItemList myFromList = itemListMap.get(fromList);
@@ -143,7 +146,8 @@ public class ListManager implements Serializable {
     public void completeItem(ListItem myItem, int fromList) {
         ItemList myFromList = itemListMap.get(fromList);
         // TODO: Put this into settings and make a settings class to cache settings
-        int completedListID = 2;
+        int completedListID = 1;
+        // TODO: Get completed cat ID from settings class
         ItemList myToList = itemListMap.get(completedListID);
         Log.v("ListManager.completeItem", "myFromList Name: " + myFromList.getName());
         Log.v("ListManager.completeItem", "myToList Name: " + myToList.getName());

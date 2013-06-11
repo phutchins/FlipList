@@ -351,7 +351,7 @@ public class FlipList extends Activity {
     		}
     	 
     		ListItem item = itemList.get(position);
-    		holder.itemName.setText(item.getName() + " (" +  item.getDueDate() + ")");
+    		holder.itemName.setText(item.getName() + " (" +  item.getDueDate() + ")" + "(" + item.getID() + ")");
     		holder.itemCheckBox.setText("");
     		holder.itemCheckBox.setTag(item);
     	 

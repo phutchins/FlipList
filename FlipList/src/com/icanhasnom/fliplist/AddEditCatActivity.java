@@ -300,11 +300,11 @@ public class AddEditCatActivity extends Activity {
     	
     	ListCategory myNewCat = myListMan.addCategory(categoryName, categoryDesc, categoryTypeID);
     	if (currentCategory.isNew()) {
-    		Log.v("mySaveCatButtonAction", "Adding new category " + currentCategory.getName());
+    		Log.v("AddEditCatActivity", "Adding new category " + currentCategory.getName());
     		myNewCat.setID(categoryID);
     		myListMan.addObjCategory(myNewCat);
     	} else {
-    		Log.v("mySaveCatButtonAction", "Updating category " + currentCategory.getName());
+    		Log.v("AddEditCatActivity", "Updating category " + currentCategory.getName());
     		myListMan.updateObjCategory(myNewCat);
     	}
     	
