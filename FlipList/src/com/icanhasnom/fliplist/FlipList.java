@@ -59,6 +59,9 @@ import android.util.Log;
 // Make certain list types change the defaults for items added
 //   Grocery List type would not have a date by default and no reminders
 //   Have it learn common items and group them by section in store
+//   Password list type - make list passworded and encrypt the list items
+//   Songs - have it link you to places to download them
+//           maybe have it add list items by using a song finder app
 
 
 public class FlipList extends Activity {
