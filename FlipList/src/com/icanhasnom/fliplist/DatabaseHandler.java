@@ -16,7 +16,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
-	private static final int DATABASE_VERSION = 13;
+	private static final int DATABASE_VERSION = 15;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
@@ -35,7 +35,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	private static final String KEY_ITEM_ID = "id";
 	private static final String KEY_ITEM_NAME = "name";
 	private static final String KEY_ITEM_DESC = "desc";
-	private static final String KEY_ITEM_CATS = "cats";
+	private static final String KEY_ITEM_PRIMARY_CAT = "cat";
+	private static final String KEY_ITEM_SECONDARY_CATS = "cats";
 	private static final String KEY_ITEM_DUE_DATE = "due_date";
 	private static final String KEY_ITEM_CREATE_DATE = "create_date";
 	
@@ -68,9 +69,10 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				+ KEY_CAT_DESC + " TEXT," + KEY_CAT_TYPE + " TEXT" + ")";
 		String CREATE_ITEMS_TABLE = "CREATE TABLE " + TABLE_ITEMS + "("
 				+ KEY_ITEM_ID + " INTEGER PRIMARY KEY," + KEY_ITEM_NAME + " TEXT,"
-				+ KEY_ITEM_DESC + " TEXT," + KEY_ITEM_CATS + " TEXT,"
-				+ KEY_ITEM_DUE_DATE + " NUMERIC," + KEY_ITEM_CREATE_DATE 
-				+ " NUMERIC" + ")";
+				+ KEY_ITEM_DESC + " TEXT," + KEY_ITEM_PRIMARY_CAT + " TEXT," 
+				+ KEY_ITEM_SECONDARY_CATS + " TEXT,"
+				+ KEY_ITEM_DUE_DATE + " TEXT," + KEY_ITEM_CREATE_DATE 
+				+ " TEXT" + ")";
 		String CREATE_TYPES_TABLE = "CREATE TABLE " + TABLE_CATEGORY_TYPES + "("
 				+ KEY_TYPE_ID + " INTEGER PRIMARY KEY," + KEY_TYPE_NAME + " TEXT,"
 				+ KEY_TYPE_DESC + " TEXT" + ")";
@@ -117,6 +119,17 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 			
 		onCreate(db);
 	}
+	// Use this to set a single completed category
+	//     add a field to each category to show if its hidden or not
+	public void setCompletedCategory(int catID) {
+		// set completed category here
+	}
+	public void hideCategory(int catID) {
+		// hide category
+	}
+	public void unHideCategory(int catId) {
+		// unhide category
+	}
 	public int getDefaultCatID() {
 		SQLiteDatabase db = this.getReadableDatabase();
 		
@@ -142,12 +155,14 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	}
 	public void addItem(ListItem item) {
 		SQLiteDatabase db = this.getWritableDatabase();
+		String secondaryCatsString = item.getSecondaryCatsString();
 		
 		ContentValues values = new ContentValues();
 		values.put(KEY_ITEM_DESC, item.getDescription());
 		values.put(KEY_ITEM_NAME, item.getName());
-		values.put(KEY_ITEM_CATS, item.getCategories().toString());
-		values.put(KEY_ITEM_CREATE_DATE, item.getCreateDate().toString());
+		values.put(KEY_ITEM_PRIMARY_CAT,  item.getPrimaryCat());
+		values.put(KEY_ITEM_SECONDARY_CATS, secondaryCatsString);
+		values.put(KEY_ITEM_CREATE_DATE, item.getCreateDate());
 		values.put(KEY_ITEM_DUE_DATE, item.getDueDate());
 		
 		Log.v("DatabaseHandler.addItem", "Adding Item " + item.getName() + " to the DB");
@@ -187,14 +202,19 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		SQLiteDatabase db = this.getReadableDatabase();
 		
 		Cursor cursor = db.query(TABLE_ITEMS, new String[] { KEY_ITEM_ID, KEY_ITEM_NAME,
-				KEY_ITEM_DESC, KEY_ITEM_CATS, KEY_ITEM_CREATE_DATE, KEY_ITEM_DUE_DATE }, KEY_ITEM_ID
+				KEY_ITEM_DESC, KEY_ITEM_PRIMARY_CAT, KEY_ITEM_SECONDARY_CATS, KEY_ITEM_CREATE_DATE, KEY_ITEM_DUE_DATE }, KEY_ITEM_ID
 				+ "?", new String[] { String.valueOf(id) }, null, null, null, null);
 		if (cursor != null)
 			cursor.moveToFirst();
+		int itemID = Integer.parseInt(cursor.getString(0));
+		String itemName = cursor.getString(1);
+		String itemDesc = cursor.getString(2);
+		String itemPriCat = cursor.getString(3);
+		String itemSecCats = cursor.getString(4);   // Not used yet
+		String itemCreateDate = cursor.getString(5);
+		String itemDueDate = cursor.getString(6);
 		
-		ListItem item = new ListItem(Integer.parseInt(cursor.getString(0)),
-				cursor.getString(1), cursor.getString(2), cursor.getString(3), Integer.parseInt(cursor.getString(4)),
-				Integer.parseInt(cursor.getString(5)));
+		ListItem item = new ListItem(itemID, itemPriCat, itemName, itemDesc, itemCreateDate, itemDueDate);
 		// return item
 		return item;
 	}
@@ -254,9 +274,10 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				item.setID(Integer.parseInt(cursor.getString(0)));
 				item.setName(cursor.getString(1));
 				item.setDescription(cursor.getString(2));
-				item.addCategory(cursor.getString(3));
-				item.setCreateDate(Integer.parseInt(cursor.getString(4)));
-				item.setDueDate(Integer.parseInt(cursor.getString(5)));
+				item.setPrimaryCat(Integer.parseInt(cursor.getString(3)));
+				item.addToCats(cursor.getString(4));
+				item.setCreateDate(cursor.getString(5));
+				item.setDueDate(cursor.getString(6));
 				// Adding category to list
 				itemList.add(item);
 			} while (cursor.moveToNext());
@@ -268,11 +289,13 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	}
 	public ItemList getItemList(int catID) {
 		ItemList itemList = new ItemList(catID);
-		// Select All Query
-		String selectQuery = "SELECT * FROM " + TABLE_ITEMS + " WHERE " + KEY_ITEM_CATS + " = " + catID;
-		
 		SQLiteDatabase db = this.getReadableDatabase();
-		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		Cursor cursor = db.query(TABLE_ITEMS, new String[] { KEY_ITEM_ID, KEY_ITEM_NAME, 
+				KEY_ITEM_DESC ,KEY_ITEM_PRIMARY_CAT, KEY_ITEM_SECONDARY_CATS, 
+				KEY_ITEM_DUE_DATE, KEY_ITEM_CREATE_DATE }, 
+				KEY_ITEM_PRIMARY_CAT + "=?", new String[] { String.valueOf(catID) }, null, null, null, null);
+		
 		Log.v("DatabaseHandler.getItemList", "Trying to get ItemList for catID: " + catID);
 		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
@@ -281,16 +304,17 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				item.setID(Integer.parseInt(cursor.getString(0)));
 				item.setName(cursor.getString(1));
 				item.setDescription(cursor.getString(2));
-				item.addCategory(cursor.getString(3));
-				item.setCreateDate(Integer.parseInt(cursor.getString(4)));
-				item.setDueDate(Integer.parseInt(cursor.getString(5)));
-				Log.v("DatabaseHandler", "getItemList - Getting item - Name (" + item.getName() + ")" + " ID: (" + item.getID() + ")");
+				item.setPrimaryCat(Integer.parseInt(cursor.getString(3)));
+				item.addToCats(cursor.getString(4));
+				item.setDueDate(cursor.getString(5));
+				item.setCreateDate(cursor.getString(6));
+				
+				Log.v("DatabaseHandler", "getItemList - Getting item - Name (" + item.getName() + ") ID: (" + item.getID() + ") PriCatID: " + item.getPrimaryCat());
 				// Adding category to list
 				itemList.addListItem(item);
 			} while (cursor.moveToNext());
+			Log.v("DatabaseHandler.getItemList", "cursor.size(): " + cursor.getCount());
 		}
-		db.close();
-		
 		// return contact list
 		return itemList;
 	}
@@ -349,7 +373,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		cursor.close();
 		
 		// return count
 		return catID;
@@ -359,7 +382,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		String countQuery = "SELECT * FROM " + TABLE_ITEMS;
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.rawQuery(countQuery, null);
-		cursor.close();
+		
 		
 		// return count
 		return cursor.getCount();
@@ -370,7 +393,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		ContentValues values = new ContentValues();
 		values.put(KEY_ITEM_NAME, item.getName());
 		values.put(KEY_ITEM_DESC, item.getDescription());
-		values.put(KEY_ITEM_CATS, item.getCategories().toString());
+		values.put(KEY_ITEM_PRIMARY_CAT, item.getPrimaryCat());
+		values.put(KEY_ITEM_SECONDARY_CATS, item.getSecondaryCatsString());
 		values.put(KEY_ITEM_DUE_DATE, item.getDueDate());
 		
 		// updating row

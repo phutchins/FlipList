@@ -1,7 +1,10 @@
 package com.icanhasnom.fliplist;
 
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -158,9 +161,11 @@ public class FlipList extends Activity {
     
     public class SpinnerActivity extends Activity implements OnItemSelectedListener {
     	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-    		// String itemSelected = (String) parent.getItemAtPosition(pos);
-    		Log.v("FlipList.SpinnerActivity", "Inside SpinnerActivity");
+    		ListCategory itemSelected = (ListCategory) parent.getItemAtPosition(pos);
+    		currentCategory = itemSelected;
+    		Log.v("FlipList.SpinnerActivity", "itemSelected (cast to ListCategory) name: " + itemSelected.getName());
     		// Do stuff with clicked category here
+    		
     		addItemsOnList();
     		// Refresh spinner here?
     		
@@ -171,15 +176,24 @@ public class FlipList extends Activity {
     }
     
     public void mySaveButtonAction(View view) {
-       Date dueDate = new Date();
+    	//This is only temporary until I make the DueDate input fields
+        Date date = new Date();
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	String dueDate = sdf.format(date);
+
+       // Putting the below in the DB handler so we can just pass objects in and out from the DB layer
+       //int intDueDate = (int) dueDate.getTime();
+
+       // Not sure if i should use this way
+       //DateFormat myDate = new SimpleDateFormat ("yyy-MM-dd'T'HH:mm:ssZ");
+       //String dateStr = myDate.format(dueDate);
+       
        editText = (EditText) findViewById(R.id.editText);
        String name = editText.getText().toString();
        //String description = editText.getText().toString();
        String description = "blank";
        
        catSpinner = (Spinner) findViewById(R.id.catSpinner);
-       //selectedCategory = String.valueOf(catSpinner.getSelectedItem());
-       //ListCategory selectedCategoryObj = (ListCategory) catSpinner.getTag();
        int position = catSpinner.getSelectedItemPosition();
        ListCategory selectedCategory = (ListCategory) catSpinner.getItemAtPosition(position);
        
@@ -188,6 +202,7 @@ public class FlipList extends Activity {
        Log.v(TAG, "selectedCategoryObj Name: " + selectedCategory.getName());
        
        int catID = selectedCategory.getID();
+       
        ListItem myItem = myListMan.addItem(catID, name, description, dueDate);
        Log.v(TAG, "Added Item: " + myItem.getName());
 
@@ -239,7 +254,8 @@ public class FlipList extends Activity {
     	
     	listView.setOnItemClickListener(new OnItemClickListener() {
     		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-    			// When clicked, show a toast with the TextView text
+    			// This is run when the item NAME is clicked
+    			// We will send the user to item edit layout for this eventually
     			ListItem item = (ListItem) parent.getItemAtPosition(position);
     			Log.v("FlipList.addItemsOnList.setOnItemClickListener", "position: " + position + " id " + id);
     			Toast.makeText(getApplicationContext(),

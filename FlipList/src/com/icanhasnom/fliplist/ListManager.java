@@ -32,9 +32,11 @@ public class ListManager implements Serializable {
     // How should we handle items that are on more than one list? Use foreach to add to each item list?
     
     // Get these from the settings table in the DB
-
+    
     public int defaultTypeID = 0;
     public String defaultType = "Generic";
+    // TODO: Put this in settings and DB
+    public int completedCatID = 1;
     
     // TODO: Still using these?
     //ItemList defaultList = new ItemList(defaultCategory);
@@ -79,7 +81,7 @@ public class ListManager implements Serializable {
     		itemListMap.put(curCatID, myItemList);
     		Log.v("ListManager.buildItemListMap", "Building ItemList for " + curCat.getName() + " with ID " + curCatID);
     		//BROKEN
-    		Log.v("ListManager.buildItemListMap", "itemCount: " + db.getItemsCount());
+    		//Log.v("ListManager.buildItemListMap", "itemCount: " + db.getItemsCount());
     	}	
     }
     public void populateItemList(int catID) {
@@ -112,11 +114,11 @@ public class ListManager implements Serializable {
     	buildItemListMap();
     	populateCategoryList();
     }
-    public ListItem addItem(int curCategory, String name, String description, Date dueDate) {
+    public ListItem addItem(int curCategory, String name, String description, String dueDate) {
     	// TODO: decide if i want to add it to the itemList or repopulate from the DB
     	//       each time we add an item
         //ItemList myList = itemListMap.get(curCategory);
-        
+
         ListItem myItem = new ListItem(curCategory, name, description, dueDate);
         Log.v("ListManager.addItem", "Sending new item to DB (" + myItem.getName() + ")");
         db.addItem(myItem);
@@ -158,14 +160,16 @@ public class ListManager implements Serializable {
     public void completeItem(ListItem myItem, int fromList) {
         ItemList myFromList = itemListMap.get(fromList);
         // TODO: Put this into settings and make a settings class to cache settings
-        int completedListID = 1;
+        int completedListID = completedCatID;
         // TODO: Get completed cat ID from settings class
-        ItemList myToList = itemListMap.get(completedListID);
+        //ItemList myToList = itemListMap.get(completedListID);
         Log.v("ListManager.completeItem", "myFromList Name: " + myFromList.getName());
-        Log.v("ListManager.completeItem", "myToList Name: " + myToList.getName());
-        myFromList.removeListItem(myItem);
+        //Log.v("ListManager.completeItem", "myToList Name: " + myToList.getName());
+        myItem.setPrimaryCat(completedListID);
         if (fromList != completedListID) {
-            myToList.addListItem(myItem);
+            db.updateItem(myItem);
+        } else {
+        	db.deleteItem(myItem);
         }
     }
     
@@ -191,16 +195,6 @@ public class ListManager implements Serializable {
     }
     public ItemList getItemList(int catID) {
     	ItemList myItemList;
-
-        //if (itemListMap.containsKey(catID)) {
-        //	myItemList = itemListMap.get(catID);
-        //} else {
-        //	ArrayList<ListItem> myItemArrayList = (ArrayList<ListItem>) db.getAllItemsFromCategory(catID);
-        //	myItemList = new ItemList(catID);
-        //	itemListMap.put(catID, myItemList);
-        //}
-        //ArrayList<ListItem> myItemArrayList = myItemList.getListItems();
-    	// ** FIgure out why this is breaking below, should i really be using the id to get the cat? **
     	buildItemListMap();
     	myItemList = itemListMap.get(catID);
         return myItemList;

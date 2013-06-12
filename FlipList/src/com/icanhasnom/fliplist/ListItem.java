@@ -22,73 +22,76 @@ public class ListItem implements Serializable {
 	public int itemID;
 	public String name;
 	public String description;
-    public Date dueDate;
-    public ArrayList<String> categories = new ArrayList<String>();
-    public Date createDate;
+    public String dueDate;
+    public String createDate;
+    public int primaryCat;
+    public List<String> secondaryCats = new ArrayList<String>();
     public boolean isSelected;
     
-    java.text.DateFormat df = new SimpleDateFormat("MM/dd/yyy");
+    //java.text.DateFormat df = new SimpleDateFormat("MM/dd/yyy");
     
     public ListItem() {
     }
-    public ListItem(String cat, String n, String desc, int crDate, int due) throws ParseException {
+    public ListItem(int cat, String n, String desc, String crDate, String due) throws ParseException {
     	name = n;
     	description = desc;
-        String dueDateString = "" + due;
-        dueDate = df.parse(dueDateString);
-        categories.add(cat);
-        createDate = new Date();
+    	dueDate = due;
+        //stringCatsToList(cats);
+    	primaryCat = cat;
+        createDate = new Date().toString();
     }
-    public ListItem(int cat, String n, String desc, Date due) {
+    public ListItem(int cat, String n, String desc, String due) {
     	name = n;
-    	Log.v("ListItem Constructor", "Category: " + cat);
     	Log.v("ListItem Constructor", "Name: " + n);
     	Log.v("ListItem Constructor", "Description: " + desc);
     	Log.v("ListItem Constructor", "Due Date: " + due);
-    	String catString = cat + "";
-    	Log.v("ListItem Constructor", "Category is: " + catString);
-    	//categories.add(catString);
-    	categories.add("1");
+    	Log.v("ListItem Constructor", "Category is: " + cat);
+        //stringCatsToList(cats);
+    	primaryCat = cat;
     	if (desc != null) {
     		description = desc;
     	} else {
     		description = "";
     	}
     	dueDate = due;
-    	createDate = new Date();
+    	createDate = new Date().toString();
     }
-    public ListItem(int id, String cat, String n, String desc, int crDate, int due) throws ParseException {
+    public ListItem(int id, String cats, String n, String desc, String crDate, String due) throws ParseException {
     	itemID = id;
     	name = n;
         description = desc;
-        String dueDateString = "" + due;
-        dueDate = df.parse(dueDateString);
-        categories.add(cat);
-        String crDateString = "" + crDate;
-        createDate = df.parse(crDateString);
+        dueDate = due;
+        addToCats(cats);
+        createDate = crDate;
     }
     public String getDueDate() {
-        DateFormat dateFormatter = DateFormat.getDateInstance();
-        String dateUS = dateFormatter.format(dueDate);
-        return dateUS;
+    	return dueDate;
     }
-    public void setDueDate(int dd) {
-    	String dueDateString = "" + dd;
-        try {
-			dueDate = df.parse(dueDateString);
+    public Date getDueDateObj() {
+    	return stringToDate(dueDate);
+    }
+    public void setDueDate(String dd) {
+    	dueDate = dd;
+    }
+    public void setCreateDate(String cd) {
+    	// Do some checking here?
+    	createDate = cd;
+    }
+    public String dateToString(Date date) {
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	String dateStr = sdf.format(date);
+    	return dateStr;
+    }
+    public Date stringToDate(String dateStr) {
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	Date date = null;
+		try {
+			date = sdf.parse(dateStr);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    }
-    public void setCreateDate(int cd) {
-    	String createDateString = "" + cd;
-    	try {
-			createDate = df.parse(createDateString);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    	return date;
     }
     public void setDescription(String d) {
         description = d;
@@ -105,22 +108,35 @@ public class ListItem implements Serializable {
     public int getID() {
     	return itemID;
     }
-    public boolean isSelected() {
-    	return isSelected;
-    }
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
-    public ArrayList<String> getCategories() {
-        return categories;
+    public int getPrimaryCat() {
+    	return primaryCat;
     }
-    // Maybe make this so it can accept more than one category at a time if comma separated
-    // ToDo: string to array to parse comma separated categories from DB
-    public void addCategory(String cat) {
-        categories.add(cat);
+    public List<String> getSecondaryCats() {
+        return secondaryCats;
+    }
+    public String getSecondaryCatsString() {
+    	String secondaryCatsString = secondaryCats.toArray().toString();
+    	return secondaryCatsString;
+    }
+    public void addToCats(String cats) {
+    	// TODO: Make this check for duplicates
+    	String[] catList = cats.split(",");
+        int catListSize = catList.length;
+        for (int i = 0; i < catListSize; i++) {
+        	secondaryCats.add(catList[i]);
+        }
+    }
+    public void addSecondaryCat(String cat) {
+    	secondaryCats.add(cat);
+    }
+    public void setPrimaryCat(int cat) {
+    	primaryCat = cat;
     }
     public void rmCategory(String cat) {
-    	categories.remove(cat);
+    	secondaryCats.remove(cat);
     }
     public String getDescription() {
         return description;

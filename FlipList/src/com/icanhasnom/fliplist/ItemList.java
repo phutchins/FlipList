@@ -44,7 +44,7 @@ public class ItemList implements Serializable {
     
     public void addListItem(ListItem li) {
         myItemList.add(li);
-        Log.v("ItemList", "Added ListItem: " + li.getName() + ", " + li.getID() + ", " + li.getCategories());
+        Log.v("ItemList", "Added ListItem: " + li.getName() + ", " + li.getID() + ", " + li.getPrimaryCat());
     }
     
     public void removeListItem(ListItem li) {
