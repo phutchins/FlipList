@@ -66,6 +66,10 @@ import android.util.Log;
 //   Songs - have it link you to places to download them
 //           maybe have it add list items by using a song finder app
 
+// Caching and Redrawing
+// TODO: Only recreate the listmap if we've written, edited or deleted a category, item or type
+// TODO: Pull all of the items at one time from the DB into a searchable hash for parsing into itemlists
+
 
 public class FlipList extends Activity {
 	public final static String EXTRA_MESSAGE = "com.icanhasnom.FlipList.MESSAGE";
