@@ -173,6 +173,13 @@ public class ListManager implements Serializable {
         }
     }
     
+    // Removing Objects
+    public boolean rmCategory(int catID) {
+    	boolean success;
+    	success = db.deleteCategory(catID);
+    	return success;
+    }
+    
     // Retrieving Lists
     public ArrayList<ListCategory> getCategoryList() {
     	// TODO: Add a variable to save the category list

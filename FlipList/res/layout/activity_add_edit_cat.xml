@@ -11,7 +11,7 @@
         android:layout_below="@+id/checkedTextView1"
         android:ems="10"
         android:hint="@string/text_view_cat_name_edit_text"
-        android:inputType="textCapCharacters" >
+        android:inputType="textCapSentences" >
 
         <requestFocus />
     </EditText>
@@ -101,6 +101,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:text="Delete" />
+        android:onClick="myDeleteCatButtonAction"
+        android:text="@string/cat_delete_button_text" />
 
 </RelativeLayout>

@@ -20,6 +20,7 @@ public class ListCategory implements Serializable {
     String description;
     int type;
     boolean isNew = false;
+    int isVisible = 1;
     public ListCategory() {
     }
     public ListCategory(int catID, String catName, String catDesc, int catType) {
@@ -62,4 +63,7 @@ public class ListCategory implements Serializable {
     public void setIsNew() {
     	isNew = true;
     }
+	public int getVisible() {
+		return isVisible;
+	}
 }

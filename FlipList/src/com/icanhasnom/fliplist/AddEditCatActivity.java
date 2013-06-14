@@ -60,7 +60,7 @@ public class AddEditCatActivity extends Activity {
     	// Create blank new category to add to the list so there is an option to add new at the top
     	ListCategory newCategory = new ListCategory();
     	newCategory.setIsNew();
-    	newCategory.setName("+ Add New Category");
+    	//newCategory.setName("+ Add New Category");
     	newCategory.setType(myListMan.defaultTypeID);
     	
     	addEditCategory(newCategory);
@@ -68,7 +68,7 @@ public class AddEditCatActivity extends Activity {
 	public void addEditCategory(ListCategory lc) {
 		// TODO: Do I need to pass in the ListCategory? or just use the global currentCategory
 		setContentView(R.layout.activity_add_edit_cat);
-		boolean isNew = currentCategory.isNew();
+		boolean isNew = lc.isNew();
 		Log.v("addEditCategory", "isNew: " + isNew);
 		
 		// Get all of the View Objects
@@ -81,19 +81,20 @@ public class AddEditCatActivity extends Activity {
 		
 		// Populate type spinner and select the categories type (will be default if new)
 		addTypesToSpinner();
-		typeSpinner.setSelection(currentCategory.getType());
+		typeSpinner.setSelection(lc.getType());
 		
 		// fill out layout variables using the currentCategory object
 		if (isNew) {
 			pageTitle.setText("New Category");
 		} else {
 			pageTitle.setText("Edit Category");
-			catName.setText(currentCategory.getName());
-			catDesc.setText(currentCategory.getDescription());
+			catName.setText(lc.getName());
+			catDesc.setText(lc.getDescription());
 			//Log.v("addEditCategory", "lc.getID(): " + lc.getID());
 			//Log.v("addEditCategory", "currentCategory.getID(): " + currentCategory.getID());
-			catID.setText(String.valueOf(currentCategory.getID()));
+			catID.setText(String.valueOf(lc.getID()));
 		}
+		currentCategory = lc;
 	}
 	
     public void addTypesToSpinner() {
@@ -275,13 +276,22 @@ public class AddEditCatActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	public void myDeleteCatButtonAction(View view) {
+		boolean success = false;
+		EditText editCategoryIdNumber = (EditText) findViewById(R.id.cat_edit_id); 
+		int categoryID = Integer.parseInt(editCategoryIdNumber.getText().toString());
+		success = myListMan.rmCategory(categoryID);
+		
+		// TODO: Do something with success to notify user of success or not
+		//       Use a toast to display success or failure
+		Intent flipList = new Intent(this, FlipList.class);
+		this.startActivity(flipList);
+	}
     public void mySaveCatButtonAction(View view) {
     	CategoryType categoryType;
     	
     	// Make this a hidden field
     	EditText editCategoryIdNumber = (EditText) findViewById(R.id.cat_edit_id);
-    	int categoryID = Integer.parseInt(editCategoryIdNumber.getText().toString());
-    	
     	EditText editCategoryNameText = (EditText) findViewById(R.id.cat_edit_name);
     	String categoryName = editCategoryNameText.getText().toString();
     	
@@ -295,7 +305,7 @@ public class AddEditCatActivity extends Activity {
     	categoryType = (CategoryType) typeSpinner.getItemAtPosition(position);
     	int categoryTypeID = categoryType.getID();
     	
-    	Log.v("MySaveCatButtonAction", "categoryID: " + categoryID);
+
     	Log.v("MySaveCatButtonAction", "categoryName: " + categoryName);
     	Log.v("MySaveCatButtonAction", "categoryDesc: " + categoryDesc);
     	Log.v("MySaveCatButtonAction", "categoryTypeID: " + categoryTypeID);
@@ -304,9 +314,11 @@ public class AddEditCatActivity extends Activity {
 
     	if (currentCategory.isNew()) {
     		Log.v("AddEditCatActivity", "Adding new category " + currentCategory.getName());
-    		myNewCat.setID(categoryID);
     		myListMan.addCategory(myNewCat);
     	} else {
+    		int categoryID = Integer.parseInt(editCategoryIdNumber.getText().toString());
+    		myNewCat.setID(categoryID);
+        	Log.v("MySaveCatButtonAction", "categoryID: " + categoryID);
     		Log.v("AddEditCatActivity", "Updating category " + currentCategory.getName());
     		myListMan.updateObjCategory(myNewCat);
     	}

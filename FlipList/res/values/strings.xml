@@ -21,5 +21,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="text_view_cat_id_text">ID</string>
     <string name="add_new_category_text">Add New Category</string>
+    <string name="new_category_button_text">Add Category</string>
+    <string name="cat_delete_button_text">Delete</string>
 
 </resources>
