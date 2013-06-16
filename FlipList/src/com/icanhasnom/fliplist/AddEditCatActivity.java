@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -37,6 +39,7 @@ public class AddEditCatActivity extends Activity {
 	Spinner typeSpinner;
 	MyTypeSpinnerCustomAdapter adapter;
 
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -45,7 +48,7 @@ public class AddEditCatActivity extends Activity {
 		//catList = getIntent().getExtras().getStringArray("catList");
 		
 		myListMan = new ListManager(this);
-        categoryList = myListMan.getCategoryList();
+        categoryList = myListMan.getCategoryListAll();
 		
 		addItemsOnEditList();
 		
@@ -62,14 +65,23 @@ public class AddEditCatActivity extends Activity {
     	newCategory.setIsNew();
     	//newCategory.setName("+ Add New Category");
     	newCategory.setType(myListMan.defaultTypeID);
-    	
+    	currentCategory = newCategory;
     	addEditCategory(newCategory);
 	}
 	public void addEditCategory(ListCategory lc) {
 		// TODO: Do I need to pass in the ListCategory? or just use the global currentCategory
 		setContentView(R.layout.activity_add_edit_cat);
 		boolean isNew = lc.isNew();
+		boolean isVisible;
 		Log.v("addEditCategory", "isNew: " + isNew);
+    	
+    	if (isNew) {
+    		Button categoryDeleteButton = (Button)findViewById(R.id.category_delete_button);
+    		categoryDeleteButton.setEnabled(false);
+    		isVisible = true;
+    	} else {
+    		isVisible = lc.isVisible();
+    	}
 		
 		// Get all of the View Objects
 		CheckedTextView pageTitle = (CheckedTextView) findViewById(R.id.catNameOrNewCat);
@@ -78,6 +90,8 @@ public class AddEditCatActivity extends Activity {
 		// Make this catID a hidden text field or something to store the value
 		EditText catID = (EditText) findViewById(R.id.cat_edit_id);
 		typeSpinner = (Spinner) findViewById(R.id.cat_type_spinner);
+		CheckBox isVisibleBox = (CheckBox) findViewById(R.id.cat_visible_check_box);
+		isVisibleBox.setChecked(isVisible);
 		
 		// Populate type spinner and select the categories type (will be default if new)
 		addTypesToSpinner();
@@ -168,10 +182,11 @@ public class AddEditCatActivity extends Activity {
     		public void onItemClick(AdapterView<?> parent, View view,
     		int position, long id) {
     			// When clicked, show a toast with the TextView text
-    			ListItem item = (ListItem) parent.getItemAtPosition(position);
+    			ListCategory category = (ListCategory) parent.getItemAtPosition(position);
     			Toast.makeText(getApplicationContext(),
-    					"Clicked on Row: " + item.getDescription(), 
+    					"Clicked on Row: " + category.getDescription(), 
     					Toast.LENGTH_LONG).show();
+    			addEditCategory(category);
     		}
     	});
     }
@@ -197,27 +212,32 @@ public class AddEditCatActivity extends Activity {
 
     		ViewHolder holder = null;
     		Log.v("ConvertView", String.valueOf(position));
+    		Log.v("AddEditCatActivity", "convertView" + convertView);
     	 
     		if (convertView == null) {
     			LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    			// TODO: Should I set null to parent? It errors if I do but I can't call the one below if i do.
     			convertView = vi.inflate(R.layout.add_edit_layout, null);
     	 
     			holder = new ViewHolder();
     			holder.cat_list_text_view = (TextView) convertView.findViewById(R.id.cat_list_text_view);
 
     			convertView.setTag(holder);
-    	 
-    			holder.cat_list_text_view.setOnClickListener( new View.OnClickListener() {  
+    			
+    			View.OnClickListener categoryClickListener;
+    			categoryClickListener = new View.OnClickListener() {  
     				public void onClick(View v) {  
     					// Use this onClick to send the user to the edit screen for the clicked category
     					TextView tv = (TextView) v;
     					ListCategory lc = (ListCategory) tv.getTag();
-    					
+    					Log.v("AddEditCatActivity", "categoryClickListener - made it here");
     					// TODO: Probably only need one of these
     					currentCategory = lc;
-    					addEditCategory(lc);
+    					//addEditCategory(lc);
     				}  
-    			});  
+    			};
+    	 
+    			holder.cat_list_text_view.setOnClickListener( categoryClickListener );  
     	   } 
     	   else {
     	    holder = (ViewHolder) convertView.getTag();
@@ -299,18 +319,21 @@ public class AddEditCatActivity extends Activity {
     	String categoryDesc = editCategoryDescText.getText().toString();
     	
     	Spinner typeSpinner = (Spinner) findViewById(R.id.cat_type_spinner);
+    	CheckBox visibleCheckBox = (CheckBox) findViewById(R.id.cat_visible_check_box);
     	
     	// TODO: Fix this
     	int position = typeSpinner.getSelectedItemPosition();
     	categoryType = (CategoryType) typeSpinner.getItemAtPosition(position);
     	int categoryTypeID = categoryType.getID();
-    	
+    	boolean isVisible = visibleCheckBox.isChecked();
+    	int isVisibleInt = (isVisible) ? 1 : 0;
 
     	Log.v("MySaveCatButtonAction", "categoryName: " + categoryName);
     	Log.v("MySaveCatButtonAction", "categoryDesc: " + categoryDesc);
     	Log.v("MySaveCatButtonAction", "categoryTypeID: " + categoryTypeID);
+    	Log.v("MySaveCatButtonAction", "categoryVisible: " + isVisible + ", " + isVisibleInt);
     	
-    	ListCategory myNewCat = new ListCategory(categoryName, categoryDesc, categoryTypeID);
+    	ListCategory myNewCat = new ListCategory(categoryName, categoryDesc, categoryTypeID, isVisibleInt);
 
     	if (currentCategory.isNew()) {
     		Log.v("AddEditCatActivity", "Adding new category " + currentCategory.getName());
@@ -324,7 +347,6 @@ public class AddEditCatActivity extends Activity {
     	}
     	
 		Intent flipList = new Intent(this, FlipList.class);
-		//flipList.putExtra("myNewCat", myNewCat);
 		this.startActivity(flipList);
     }
 

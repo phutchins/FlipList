@@ -23,5 +23,18 @@
     <string name="add_new_category_text">Add New Category</string>
     <string name="new_category_button_text">Add Category</string>
     <string name="cat_delete_button_text">Delete</string>
+    <string name="cat_visible_check_box_text">Visible</string>
+    <string name="item_edit_title_text">Edit Item</string>
+    <string name="item_edit_name_text">Name</string>
+    <string name="item_edit_name_text_hint">name</string>
+    <string name="item_edit_description_text">Description</string>
+    <string name="item_edit_description_text_hint">description</string>
+    <string name="item_edit_category_text">Category</string>
+    <string name="item_edit_notes_text">Notes</string>
+    <string name="item_edit_notes_text_hint">notes</string>
+    <string name="item_edit_save_text">Save</string>
+    <string name="item_edit_delete_text">Delete</string>
+    <string name="item_edit_due_text">Due</string>
+    <string name="item_edit_due_text_hint">due</string>
 
 </resources>

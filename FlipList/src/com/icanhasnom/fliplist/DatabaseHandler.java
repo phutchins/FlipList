@@ -16,7 +16,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
-	private static final int DATABASE_VERSION = 16;
+	private static final int DATABASE_VERSION = 24;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
@@ -67,7 +67,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	public void onCreate(SQLiteDatabase db) {
 		String CREATE_CATEGORIES_TABLE = "CREATE TABLE " + TABLE_CATEGORIES + "(" 
 				+ KEY_CAT_ID + " INTEGER PRIMARY KEY," + KEY_CAT_NAME + " TEXT," 
-				+ KEY_CAT_DESC + " TEXT," + KEY_CAT_TYPE + " TEXT" + KEY_CAT_VISIBLE
+				+ KEY_CAT_DESC + " TEXT," + KEY_CAT_TYPE + " TEXT," + KEY_CAT_VISIBLE
 				+ " INTEGER" + ")";
 		String CREATE_ITEMS_TABLE = "CREATE TABLE " + TABLE_ITEMS + "("
 				+ KEY_ITEM_ID + " INTEGER PRIMARY KEY," + KEY_ITEM_NAME + " TEXT,"
@@ -83,10 +83,11 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				+ KEY_SETTING_ID + " INTEGER PRIMARY KEY," + KEY_SETTING_NAME + " TEXT,"
 				+ KEY_SETTING_VAL1 + " TEXT," + KEY_SETTING_VAL2 + " TEXT" + ")";
 		
+		// TODO: Make these undeletable? Atleast the completed category.
 		String CREATE_DEFAULT_CATEGORY = "insert into " + TABLE_CATEGORIES + "(" + KEY_CAT_ID + "," + KEY_CAT_NAME + ","
-                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + ") values(0, 'Default', 'Default Category','0')";
+                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + "," + KEY_CAT_VISIBLE + ") values(0, 'Default', 'Default Category','0', '1')";
 		String CREATE_COMPLETED_CATEGORY = "insert into " + TABLE_CATEGORIES + "(" + KEY_CAT_ID + "," + KEY_CAT_NAME + ","
-                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + ") values(1, 'Completed', 'Completed Category','0')";
+                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + "," + KEY_CAT_VISIBLE + ") values(1, 'Completed', 'Completed Category','0', '0')";
 		
 		String CREATE_TYPE_GENERIC = "insert into " + TABLE_CATEGORY_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
 				+ KEY_TYPE_DESC + ") values(0, 'Generic', 'Generic items')";
@@ -263,6 +264,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_CAT_NAME, category.getName());
 		values.put(KEY_CAT_DESC, category.getDescription());
 		values.put(KEY_CAT_TYPE, category.getType());
+		values.put(KEY_CAT_VISIBLE, category.getVisible());
 		
 		Log.v("addCategory", "DatabaseHandler.category.getName: " + category.getName());
 		
@@ -273,13 +275,13 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		SQLiteDatabase db = this.getReadableDatabase();
 		
 		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
-				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE }, KEY_CAT_ID + "=?",
+				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE }, KEY_CAT_ID + "=?",
 				new String[] { String.valueOf(id) }, null, null, null, null);
 		if (cursor != null)
 			cursor.moveToFirst();
 		
 		ListCategory category = new ListCategory(Integer.parseInt(cursor.getString(0)),
-				cursor.getString(1), cursor.getString(2), Integer.parseInt(cursor.getString(3)));
+				cursor.getString(1), cursor.getString(2), Integer.parseInt(cursor.getString(3)), Integer.parseInt(cursor.getString(4)));
 		// return category
 		return category;
 	}
@@ -287,13 +289,13 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		SQLiteDatabase db = this.getReadableDatabase();
 		
 		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
-				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE }, KEY_CAT_NAME + "=?",
+				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE }, KEY_CAT_NAME + "=?",
 				new String[] { catName }, null, null, null, null);
 		if (cursor != null)
 			cursor.moveToFirst();
 		
 		ListCategory category = new ListCategory(Integer.parseInt(cursor.getString(0)),
-				cursor.getString(1), cursor.getString(2), Integer.parseInt(cursor.getString(3)));
+				cursor.getString(1), cursor.getString(2), Integer.parseInt(cursor.getString(3)), Integer.parseInt(cursor.getString(4)));
 		// return category
 		return category;
 	}
@@ -320,11 +322,44 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				category.setName(cursor.getString(1));
 				category.setDescription(cursor.getString(2));
 				category.setType(Integer.parseInt(cursor.getString(3)));
+				category.setVisible(Integer.parseInt(cursor.getString(4)));
 				// Adding category to list
 				categoryList.add(category);
 			} while (cursor.moveToNext());
 		}
 		db.close();
+		
+		// return contact list
+		return categoryList;
+	}
+	public ArrayList<ListCategory> getCategories() {
+		ArrayList<ListCategory> categoryList = new ArrayList<ListCategory>();
+		// Select All Query
+		//String selectQuery = "SELECT * FROM " + TABLE_CATEGORIES;
+		String isVisible = "1";
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
+				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE }, KEY_CAT_VISIBLE + "=?",
+				new String[] { isVisible }, null, null, null, null);
+		//Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
+		//		KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE }, KEY_CAT_VISIBLE + " = 1",
+		//		null, null, null, null, null);
+		
+		//Cursor cursor = db.rawQuery(selectQuery, null);
+		
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				ListCategory category = new ListCategory();
+				category.setID(Integer.parseInt(cursor.getString(0)));
+				category.setName(cursor.getString(1));
+				category.setDescription(cursor.getString(2));
+				category.setType(Integer.parseInt(cursor.getString(3)));
+				category.setVisible(Integer.parseInt(cursor.getString(4)));
+				// Adding category to list
+				categoryList.add(category);
+			} while (cursor.moveToNext());
+		}
 		
 		// return contact list
 		return categoryList;

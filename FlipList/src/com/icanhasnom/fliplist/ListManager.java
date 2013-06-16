@@ -65,6 +65,12 @@ public class ListManager implements Serializable {
     	buildItemListMap();
     	populateCategoryList();
     }
+    public void updateItem(ListItem item) {
+    	db.updateItem(item);
+    }
+    public void deleteItem(ListItem item) {
+    	db.deleteItem(item);
+    }
     public void populateCategoryList() {
     	categoryList = db.getAllCategories();
     }
@@ -175,6 +181,9 @@ public class ListManager implements Serializable {
     
     // Removing Objects
     public boolean rmCategory(int catID) {
+    	// TODO: Make this remove all items in category or move them to some other list
+    	//       or warn user that all items on the list will be deleted, or give the option
+    	//       to delete them all or move them to a different list
     	boolean success;
     	success = db.deleteCategory(catID);
     	return success;
@@ -187,6 +196,10 @@ public class ListManager implements Serializable {
     	//       and populate from the DB if it doesn't exist or has been updated
     	//       Create Variable to set in in the ListManager that is true if a certain datatype
     	//       has been updated, then update the list and set the variable to false
+    	ArrayList<ListCategory> retCatListObjs = db.getCategories();
+        return retCatListObjs;
+    }
+    public ArrayList<ListCategory> getCategoryListAll() {
     	ArrayList<ListCategory> retCatListObjs = db.getAllCategories();
         return retCatListObjs;
     }

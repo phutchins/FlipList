@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/item_edit_title_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/item_edit_title_text"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/item_edit_name_text_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/item_edit_title_textview"
+        android:text="@string/item_edit_name_text"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <EditText
+        android:id="@+id/item_edit_name_edittext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/item_edit_name_text_textview"
+        android:ems="10"
+        android:hint="@string/item_edit_name_text_hint" >
+
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:id="@+id/item_edit_text_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/item_edit_name_edittext"
+        android:text="@string/item_edit_description_text"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <EditText
+        android:id="@+id/item_edit_description_edittext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/item_edit_text_textview"
+        android:ems="10"
+        android:hint="@string/item_edit_description_text_hint" />
+
+    <TextView
+        android:id="@+id/item_edit_category_text_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/item_edit_description_edittext"
+        android:text="@string/item_edit_category_text"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <Spinner
+        android:id="@+id/item_edit_category_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/item_edit_title_textview"
+        android:layout_below="@+id/item_edit_category_text_textview" />
+
+    <TextView
+        android:id="@+id/item_edit_notes_text_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/item_edit_category_spinner"
+        android:text="@string/item_edit_notes_text"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <EditText
+        android:id="@+id/item_edit_notes_edittext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/item_edit_notes_text_textview"
+        android:ems="10"
+        android:hint="@string/item_edit_notes_text_hint"
+        android:inputType="textMultiLine" />
+
+    <Button
+        android:id="@+id/item_edit_save_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:onClick="itemEditSaveButtonAction"
+        android:text="@string/item_edit_save_text" />
+
+    <Button
+        android:id="@+id/item_edit_delete_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:onClick="itemEditDeleteButtonAction"
+        android:text="@string/item_edit_delete_text" />
+
+    <TextView
+        android:id="@+id/item_edit_due_text_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/item_edit_notes_edittext"
+        android:text="@string/item_edit_due_text"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <EditText
+        android:id="@+id/item_edit_due_edittext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/item_edit_due_text_textview"
+        android:ems="10"
+        android:hint="@string/item_edit_due_text_hint" />
+
+    <EditText
+        android:id="@+id/item_edit_id_edittext"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/item_edit_name_edittext"
+        android:layout_alignBottom="@+id/item_edit_name_edittext"
+        android:layout_alignLeft="@+id/item_edit_save_button"
+        android:layout_alignParentRight="true"
+        android:ems="10" />
+
+</RelativeLayout>

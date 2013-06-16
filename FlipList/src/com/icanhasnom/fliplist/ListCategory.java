@@ -23,15 +23,17 @@ public class ListCategory implements Serializable {
     int isVisible = 1;
     public ListCategory() {
     }
-    public ListCategory(int catID, String catName, String catDesc, int catType) {
+    public ListCategory(int catID, String catName, String catDesc, int catType, int v) {
         name = catName;
         description = catDesc;
         type = catType;
+        isVisible = v;
     }
-    public ListCategory(String catName, String catDesc, int catType) {
+    public ListCategory(String catName, String catDesc, int catType, int v) {
     	name = catName;
     	description = catDesc;
     	type = catType;
+    	isVisible = v;
     }
     public void setID(int id) {
     	catID = id;
@@ -63,7 +65,19 @@ public class ListCategory implements Serializable {
     public void setIsNew() {
     	isNew = true;
     }
+	public boolean isVisible() {
+		boolean isVisibleBool;
+		if (isVisible == 1) {
+			isVisibleBool = true;
+		} else {
+			isVisibleBool = false;
+		}
+		return isVisibleBool;
+	}
 	public int getVisible() {
 		return isVisible;
+	}
+	public void setVisible(int v) {
+		isVisible = v;
 	}
 }

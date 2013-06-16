@@ -27,6 +27,7 @@ public class ListItem implements Serializable {
     public int primaryCat;
     public List<String> secondaryCats = new ArrayList<String>();
     public boolean isSelected;
+    public String notes;
     
     //java.text.DateFormat df = new SimpleDateFormat("MM/dd/yyy");
     
@@ -140,5 +141,11 @@ public class ListItem implements Serializable {
     }
     public String getDescription() {
         return description;
+    }
+    public String getNotes() {
+    	return notes;
+    }
+    public void setNotes(String n) {
+    	notes = n;
     }
 }
