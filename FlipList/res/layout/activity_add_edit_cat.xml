@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/cat_visible_check_box"
+        android:layout_marginTop="12dp" >
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="463dp"
+            android:orientation="vertical" >
+            
+            
+            
     <EditText
         android:id="@+id/cat_edit_name"
         android:layout_width="wrap_content"
@@ -73,7 +84,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:text="@string/cat_name_or_edit_text" />
+        android:text="@string/cat_name_or_edit_text"
+        android:textSize="24sp" />
 
     <EditText
         android:id="@+id/cat_edit_id"
@@ -97,6 +109,14 @@
         android:text="@string/text_view_cat_id_text"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
+    <CheckBox
+        android:id="@+id/cat_visible_check_box"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/cat_type_spinner"
+        android:text="@string/cat_visible_check_box_text" />
+
     <Button
         android:id="@+id/category_delete_button"
         android:layout_width="wrap_content"
@@ -106,12 +126,7 @@
         android:onClick="myDeleteCatButtonAction"
         android:text="@string/cat_delete_button_text" />
 
-    <CheckBox
-        android:id="@+id/cat_visible_check_box"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/cat_type_spinner"
-        android:text="@string/cat_visible_check_box_text" />
+        </RelativeLayout>
+    </ScrollView>
 
-</RelativeLayout>
+

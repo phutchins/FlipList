@@ -27,6 +27,7 @@ public class ListItem implements Serializable {
     public int primaryCat;
     public List<String> secondaryCats = new ArrayList<String>();
     public boolean isSelected;
+    public boolean hasDueDateBool = false;
     public String notes;
     
     //java.text.DateFormat df = new SimpleDateFormat("MM/dd/yyy");
@@ -36,47 +37,105 @@ public class ListItem implements Serializable {
     public ListItem(int cat, String n, String desc, String crDate, String due) throws ParseException {
     	name = n;
     	description = desc;
-    	dueDate = due;
+    	Log.v("ListItem", "1) due: " + due + " hasDueDateBool: " + hasDueDateBool);
+        if (due != "") {
+        	dueDate = due;
+        	hasDueDateBool = true;
+        }
         //stringCatsToList(cats);
     	primaryCat = cat;
+    	// TODO: Make this use crDate from DB if its not null (after I fix the due date being empty crashing problem)
         createDate = new Date().toString();
+    	Log.v("ListItem", "1) due: " + due + " hasDueDateBool: " + hasDueDateBool);
     }
     public ListItem(int cat, String n, String desc, String due) {
     	name = n;
     	Log.v("ListItem Constructor", "Name: " + n);
     	Log.v("ListItem Constructor", "Description: " + desc);
-    	Log.v("ListItem Constructor", "Due Date: " + due);
+    	//Log.v("ListItem Constructor", "Due Date: " + due);
     	Log.v("ListItem Constructor", "Category is: " + cat);
         //stringCatsToList(cats);
+    	primaryCat = cat;
+    	Log.v("ListItem", "1) due: " + due + " hasDueDateBool: " + hasDueDateBool);
+
+    	if (desc != null) {
+    		description = desc;
+    	} else {
+    		description = "";
+    	}
+        if (due != "") {
+        	hasDueDateBool = true;
+        	dueDate = due;
+        } else {
+        	dueDate = "";
+        }
+    	createDate = new Date().toString();
+    	Log.v("ListItem", "2) due: " + due + " hasDueDateBool: " + hasDueDateBool);
+    }
+    public ListItem(int cat, String n, String desc) {
+    	name = n;
     	primaryCat = cat;
     	if (desc != null) {
     		description = desc;
     	} else {
     		description = "";
     	}
-    	dueDate = due;
     	createDate = new Date().toString();
     }
     public ListItem(int id, String cats, String n, String desc, String crDate, String due) throws ParseException {
     	itemID = id;
     	name = n;
         description = desc;
-        dueDate = due;
+    	Log.v("ListItem", "1) due: " + due + " hasDueDateBool: " + hasDueDateBool);
+
+        if (due != "") {
+            dueDate = due;
+        	hasDueDateBool = true;
+        } else {
+        	dueDate = "";
+        }
         addToCats(cats);
         createDate = crDate;
+    	Log.v("ListItem", "3) due: " + due + " hasDueDateBool: " + hasDueDateBool);
     }
     public String getDueDate() {
     	return dueDate;
+    }
+    public String getDueDatePretty() {
+    	return dateToStringPretty(stringToDate(dueDate));
     }
     public Date getDueDateObj() {
     	return stringToDate(dueDate);
     }
     public void setDueDate(String dd) {
-    	dueDate = dd;
+    	if (dd != null) {
+    		dueDate = dd;
+    		hasDueDateBool = true;
+    	} else {
+    		dueDate = "";
+    	}
+    }
+    public void removeDueDate() {
+    	dueDate = null;
+    	hasDueDateBool = false;
+    }
+    public boolean hasDueDate() {
+    	if(dueDate != null && dueDate.length() == 0) {
+    		hasDueDateBool = false;
+    	} else {
+    		hasDueDateBool = true;
+    	}
+    	//hasDueDateBool = dueDate.isEmpty();
+    	return hasDueDateBool;
     }
     public void setCreateDate(String cd) {
     	// Do some checking here?
     	createDate = cd;
+    }
+    public String dateToStringPretty(Date date) {
+    	SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, HH:mm aa");
+    	String dateStr = sdf.format(date);
+    	return dateStr;
     }
     public String dateToString(Date date) {
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

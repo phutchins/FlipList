@@ -13,7 +13,9 @@
     <string name="text_view_cat_type_text">Type</string>
     <string name="check_box">CheckBox</string>
     <string name="text_view">TextView</string>
+    <string name="item_info_text">Item Info</string>
     <string name="cat_list_text_view">CatListTextView</string>
+    <string name="cat_list_text_view_type">Type Name</string>
     <string name="title_activity_main">FlipList</string>
     <string name="title_activity_save_cat">SaveCatActivity</string>
     <string name="title_activity_add_edit_cat">AddEditCatActivity</string>

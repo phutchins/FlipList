@@ -69,6 +69,8 @@ import android.util.Log;
 //   Password list type - make list passworded and encrypt the list items
 //   Songs - have it link you to places to download them
 //           maybe have it add list items by using a song finder app
+// Make type creation tool that lets you change all options and set sizes display characteristics
+
 
 // Caching and Redrawing
 // TODO: Only recreate the listmap if we've written, edited or deleted a category, item or type
@@ -81,8 +83,9 @@ import android.util.Log;
 // General Todo
 // TODO: Make cancel button on item edit and category edit (or just use up button?)
 // TODO: Make date/time selection on item edit layout
+// TODO: Set input validity check for fields (Date)
 // TODO: Make notes field work
-// TODO: 
+// TODO: On category creation, get category settings from type if they exist
 
 
 public class FlipList extends Activity {
@@ -296,7 +299,11 @@ public class FlipList extends Activity {
     	itemNameTv.setText(item.getName());
     	itemDescTv.setText(item.getDescription());
     	itemNotesTv.setText(item.getNotes());
-    	itemDueTv.setText(item.getDueDate());
+    	if (item.hasDueDate()) {
+    		itemDueTv.setText(item.getDueDate());
+    	} else {
+    		itemDueTv.setText("");
+    	}
     	
     	// TODO: Make this into a generic addItemsToSpinner method that I can use with the first spinner also
         catList = myListMan.getCategoryList();
@@ -335,7 +342,11 @@ public class FlipList extends Activity {
     	myItem.setDescription(itemDesc);
     	myItem.setPrimaryCat(itemCategoryID);
     	myItem.setNotes(itemNotes);
-    	myItem.setDueDate(itemDue);
+    	if (itemDue == "") {
+    		myItem.removeDueDate();
+    	} else {
+    		myItem.setDueDate(itemDue);
+    	}
     	myItem.setCreateDate(currentItem.getCreateDate());
     	
     	//Set up constructor to be able to take all this stuff
@@ -410,6 +421,7 @@ public class FlipList extends Activity {
     private class MyCustomAdapter extends ArrayAdapter<ListItem> {
     	 
     	private ArrayList<ListItem> itemList;
+		ListCategory catSelectedObj = (ListCategory) catSpinner.getSelectedItem();
     	 
     	public MyCustomAdapter(Context context, int textViewResourceId, ArrayList<ListItem> itemList) {
     		super(context, textViewResourceId, itemList);
@@ -419,6 +431,7 @@ public class FlipList extends Activity {
     	 
     	private class ViewHolder {
     		TextView itemName;
+    		TextView itemInfo;
     		CheckBox itemCheckBox;
     	}
     	 
@@ -435,6 +448,7 @@ public class FlipList extends Activity {
     			holder = new ViewHolder();
     			holder.itemCheckBox = (CheckBox) convertView.findViewById(R.id.itemCheckBox);
     			holder.itemName = (TextView) convertView.findViewById(R.id.itemName);
+    			holder.itemInfo = (TextView) convertView.findViewById(R.id.itemInfo);
     			
     			convertView.setTag(holder);
     	 
@@ -443,9 +457,9 @@ public class FlipList extends Activity {
     					CheckBox cb = (CheckBox) v ;  
     					ListItem item = (ListItem) cb.getTag();
     					Spinner catSpinner = (Spinner) findViewById(R.id.catSpinner);
-    					ListCategory catSelectedObj = (ListCategory) catSpinner.getSelectedItem();
+
     					int catSelected = catSelectedObj.getID();
-    					String itemDescription = item.getDescription();
+    					//String itemDescription = item.getDescription();
     					String itemName = item.getName();
     					Toast.makeText(getApplicationContext(), "Completed: " + itemName, Toast.LENGTH_LONG).show();
     					myListMan.completeItem(item, catSelected);
@@ -458,7 +472,18 @@ public class FlipList extends Activity {
     		}
     		
     		ListItem item = itemList.get(position);
-    		holder.itemName.setText(item.getName() + " (" +  item.getDueDate() + ")" + "(" + item.getID() + ")");
+    		holder.itemName.setText(item.getName());
+    		Log.v("FlipList", "item: " + item.getName() + " item.hasDueDate(): " + item.hasDueDate());
+    		String infoString = "";
+    		if (catSelectedObj.showDueDate()) {
+	    		if (item.hasDueDate() == true ) {
+	    			infoString = " (" + item.getDueDatePretty() + ")";
+	    		}
+    		}
+	    	if (catSelectedObj.showDescription()) {
+	    		infoString = infoString + " (" + item.getDescription() + ")";
+    		}
+    		holder.itemInfo.setText(infoString);
     		holder.itemCheckBox.setText("");
     		holder.itemCheckBox.setTag(item);
     	 

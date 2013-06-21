@@ -20,6 +20,8 @@ public class ListCategory implements Serializable {
     String description;
     int type;
     boolean isNew = false;
+    boolean showDueDate = true;
+    boolean showDescription = true;
     int isVisible = 1;
     public ListCategory() {
     }
@@ -34,6 +36,18 @@ public class ListCategory implements Serializable {
     	description = catDesc;
     	type = catType;
     	isVisible = v;
+    }
+    public boolean showDueDate() {
+    	return showDueDate;
+    }
+    public boolean showDescription() {
+    	return showDescription;
+    }
+    public void setShowDueDate(boolean sdd) {
+    	showDueDate = sdd;
+    }
+    public void setShowDescription(boolean sd) {
+    	showDescription = sd;
     }
     public void setID(int id) {
     	catID = id;

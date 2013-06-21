@@ -205,6 +205,7 @@ public class AddEditCatActivity extends Activity {
     	
     	private class ViewHolder {
     		TextView cat_list_text_view;
+    		TextView cat_list_text_view_type;
     	}
     	 
     	@Override
@@ -221,6 +222,7 @@ public class AddEditCatActivity extends Activity {
     	 
     			holder = new ViewHolder();
     			holder.cat_list_text_view = (TextView) convertView.findViewById(R.id.cat_list_text_view);
+    			holder.cat_list_text_view_type = (TextView) convertView.findViewById(R.id.cat_list_text_view_type);
 
     			convertView.setTag(holder);
     			
@@ -238,6 +240,7 @@ public class AddEditCatActivity extends Activity {
     			};
     	 
     			holder.cat_list_text_view.setOnClickListener( categoryClickListener );  
+    			holder.cat_list_text_view.setOnClickListener( categoryClickListener );
     	   } 
     	   else {
     	    holder = (ViewHolder) convertView.getTag();
@@ -254,8 +257,11 @@ public class AddEditCatActivity extends Activity {
     		Log.v("MyCatListCustomAdapter", "category.getDescription(): " + category.getDescription());
     		Log.v("MyCatListCustomAdapter", "myListMan.getCategoryTypeName(): " + myListMan.getCategoryTypeName(categoryTypeID));
     		
-    		holder.cat_list_text_view.setText(categoryName + "(" + categoryTypeName + ")");
+    		holder.cat_list_text_view.setText(categoryName);
+    		holder.cat_list_text_view_type.setText("(" + categoryTypeName + ")");
     		holder.cat_list_text_view.setTag(category);
+    		// TODO: Link this to type type editing activity later
+    		holder.cat_list_text_view_type.setTag(category);
     	 
     		return convertView;
     	}

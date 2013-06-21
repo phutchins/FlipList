@@ -16,7 +16,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
-	private static final int DATABASE_VERSION = 24;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private static final int DATABASE_VERSION = 25;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
