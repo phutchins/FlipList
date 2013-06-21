@@ -51,6 +51,10 @@ import android.util.Log;
 //    Choose what values are displayed for list item on main screen
 //    Default list type (grocery, todo, etc...)
 
+// Category Design
+//   In addition to having a type, categories should have the ability to choose the behavior when items are checked
+//     they could (1) go away immediately (2) stay for X time (3) Disappear after X other items are checked
+
 
 // Filter Design (Acts as a categoryList item?)
 //   Ability to make custom filters
@@ -69,6 +73,16 @@ import android.util.Log;
 // Caching and Redrawing
 // TODO: Only recreate the listmap if we've written, edited or deleted a category, item or type
 // TODO: Pull all of the items at one time from the DB into a searchable hash for parsing into itemlists
+
+// BUGS & FIXES
+// TODO: Fix all back and "UP" buttons on navigation bar
+// TODO: Fix unresponsive category listeners
+
+// General Todo
+// TODO: Make cancel button on item edit and category edit (or just use up button?)
+// TODO: Make date/time selection on item edit layout
+// TODO: Make notes field work
+// TODO: 
 
 
 public class FlipList extends Activity {
@@ -119,10 +133,6 @@ public class FlipList extends Activity {
     	//selectedCategory = String.valueOf(catSpinner.getSelectedItem());
 
 		currentItemList = myListMan.getItemList(defaultCatID);
-
-    	//itemListDataAdapter = new MyCustomAdapter(this, R.layout.activity_main, currentItemList);
-    	//catList = myListMan.getCategoryList();
-        //spinnerDataAdapter = (MyCatSpinnerCustomAdapter) new ArrayAdapter<ListCategory>(this, android.R.layout.simple_spinner_item, catList);
 
 		// Do we need this? Might come in handy later...
 		updateState();
