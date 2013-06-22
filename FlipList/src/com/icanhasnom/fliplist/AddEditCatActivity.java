@@ -121,7 +121,6 @@ public class AddEditCatActivity extends Activity {
     
     public class MyTypeSpinnerCustomAdapter extends ArrayAdapter<CategoryType>{
     	private Activity activity;
-    	//private Context context;
     	private ArrayList<CategoryType> myTypes;
     	LayoutInflater inflater;
     	

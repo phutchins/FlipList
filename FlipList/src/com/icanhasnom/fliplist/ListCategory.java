@@ -25,7 +25,8 @@ public class ListCategory implements Serializable {
     int isVisible = 1;
     public ListCategory() {
     }
-    public ListCategory(int catID, String catName, String catDesc, int catType, int v) {
+    public ListCategory(int ID, String catName, String catDesc, int catType, int v) {
+    	catID = ID;
         name = catName;
         description = catDesc;
         type = catType;

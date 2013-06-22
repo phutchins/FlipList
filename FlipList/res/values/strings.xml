@@ -38,5 +38,7 @@
     <string name="item_edit_delete_text">Delete</string>
     <string name="item_edit_due_text">Due</string>
     <string name="item_edit_due_text_hint">due</string>
+    <string name="pick_time">Time</string>
+    <string name="pick_date">Date</string>
 
 </resources>

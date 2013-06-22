@@ -1,19 +1,29 @@
 package com.icanhasnom.fliplist;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.text.format.DateFormat;
 import android.util.Log;
+import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,12 +33,15 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 import android.util.Log;
 
@@ -88,6 +101,7 @@ import android.util.Log;
 // TODO: On category creation, get category settings from type if they exist
 
 
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class FlipList extends Activity {
 	public final static String EXTRA_MESSAGE = "com.icanhasnom.FlipList.MESSAGE";
 	public static final String TAG = "FlipList";
@@ -98,15 +112,17 @@ public class FlipList extends Activity {
 	
     HashMap<String, ListItem> checkListItems = new HashMap<String, ListItem>();
     ItemList currentItemList;
-    ListCategory currentCategory;
+    ListCategory currentCategory = null;
     ListItem currentItem;
     ArrayList<ListCategory> catList;
     ArrayList<ListItem> currentListItems;
     
     MyCustomAdapter itemListDataAdapter;
     MyCatSpinnerCustomAdapter catSpinnerDataAdapter;
+    MyCatSpinnerCustomAdapter itemCatSpinnerDataAdapter;
     
     Spinner catSpinner;
+    Spinner itemCatSpinner;
     
     EditText editText;
     DatabaseHandler db;
@@ -129,18 +145,16 @@ public class FlipList extends Activity {
         	// Load saved data from somewhere, maybe SqlLite
         	myListMan = new ListManager(this);
         	Log.v("FlipList.onCreate", "Created new ListManager Object");
+    		currentItemList = myListMan.getItemList(defaultCatID);
+    		currentCategory = myListMan.getCategory(defaultCatID);
         }
         
     	catSpinner = (Spinner) findViewById(R.id.catSpinner);
     	catSpinner.setOnItemSelectedListener(new SpinnerActivity());
-    	//selectedCategory = String.valueOf(catSpinner.getSelectedItem());
-
-		currentItemList = myListMan.getItemList(defaultCatID);
-
+    	
 		// Do we need this? Might come in handy later...
 		updateState();
 		
-		// Populate the screen
         addItemsOnSpinner();
         addItemsOnList();
     }
@@ -181,7 +195,6 @@ public class FlipList extends Activity {
     	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
     		ListCategory itemSelected = (ListCategory) parent.getItemAtPosition(pos);
     		currentCategory = itemSelected;
-    		Log.v("FlipList.SpinnerActivity", "itemSelected (cast to ListCategory) name: " + itemSelected.getName());
     		addItemsOnList();
     	}
     	public void onNothingSelected(AdapterView<?> parent) {
@@ -190,39 +203,19 @@ public class FlipList extends Activity {
     }
     
     public void mySaveButtonAction(View view) {
-    	//This is only temporary until I make the DueDate input fields
-        Date date = new Date();
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    	String dueDate = sdf.format(date);
-
-       // Putting the below in the DB handler so we can just pass objects in and out from the DB layer
-       //int intDueDate = (int) dueDate.getTime();
-
-       // Not sure if i should use this way
-       //DateFormat myDate = new SimpleDateFormat ("yyy-MM-dd'T'HH:mm:ssZ");
-       //String dateStr = myDate.format(dueDate);
-       
        editText = (EditText) findViewById(R.id.editText);
        String name = editText.getText().toString();
-       if (name == null) {
+       if (name.isEmpty()) {
 			Toast.makeText(getApplicationContext(),
 					"Please enter an item name!", Toast.LENGTH_LONG).show();
        } else {
-	       //String description = editText.getText().toString();
-	       String description = "blank";
-	       
 	       catSpinner = (Spinner) findViewById(R.id.catSpinner);
 	       int position = catSpinner.getSelectedItemPosition();
-	       ListCategory selectedCategory = (ListCategory) catSpinner.getItemAtPosition(position);
 	       
-	       Log.v(TAG, "mySaveButtonAction: (below selectedCategory assignment)");
-	       Log.v(TAG, "Position: " + position);
-	       Log.v(TAG, "selectedCategoryObj Name: " + selectedCategory.getName());
+	       currentCategory = (ListCategory) catSpinner.getItemAtPosition(position);
+	       int catID = currentCategory.getID();
 	       
-	       int catID = selectedCategory.getID();
-	       
-	       ListItem myItem = myListMan.addItem(catID, name, description, dueDate);
-	       Log.v(TAG, "Added Item: " + myItem.getName());
+	       myListMan.addItem(catID, name);
 	
 	       addItemsOnList();
 	       editText.setText("");
@@ -232,51 +225,31 @@ public class FlipList extends Activity {
     	// Use this later if needed
     }
     public void addItemsOnSpinner() {
-    	// TODO: Do we need to set current selected category here?
         catList = myListMan.getCategoryList();
-        Resources res = getResources();
         
-        catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.activity_main_cat_spinner, catList, res);
+        catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.activity_main_cat_spinner, catList);
         catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         
         catSpinner.setAdapter(catSpinnerDataAdapter);
         catSpinner.setOnItemSelectedListener(new SpinnerActivity());
         
-        // Set the current category globally
-    	int position = catSpinner.getSelectedItemPosition();
-    	currentCategory = (ListCategory) catSpinner.getItemAtPosition(position);
-        
-        // Run this to update spinner
+        // TODO: Get this setting the lastSelected or Current category
+        Log.v("FlipList.addItemsOnSpinner", "currentCategory.getID:" + currentCategory.getID());
+        catSpinner.setSelection(catSpinnerDataAdapter.getPosition(currentCategory.getID()));
         catSpinnerDataAdapter.notifyDataSetChanged();
     }
     
     public void addItemsOnList()  {
-    	// Line below works
-    	Log.v("FlipList.addItemsOnList", "selectedCategory: " + currentCategory.getName());
     	int catID = currentCategory.getID();
-    	String catName = currentCategory.getName();
-    	Log.v("FlipList.addItemsOnList", "catID: " + catID);
-
 		currentItemList = myListMan.getItemList(catID);
-		Log.v("FlipList.addItemsOnList", "catID: " + catID);
-		Log.v("FlipList.addItemsOnList", "catName: " + catName);
-		Log.v("FlipList.addItemsOnList", "currentItemList: " + currentItemList.listID);
-		
 		currentListItems = currentItemList.getListItems();
-
-		Log.v("FlipList.addItemsOnList", "currentListItems.size(): " + currentListItems.size());
-
     	itemListDataAdapter = new MyCustomAdapter(this, R.layout.list_layout, currentListItems);
-    	
     	ListView listView = (ListView) findViewById(R.id.itemList);
     	listView.setAdapter(itemListDataAdapter);
     	
     	listView.setOnItemClickListener(new OnItemClickListener() {
     		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-    			// This is run when the item NAME is clicked
-    			// We will send the user to item edit layout for this eventually
     			ListItem item = (ListItem) parent.getItemAtPosition(position);
-    			Log.v("FlipList.addItemsOnList.setOnItemClickListener", "position: " + position + " id " + id);
     			editListItem(item);
     			Toast.makeText(getApplicationContext(),
     					"Clicked on Row: " + item.getName(), 
@@ -286,37 +259,39 @@ public class FlipList extends Activity {
     }
     public void editListItem(ListItem item) {
     	currentItem = item;
+    	Date dueDateObj = null;
     	setContentView(R.layout.item_edit_layout);
     	EditText itemIDTv = (EditText) findViewById(R.id.item_edit_id_edittext);
     	EditText itemNameTv = (EditText) findViewById(R.id.item_edit_name_edittext);
     	EditText itemDescTv = (EditText) findViewById(R.id.item_edit_description_edittext);
-    	Spinner itemCatSpinner = (Spinner) findViewById(R.id.item_edit_category_spinner);
+    	itemCatSpinner = (Spinner) findViewById(R.id.item_edit_category_spinner);
     	EditText itemNotesTv = (EditText) findViewById(R.id.item_edit_notes_edittext);
-    	EditText itemDueTv = (EditText) findViewById(R.id.item_edit_due_edittext);
-    	
+    	Button editTimeButton = (Button) findViewById(R.id.time_edit_button);
+    	Button editDateButton = (Button) findViewById(R.id.date_edit_button);
     	
     	itemIDTv.setText(String.valueOf(item.getID()));
     	itemNameTv.setText(item.getName());
     	itemDescTv.setText(item.getDescription());
     	itemNotesTv.setText(item.getNotes());
-    	if (item.hasDueDate()) {
-    		itemDueTv.setText(item.getDueDate());
-    	} else {
-    		itemDueTv.setText("");
-    	}
+
+    	dueDateObj = item.getDueDateObj();
+
+    	String myDate = item.getDueDatePretty();
+    	String myTime = item.getDueTimePretty();
+
+    	editDateButton.setText(myDate);
+    	editTimeButton.setText(myTime);
     	
-    	// TODO: Make this into a generic addItemsToSpinner method that I can use with the first spinner also
         catList = myListMan.getCategoryList();
-        Resources res = getResources();
-        catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.item_edit_layout, catList, res);
-        catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        itemCatSpinner.setAdapter(catSpinnerDataAdapter);
-    	//int position = catSpinner.getSelectedItemPosition();
-    	//currentCategory = (ListCategory) catSpinner.getItemAtPosition(position);
-        // Run this to update spinner
-        //catSpinnerDataAdapter.notifyDataSetChanged();
-        catSpinner.setSelection(item.getPrimaryCat());
+    	// TODO: Make this into a generic addItemsToSpinner method that I can use with the first spinner also
+        ArrayAdapter<ListCategory> itemCatSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.item_edit_layout, catList);
+        itemCatSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        itemCatSpinner.setAdapter(itemCatSpinnerDataAdapter);
         
+        int myCatID = item.getPrimaryCat();
+        int spinnerPosition = catSpinnerDataAdapter.getPosition(myCatID);
+        itemCatSpinner.setSelection(spinnerPosition);
+
         itemNotesTv.setText(item.getNotes());
     }
     public void itemEditSaveButtonAction(View view) {
@@ -325,16 +300,17 @@ public class FlipList extends Activity {
     	EditText itemDescTv = (EditText) findViewById(R.id.item_edit_description_edittext);
     	Spinner itemCatSpinner = (Spinner) findViewById(R.id.item_edit_category_spinner);
     	EditText itemNotesTv = (EditText) findViewById(R.id.item_edit_notes_edittext);
-    	EditText itemDueTv = (EditText) findViewById(R.id.item_edit_due_edittext);
+    	Button itemDueTimeBtn = (Button) findViewById(R.id.time_edit_button);
+    	Button itemDueDateBtn = (Button) findViewById(R.id.date_edit_button);
     	
     	int itemID = Integer.parseInt(itemIDTv.getText().toString());
     	String itemName = itemNameTv.getText().toString();
     	String itemDesc = itemDescTv.getText().toString();
-    	//int itemCategoryPosition = itemCatSpinner.getSelectedItemPosition();
     	ListCategory itemCategory = (ListCategory) itemCatSpinner.getItemAtPosition(itemCatSpinner.getSelectedItemPosition());
     	int itemCategoryID = itemCategory.getID();
     	String itemNotes = itemNotesTv.getText().toString();
-    	String itemDue = itemDueTv.getText().toString();
+    	String itemDueTime = (String) itemDueTimeBtn.getText();
+    	String itemDueDate = (String) itemDueDateBtn.getText();
     	
     	ListItem myItem = new ListItem();
     	myItem.setID(itemID);
@@ -342,11 +318,8 @@ public class FlipList extends Activity {
     	myItem.setDescription(itemDesc);
     	myItem.setPrimaryCat(itemCategoryID);
     	myItem.setNotes(itemNotes);
-    	if (itemDue == "") {
-    		myItem.removeDueDate();
-    	} else {
-    		myItem.setDueDate(itemDue);
-    	}
+    	myItem.setDueTime(itemDueTime);
+    	myItem.setDueDate(itemDueDate);
     	myItem.setCreateDate(currentItem.getCreateDate());
     	
     	//Set up constructor to be able to take all this stuff
@@ -365,18 +338,22 @@ public class FlipList extends Activity {
       	 
     	private ArrayList<ListCategory> categoryList;
     	private Activity activity;
-    	// res could be used for populating images
-    	public Resources res;
     	LayoutInflater inflater;
+    	//Map<Integer, Integer> myPositionMap = new HashMap<Integer, Integer>();
+    	SparseIntArray myPositionMap;
     	 
-    	public MyCatSpinnerCustomAdapter(FlipList activitySpinner, int textViewResourceId, ArrayList<ListCategory> objects, Resources resLocal) {
+    	public MyCatSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<ListCategory> objects) {
     		super(activitySpinner, textViewResourceId, objects);
-    		categoryList = (ArrayList<ListCategory>) objects;
-    		res = resLocal;
-    		activity = activitySpinner;
+    		this.categoryList = (ArrayList<ListCategory>) objects;
+    		this.activity = activitySpinner;
     		inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    		myPositionMap = new SparseIntArray();
     	}
-    	private class ViewHolder {
+    	public int getPosition(int myListCategoryID) {
+    		int myPosition = myPositionMap.get(myListCategoryID);
+			return myPosition;
+		}
+		private class ViewHolder {
     		TextView catName;
     	}
     	public View getDropDownView(int position, View convertView, ViewGroup parent) {
@@ -387,25 +364,19 @@ public class FlipList extends Activity {
     	}
     	public View getCustomView(int position, View convertView, ViewGroup parent) {
     		ViewHolder holder;
-    		ListCategory category = categoryList.get(position);
-    		Log.v("FlipList", "getCustomView " + category.name + " visible is " + category.isVisible());
-
     		if (convertView == null) {
     			convertView = inflater.inflate(R.layout.activity_main_cat_spinner, null);
     			holder = new ViewHolder();
     			holder.catName = (TextView) convertView.findViewById(R.id.cat_spinner_text);
     			convertView.setTag(holder);
-        		
-        		//Log.v("FlipList", "CatSpinner - Category not visible, set to GONE!");
-        		//holder.catName.setVisibility(View.GONE);
-
-
     		} else {
     			holder = (ViewHolder) convertView.getTag();
     		}
+    		ListCategory category = categoryList.get(position);
+    		
+			myPositionMap.put(category.getID(), position);
     		holder.catName.setText(category.getName());
     		holder.catName.setTag(category);
-
     		return convertView;
     	}
     	 
@@ -473,7 +444,6 @@ public class FlipList extends Activity {
     		
     		ListItem item = itemList.get(position);
     		holder.itemName.setText(item.getName());
-    		Log.v("FlipList", "item: " + item.getName() + " item.hasDueDate(): " + item.hasDueDate());
     		String infoString = "";
     		if (catSelectedObj.showDueDate()) {
 	    		if (item.hasDueDate() == true ) {
@@ -492,4 +462,55 @@ public class FlipList extends Activity {
     	}
     	 
 	}
+    
+    public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
+
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			// Use the current time as the default values for the picker
+			final Calendar c = Calendar.getInstance();
+			int hour = c.get(Calendar.HOUR_OF_DAY);
+			int minute = c.get(Calendar.MINUTE);
+		
+			// Create a new instance of TimePickerDialog and return it
+			return new TimePickerDialog(getActivity(), this, hour, minute, DateFormat.is24HourFormat(getActivity()));
+		}
+		
+		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			Button setTimeBtn = (Button) view.findViewById(R.id.time_edit_button);
+			
+			setTimeBtn.setText(hourOfDay + ":" + minute);
+		}
+	}
+    
+    public void showTimePickerDialog(View v) {
+        DialogFragment newFragment = new TimePickerFragment();
+        newFragment.show(getFragmentManager(), "timePicker");
+    }
+    
+    public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			// Use the current date as the default date in the picker
+			final Calendar c = Calendar.getInstance();
+			int year = c.get(Calendar.YEAR);
+			int month = c.get(Calendar.MONTH);
+			int day = c.get(Calendar.DAY_OF_MONTH);
+		
+			// Create a new instance of DatePickerDialog and return it
+			return new DatePickerDialog(getActivity(), this, year, month, day);
+		}
+		
+		public void onDateSet(DatePicker view, int year, int month, int day) {
+			Button setDateBtn = (Button) view.findViewById(R.id.date_edit_button);
+			
+			setDateBtn.setText(month + ", " + day + " " + year);
+		}
+	}
+    
+    public void showDatePickerDialog(View v) {
+        DialogFragment newFragment = new DatePickerFragment();
+        newFragment.show(getFragmentManager(), "datePicker");
+    }
 }

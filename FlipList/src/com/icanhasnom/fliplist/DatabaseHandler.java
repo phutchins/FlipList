@@ -21,7 +21,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int DATABASE_VERSION = 25;
+	private static final int DATABASE_VERSION = 27;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
@@ -197,8 +197,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 			} while (cursor.moveToNext());
 		}
 		db.close();
-		
-		// return contact list
 		return itemList;
 	}
 	public ItemList getItemList(int catID) {
@@ -285,9 +283,10 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		if (cursor != null)
 			cursor.moveToFirst();
 		
-		ListCategory category = new ListCategory(Integer.parseInt(cursor.getString(0)),
-				cursor.getString(1), cursor.getString(2), Integer.parseInt(cursor.getString(3)), Integer.parseInt(cursor.getString(4)));
+		ListCategory category = new ListCategory(cursor.getInt(0),
+				cursor.getString(1), cursor.getString(2), cursor.getInt(3), cursor.getInt(4));
 		// return category
+		Log.v("DatabaseHandler.getCategory", "ID: " + category.getID() + " Name: " + category.getName());
 		return category;
 	}
 	public ListCategory getCategoryByName(String catName) {
@@ -346,12 +345,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
 				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE }, KEY_CAT_VISIBLE + "=?",
 				new String[] { isVisible }, null, null, null, null);
-		//Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
-		//		KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE }, KEY_CAT_VISIBLE + " = 1",
-		//		null, null, null, null, null);
-		
-		//Cursor cursor = db.rawQuery(selectQuery, null);
-		
 		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {

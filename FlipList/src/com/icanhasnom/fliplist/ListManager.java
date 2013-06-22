@@ -120,24 +120,16 @@ public class ListManager implements Serializable {
     	buildItemListMap();
     	populateCategoryList();
     }
+	public ListItem addItem(int catID, String name) {
+		ListItem myItem = new ListItem(catID, name);
+		db.addItem(myItem);
+		buildItemListMap();
+		return myItem;
+	}
     public ListItem addItem(int curCategory, String name, String description, String dueDate) {
-    	// TODO: decide if i want to add it to the itemList or repopulate from the DB
-    	//       each time we add an item
-        //ItemList myList = itemListMap.get(curCategory);
-
         ListItem myItem = new ListItem(curCategory, name, description, dueDate);
-        Log.v("ListManager.addItem", "Sending new item to DB (" + myItem.getName() + ")");
         db.addItem(myItem);
-        Log.v("ListManager.addItem", "name: " + myItem.getName());
-        Log.v("ListManager.addItem", "curCategory: " + curCategory);
-        // ItemList curCatList = itemListMap.get(curCategory);
-        
-        //Log.v("ListManager.addItem", "itemListMap.get(curCategory): " + myList.listName);
-        //myList.addListItem(myItem);
-        Log.v("ListManager.addItem", "Added Item: " + myItem.getName() + " To Category: " + db.getCategory(curCategory).getName() + " with ID (" + myItem.getID() + ")");
-        // Make this a for loop to update for each category the listItem is in?
         buildItemListMap();
-        
         return myItem;
     }
     public void addCategoryType(CategoryType newCatType) {
@@ -236,6 +228,10 @@ public class ListManager implements Serializable {
     	CategoryType catType = db.getCategoryType(typeID);
     	return catType;
     }
+    public ListCategory getCategory(int catID) {
+    	ListCategory listCat = db.getCategory(catID);
+    	return listCat;
+    }
     
     // Get/Set Primitives
     public String getCurrentCategory() {
@@ -248,6 +244,10 @@ public class ListManager implements Serializable {
     	String typeName = db.getCategoryTypeName(typeID);
     	return typeName;
     }
+    public String getCategoryName(int catID) {
+    	ListCategory listCat = db.getCategory(catID);
+    	return listCat.getName();
+    }
     
     // Do we need these? Don't think so if we're not doing parcelable any more
 	public int describeContents() {
@@ -258,4 +258,5 @@ public class ListManager implements Serializable {
 		// TODO Auto-generated method stub
 		
 	}
+
 }

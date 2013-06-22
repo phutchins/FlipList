@@ -21,16 +21,14 @@ public class ListItem implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public int itemID;
 	public String name;
-	public String description;
-    public String dueDate;
+	public String description = "";
+    public String dueDate = "";
     public String createDate;
     public int primaryCat;
     public List<String> secondaryCats = new ArrayList<String>();
-    public boolean isSelected;
     public boolean hasDueDateBool = false;
-    public String notes;
-    
-    //java.text.DateFormat df = new SimpleDateFormat("MM/dd/yyy");
+    public boolean hasDueTimeBool = false;
+    public String notes = "";
     
     public ListItem() {
     }
@@ -38,9 +36,10 @@ public class ListItem implements Serializable {
     	name = n;
     	description = desc;
     	Log.v("ListItem", "1) due: " + due + " hasDueDateBool: " + hasDueDateBool);
-        if (due != "") {
+        if (due != null) {
         	dueDate = due;
         	hasDueDateBool = true;
+        	Log.v("ListItem.hasDueDateBool", "1) Setting hasDueDateBool to true");
         }
         //stringCatsToList(cats);
     	primaryCat = cat;
@@ -63,11 +62,10 @@ public class ListItem implements Serializable {
     	} else {
     		description = "";
     	}
-        if (due != "") {
+        if (due != null) {
         	hasDueDateBool = true;
         	dueDate = due;
-        } else {
-        	dueDate = "";
+        	Log.v("ListItem.hasDueDateBool", "2) Setting hasDueDateBool to true");
         }
     	createDate = new Date().toString();
     	Log.v("ListItem", "2) due: " + due + " hasDueDateBool: " + hasDueDateBool);
@@ -82,17 +80,21 @@ public class ListItem implements Serializable {
     	}
     	createDate = new Date().toString();
     }
+    public ListItem(int cat, String n) {
+    	name = n;
+    	primaryCat = cat;
+    	createDate = new Date().toString();
+    }
     public ListItem(int id, String cats, String n, String desc, String crDate, String due) throws ParseException {
     	itemID = id;
     	name = n;
         description = desc;
     	Log.v("ListItem", "1) due: " + due + " hasDueDateBool: " + hasDueDateBool);
 
-        if (due != "") {
+        if (due != null) {
             dueDate = due;
         	hasDueDateBool = true;
-        } else {
-        	dueDate = "";
+        	Log.v("ListItem.hasDueDateBool", "3) Setting hasDueDateBool to true");
         }
         addToCats(cats);
         createDate = crDate;
@@ -101,32 +103,51 @@ public class ListItem implements Serializable {
     public String getDueDate() {
     	return dueDate;
     }
-    public String getDueDatePretty() {
+    public String getDueDateTimePretty() {
     	return dateToStringPretty(stringToDate(dueDate));
     }
     public Date getDueDateObj() {
     	return stringToDate(dueDate);
     }
     public void setDueDate(String dd) {
-    	if (dd != null) {
+    	
+    	if (!isDateValid(dd)) {
+    		hasDueDateBool = false;
+    	} else {
     		dueDate = dd;
     		hasDueDateBool = true;
+        	Log.v("ListItem.hasDueDateBool", "4) Setting hasDueDateBool to true DueDate: " + dd + " ListItem: " + name);
+    	}
+    }
+    public void setDueTime(String dt) {
+    	if (dt == null) {
+    		hasDueTimeBool = false;
     	} else {
-    		dueDate = "";
+    		dueDate = dt;
+    		hasDueTimeBool = true;
     	}
     }
     public void removeDueDate() {
-    	dueDate = null;
+    	//TODO: Set date to default value?
+    	//dueDate = null;
     	hasDueDateBool = false;
     }
+    public void removeDueTime() {
+    	//TODO: Set time to default value?
+    	//dueTime = null;
+    	hasDueTimeBool = false;
+    }
     public boolean hasDueDate() {
-    	if(dueDate != null && dueDate.length() == 0) {
-    		hasDueDateBool = false;
-    	} else {
-    		hasDueDateBool = true;
-    	}
+    	//if(dueDate != null && dueDate.length() == 0) {
+    	//	hasDueDateBool = false;
+    	//} else {
+    	//	hasDueDateBool = true;
+    	//}
     	//hasDueDateBool = dueDate.isEmpty();
     	return hasDueDateBool;
+    }
+    public boolean hasDueTime() {
+    	return hasDueTimeBool;
     }
     public void setCreateDate(String cd) {
     	// Do some checking here?
@@ -137,10 +158,40 @@ public class ListItem implements Serializable {
     	String dateStr = sdf.format(date);
     	return dateStr;
     }
+    public String getDueTimePretty() {
+    	String timeStr = "Set Time";
+    	if (hasDueTimeBool) {
+    		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm aa");
+    		timeStr = sdf.format(stringToDate(dueDate));
+    	}
+		return timeStr;
+    }
+    public String getDueDatePretty() {
+    	String dateStr = "Set Date";
+    	Log.v("ListItem.getDueDatePretty", "hasDueDateBool: " + hasDueDateBool + " hasDueTimeBool: " + hasDueTimeBool + " dueDate: " + dueDate);
+    	if (hasDueDateBool && dueDate != null) {
+    		SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd");
+    		dateStr = sdf.format(stringToDate(dueDate));
+    	}
+    	return dateStr;
+    }
     public String dateToString(Date date) {
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	String dateStr = sdf.format(date);
     	return dateStr;
+    }
+    public boolean isDateValid(String dateToValidate) {
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	sdf.setLenient(false);
+    	
+    	try {
+    		Date date = sdf.parse(dateToValidate);
+    		Log.v("Date Validator", "Date: " + dateToValidate + " is valid.");
+    	} catch (ParseException e) {
+    		e.printStackTrace();
+    		return false;
+    	}
+    	return true;
     }
     public Date stringToDate(String dateStr) {
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
