@@ -477,8 +477,10 @@ public class FlipList extends Activity {
 		}
 		
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-			Button setTimeBtn = (Button) view.findViewById(R.id.time_edit_button);
-			
+			Button setTimeBtn = (Button) getActivity().findViewById(R.id.time_edit_button);
+	    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	    	String dateStr = sdf.format(date);
+			setTimeBtn.setTag(time);
 			setTimeBtn.setText(hourOfDay + ":" + minute);
 		}
 	}
@@ -503,7 +505,7 @@ public class FlipList extends Activity {
 		}
 		
 		public void onDateSet(DatePicker view, int year, int month, int day) {
-			Button setDateBtn = (Button) view.findViewById(R.id.date_edit_button);
+			Button setDateBtn = (Button) getActivity().findViewById(R.id.date_edit_button);
 			
 			setDateBtn.setText(month + ", " + day + " " + year);
 		}
