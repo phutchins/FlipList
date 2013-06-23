@@ -95,7 +95,7 @@ public class ListItem implements Serializable {
         createDate = crDate;
     	dueDateTime = dueDT;
     }
-    public String getDueDate() {
+    public String getDueDateTime() {
     	return dueDateTime;
     }
     public String getDueDateTimePretty() {
@@ -107,45 +107,73 @@ public class ListItem implements Serializable {
     public void setDueDateTime(String ddt) {
     	dueDateTime = ddt;
     }
-    public void setDueDate(String dd) {
-    	// TODO: Create this the same as setDueTime
-    	//       use setDueDateTime in place of where this one was used
-    }
-    public void setDueTime(String dt) {
+    public Boolean setDueDate(String dd) {
+    	Boolean success = false;
     	Calendar cal = Calendar.getInstance();
     	// TODO: Fix this below to use localle
     	SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd");
+    	if (isDateValid(dd)) {
+	    	try {
+				cal.setTime(sdfDateTime.parse(dueDateTime));
+				Log.v("setDueDate", "DueDate: " + sdfDateTime.format(cal.getTime()));
+				cal.setTime(sdfTime.parse(dd));
+				Log.v("setDueDate", "New DueDate: " + sdfDateTime.format(cal.getTime()));
+				dueDateTime = cal.getTime().toString();
+				Log.v("setDueDate", "dueDateTime String: " + dueDateTime);
+				hasDueDateBool = true;
+				success = true;
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	return success;
+    }
+    public Boolean setDueTime(String dt) {
+    	Calendar cal = Calendar.getInstance();
+    	// TODO: Fix this below to use localle
+    	Boolean success = false;
+    	SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
-    	try {
-			cal.setTime(sdfDateTime.parse(dueDateTime));
-			Log.v("setDueTime", "DueTime: " + sdfDateTime.format(cal.getTime()));
-			cal.setTime(sdfTime.parse(dt));
-			Log.v("setDueTime", "New DueTime: " + sdfDateTime.format(cal.getTime()));
-			dueDateTime = cal.getTime().toString();
-			Log.v("setDueTime", "dueDateTime String: " + dueDateTime);
-			hasDueTimeBool = true;
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    	if (isTimeValid(dt)) {
+	    	try {
+				cal.setTime(sdfDateTime.parse(dueDateTime));
+				Log.v("setDueTime", "DueTime: " + sdfDateTime.format(cal.getTime()));
+				cal.setTime(sdfTime.parse(dt));
+				Log.v("setDueTime", "New DueTime: " + sdfDateTime.format(cal.getTime()));
+				dueDateTime = cal.getTime().toString();
+				Log.v("setDueTime", "dueDateTime String: " + dueDateTime);
+				hasDueTimeBool = true;
+				success = true;
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	return success;
     }
-    public void removeDueDate() {
-    	//TODO: Set date to default value?
-    	//dueDate = null;
-    	hasDueDateBool = false;
+    public void setHasDueDate(Boolean hasDD) {
+    	hasDueDateBool = hasDD;
     }
-    public void removeDueTime() {
-    	//TODO: Set time to default value?
-    	//dueTime = null;
-    	hasDueTimeBool = false;
+    public void setHasDueDate(int hasDD) {
+    	if (hasDD == 1) {
+    		hasDueDateBool = true;
+    	} else {
+    		hasDueDateBool = false;
+    	}
+    }
+    public void setHasDueTime(Boolean hasDT) {
+    	hasDueTimeBool = hasDT;
+    }
+    public void setHasDueTime(int hasDT) {
+    	if (hasDT == 1) {
+    		hasDueTimeBool = true;
+    	} else {
+    		hasDueTimeBool = false;
+    	}
     }
     public boolean hasDueDate() {
-    	//if(dueDate != null && dueDate.length() == 0) {
-    	//	hasDueDateBool = false;
-    	//} else {
-    	//	hasDueDateBool = true;
-    	//}
-    	//hasDueDateBool = dueDate.isEmpty();
     	return hasDueDateBool;
     }
     public boolean hasDueTime() {
@@ -182,13 +210,39 @@ public class ListItem implements Serializable {
     	String dateStr = sdf.format(date);
     	return dateStr;
     }
-    public boolean isDateTimeValid(String dateToValidate) {
+    public boolean isDateTimeValid(String dateTimeToValidate) {
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	sdf.setLenient(false);
+    	
+    	try {
+    		Date date = sdf.parse(dateTimeToValidate);
+    		Log.v("DateTime Validator", "Date: " + dateTimeToValidate + " is valid.");
+    	} catch (ParseException e) {
+    		e.printStackTrace();
+    		return false;
+    	}
+    	return true;
+    }
+    public boolean isDateValid(String dateToValidate) {
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     	sdf.setLenient(false);
     	
     	try {
     		Date date = sdf.parse(dateToValidate);
     		Log.v("Date Validator", "Date: " + dateToValidate + " is valid.");
+    	} catch (ParseException e) {
+    		e.printStackTrace();
+    		return false;
+    	}
+    	return true;
+    }
+    public boolean isTimeValid(String timeToValidate) {
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	sdf.setLenient(false);
+    	
+    	try {
+    		Date date = sdf.parse(timeToValidate);
+    		Log.v("Time Validator", "Date: " + timeToValidate + " is valid.");
     	} catch (ParseException e) {
     		e.printStackTrace();
     		return false;
