@@ -21,7 +21,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int DATABASE_VERSION = 28;
+	private static final int DATABASE_VERSION = 30;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
@@ -167,6 +167,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_ITEM_CREATE_DATE, item.getCreateDate());
 		
 		Log.v("DatabaseHandler.addItem", "Adding Item " + item.getName() + " to the DB");
+		Log.v("DatabaseHandler.addItem", "item.getDueDateTime(): " + item.getDueDateTime());
 		Log.v("DatabaseHandler.addItem", " *item info: " + item.getName() + "," + item.getDescription() + "," + item.getNotes() + "," 
 		+ item.getPrimaryCat() + "," + secondaryCatsString + "," + item.getCreateDate() + "," + hasDueDate + "," + hasDueTime
 		+ item.getDueDateTime());
@@ -285,6 +286,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_ITEM_HAS_DUE_DATE, hasDueDate);
 		values.put(KEY_ITEM_HAS_DUE_TIME, hasDueTime);
 		values.put(KEY_ITEM_DUE_DATETIME, item.getDueDateTime());
+		Log.v("DatabaseHandler.updateItem", "hasDueDate: " + hasDueDate + " hasDueTime: " + hasDueTime + " item.getDueDateTime: " + item.getDueDateTime());
 		
 		// updating row
 		return db.update(TABLE_ITEMS, values, KEY_ITEM_ID + " = ?",

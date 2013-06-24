@@ -259,7 +259,6 @@ public class FlipList extends Activity {
     }
     public void editListItem(ListItem item) {
     	currentItem = item;
-    	Date dueDateObj = null;
     	setContentView(R.layout.item_edit_layout);
     	EditText itemIDTv = (EditText) findViewById(R.id.item_edit_id_edittext);
     	EditText itemNameTv = (EditText) findViewById(R.id.item_edit_name_edittext);
@@ -274,13 +273,15 @@ public class FlipList extends Activity {
     	itemDescTv.setText(item.getDescription());
     	itemNotesTv.setText(item.getNotes());
 
-    	dueDateObj = item.getDueDateObj();
+    	String myDate = item.getDueDate();
+    	String myDatePretty = item.getDueDatePretty();
+    	String myTime = item.getDueTime();
+    	String myTimePretty = item.getDueTimePretty();
 
-    	String myDate = item.getDueDatePretty();
-    	String myTime = item.getDueTimePretty();
-
-    	editDateButton.setText(myDate);
-    	editTimeButton.setText(myTime);
+    	editDateButton.setText(myDatePretty);
+    	editDateButton.setTag(myDate);
+    	editTimeButton.setText(myTimePretty);
+    	editTimeButton.setTag(myTime);
     	
         catList = myListMan.getCategoryList();
     	// TODO: Make this into a generic addItemsToSpinner method that I can use with the first spinner also
@@ -319,6 +320,13 @@ public class FlipList extends Activity {
     	myItem.setPrimaryCat(itemCategoryID);
     	myItem.setNotes(itemNotes);
     	myItem.setDueTime(itemDueTime);
+    	if (itemDueTime != null && itemDueDate == null) {
+    		Calendar cal = Calendar.getInstance();
+    		int day = cal.get(Calendar.DAY_OF_MONTH);
+    		int month = cal.get(Calendar.MONTH);
+    		int year = cal.get(Calendar.YEAR);
+    		itemDueDate = year + "-" + month + "-" + day;
+    	}
     	myItem.setDueDate(itemDueDate);
     	Log.v("FlipList.itemEditSaveButtonAction", "itemDueTime: " + itemDueTime + " itemDueDate: " + itemDueDate);
     	myItem.setCreateDate(currentItem.getCreateDate());
@@ -384,13 +392,6 @@ public class FlipList extends Activity {
     	 
 	}
     
-    public class editListItem {
-    	// Make this send the item to edit to the edit view/layout
-    	public editListItem(ListItem item) {
-    		// grab the item to be edited
-    	}
-    }
-    
     private class MyCustomAdapter extends ArrayAdapter<ListItem> {
     	 
     	private ArrayList<ListItem> itemList;
@@ -439,40 +440,57 @@ public class FlipList extends Activity {
     					addItemsOnList();
     				}  
     			});  
-    	   } 
-    	   else {
-    	    holder = (ViewHolder) convertView.getTag();
+    		} else {
+    		   holder = (ViewHolder) convertView.getTag();
     		}
-    		
     		ListItem item = itemList.get(position);
     		holder.itemName.setText(item.getName());
     		String infoString = "";
+    		Boolean showInfo = false;
     		if (catSelectedObj.showDueDate()) {
-	    		if (item.hasDueDate() == true ) {
-	    			infoString = " (" + item.getDueDatePretty() + ")";
-	    		}
+    			if (item.hasDueTime() == true) {
+    				infoString = "Due: " + item.getDueDatePretty() + " @ " + item.getDueTimePretty();
+    				showInfo = true;
+    			} else if (item.hasDueDate()) {
+    				infoString = "Due: " + item.getDueDatePretty();
+    				showInfo = true;
+    			}
     		}
 	    	if (catSelectedObj.showDescription()) {
-	    		infoString = infoString + " (" + item.getDescription() + ")";
+	    		if (!item.getDescription().isEmpty()) {
+	    			infoString = infoString + " (" + item.getDescription() + ")";
+	    			showInfo = true;
+	    		}
     		}
-    		holder.itemInfo.setText(infoString);
+	    	if (showInfo) {
+	    		holder.itemInfo.setText(infoString);
+	    	} else {
+	    		holder.itemInfo.setVisibility(View.GONE);
+	    	}
     		holder.itemCheckBox.setText("");
     		holder.itemCheckBox.setTag(item);
-    	 
     		return convertView;
-    	 
-    	}
-    	 
+    	} 
 	}
     
     public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			// Use the current time as the default values for the picker
-			final Calendar c = Calendar.getInstance();
-			int hour = c.get(Calendar.HOUR_OF_DAY);
-			int minute = c.get(Calendar.MINUTE);
+			Calendar cal = Calendar.getInstance();
+			Button setTimeBtn = (Button) getActivity().findViewById(R.id.time_edit_button);
+			SimpleDateFormat hmf = new SimpleDateFormat("HH:mm");
+			try {
+				String setTimeBtnTag = (String) setTimeBtn.getTag();
+				if (setTimeBtnTag != null) {
+					cal.setTime(hmf.parse(setTimeBtnTag));
+				}
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			int hour = cal.get(Calendar.HOUR_OF_DAY);
+			int minute = cal.get(Calendar.MINUTE);
 		
 			// Create a new instance of TimePickerDialog and return it
 			return new TimePickerDialog(getActivity(), this, hour, minute, DateFormat.is24HourFormat(getActivity()));
@@ -482,6 +500,7 @@ public class FlipList extends Activity {
 			Calendar cal = Calendar.getInstance();
 			Button setTimeBtn = (Button) getActivity().findViewById(R.id.time_edit_button);
 	    	//SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	    	SimpleDateFormat hmaf = new SimpleDateFormat("HH:mm aa");
 	    	SimpleDateFormat hmf = new SimpleDateFormat("HH:mm");
 	    	String hourMinute = hourOfDay + ":" + minute;
 	    	try {
@@ -489,9 +508,8 @@ public class FlipList extends Activity {
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
-			//setTimeBtn.setTag(cal);
+	    	setTimeBtn.setText(hmaf.format(cal.getTime()));
 	    	setTimeBtn.setTag(hourMinute);
-			setTimeBtn.setText(hourOfDay + ":" + minute);
 		}
 	}
     
@@ -504,11 +522,22 @@ public class FlipList extends Activity {
 
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			// Use the current date as the default date in the picker
-			final Calendar c = Calendar.getInstance();
-			int year = c.get(Calendar.YEAR);
-			int month = c.get(Calendar.MONTH);
-			int day = c.get(Calendar.DAY_OF_MONTH);
+			
+			Calendar cal = Calendar.getInstance();
+			Button setTimeBtn = (Button) getActivity().findViewById(R.id.time_edit_button);
+			SimpleDateFormat hmf = new SimpleDateFormat("HH:mm aa");
+			try {
+				String setTimeBtnTag = (String) setTimeBtn.getTag();
+				if (setTimeBtnTag != null) {
+					cal.setTime(hmf.parse(setTimeBtnTag));
+				}
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			int year = cal.get(Calendar.YEAR);
+			int month = cal.get(Calendar.MONTH);
+			int day = cal.get(Calendar.DAY_OF_MONTH);
 		
 			// Create a new instance of DatePickerDialog and return it
 			return new DatePickerDialog(getActivity(), this, year, month, day);
@@ -517,17 +546,16 @@ public class FlipList extends Activity {
 		public void onDateSet(DatePicker view, int year, int month, int day) {
 			Calendar cal = Calendar.getInstance();
 			Button setDateBtn = (Button) getActivity().findViewById(R.id.date_edit_button);
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd");
+			SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
 			String yearMonthDay = year + "-" + month + "-" + day;
 			try {
-				cal.setTime(sdf.parse(yearMonthDay));
+				cal.setTime(ymd.parse(yearMonthDay));
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			//setDateBtn.setTag(cal);
+	    	setDateBtn.setText(sdf.format(cal.getTime()));
 			setDateBtn.setTag(yearMonthDay);
-			setDateBtn.setText(month + ", " + day + " " + year);
 		}
 	}
     
