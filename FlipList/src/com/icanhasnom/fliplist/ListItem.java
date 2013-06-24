@@ -113,7 +113,7 @@ public class ListItem implements Serializable {
     	// TODO: Fix this below to use localle
     	SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd");
-    	if (isDateValid(dd)) {
+    	if (dd != null && isDateValid(dd)) {
 	    	try {
 				cal.setTime(sdfDateTime.parse(dueDateTime));
 				Log.v("setDueDate", "DueDate: " + sdfDateTime.format(cal.getTime()));
@@ -136,7 +136,7 @@ public class ListItem implements Serializable {
     	Boolean success = false;
     	SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
-    	if (isTimeValid(dt)) {
+    	if (dt != null && isTimeValid(dt)) {
 	    	try {
 				cal.setTime(sdfDateTime.parse(dueDateTime));
 				Log.v("setDueTime", "DueTime: " + sdfDateTime.format(cal.getTime()));
@@ -237,7 +237,7 @@ public class ListItem implements Serializable {
     	return true;
     }
     public boolean isTimeValid(String timeToValidate) {
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
     	sdf.setLenient(false);
     	
     	try {

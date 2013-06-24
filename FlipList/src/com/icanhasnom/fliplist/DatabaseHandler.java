@@ -21,7 +21,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int DATABASE_VERSION = 27;
+	private static final int DATABASE_VERSION = 28;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
@@ -273,14 +273,17 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	public int updateItem(ListItem item) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		
+		int hasDueDate = item.hasDueDate()? 1 : 0;
+		int hasDueTime = item.hasDueTime()? 1 : 0;
+		
 		ContentValues values = new ContentValues();
 		values.put(KEY_ITEM_NAME, item.getName());
 		values.put(KEY_ITEM_DESC, item.getDescription());
 		values.put(KEY_ITEM_NOTES, item.getNotes());
 		values.put(KEY_ITEM_PRIMARY_CAT, item.getPrimaryCat());
 		values.put(KEY_ITEM_SECONDARY_CATS, item.getSecondaryCatsString());
-		values.put(KEY_ITEM_HAS_DUE_DATE, item.hasDueDate());
-		values.put(KEY_ITEM_HAS_DUE_TIME, item.hasDueTime());
+		values.put(KEY_ITEM_HAS_DUE_DATE, hasDueDate);
+		values.put(KEY_ITEM_HAS_DUE_TIME, hasDueTime);
 		values.put(KEY_ITEM_DUE_DATETIME, item.getDueDateTime());
 		
 		// updating row
@@ -293,8 +296,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				new String[] { String.valueOf(item.getID()) });
 		db.close();
 	}
-	
-	////// TODO: LEFT OFF HERE, KEEP FIXING HAS DUE DATE AND TIME PIECES
 	
 	// Categories
 	public void addCategory(ListCategory category) {

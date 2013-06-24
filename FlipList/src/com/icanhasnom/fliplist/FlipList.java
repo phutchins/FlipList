@@ -309,8 +309,8 @@ public class FlipList extends Activity {
     	ListCategory itemCategory = (ListCategory) itemCatSpinner.getItemAtPosition(itemCatSpinner.getSelectedItemPosition());
     	int itemCategoryID = itemCategory.getID();
     	String itemNotes = itemNotesTv.getText().toString();
-    	String itemDueTime = (String) itemDueTimeBtn.getText();
-    	String itemDueDate = (String) itemDueDateBtn.getText();
+    	String itemDueTime = (String) itemDueTimeBtn.getTag();
+    	String itemDueDate = (String) itemDueDateBtn.getTag();
     	
     	ListItem myItem = new ListItem();
     	myItem.setID(itemID);
@@ -320,8 +320,10 @@ public class FlipList extends Activity {
     	myItem.setNotes(itemNotes);
     	myItem.setDueTime(itemDueTime);
     	myItem.setDueDate(itemDueDate);
+    	Log.v("FlipList.itemEditSaveButtonAction", "itemDueTime: " + itemDueTime + " itemDueDate: " + itemDueDate);
     	myItem.setCreateDate(currentItem.getCreateDate());
-    	
+    	Log.v("FlipList.itemEditSaveButtonAction", "hasDueDate: " + myItem.hasDueDate() + " hasDueTime: " + myItem.hasDueTime());
+
     	//Set up constructor to be able to take all this stuff
     	//myListMan.updateItem(new ListItem(itemCategoryID, itemID, itemName, itemDesc));
     	myListMan.updateItem(myItem);
@@ -477,10 +479,18 @@ public class FlipList extends Activity {
 		}
 		
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			Calendar cal = Calendar.getInstance();
 			Button setTimeBtn = (Button) getActivity().findViewById(R.id.time_edit_button);
-	    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	    	String dateStr = sdf.format(date);
-			setTimeBtn.setTag(time);
+	    	//SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	    	SimpleDateFormat hmf = new SimpleDateFormat("HH:mm");
+	    	String hourMinute = hourOfDay + ":" + minute;
+	    	try {
+				cal.setTime(hmf.parse(hourMinute));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			//setTimeBtn.setTag(cal);
+	    	setTimeBtn.setTag(hourMinute);
 			setTimeBtn.setText(hourOfDay + ":" + minute);
 		}
 	}
@@ -505,8 +515,18 @@ public class FlipList extends Activity {
 		}
 		
 		public void onDateSet(DatePicker view, int year, int month, int day) {
+			Calendar cal = Calendar.getInstance();
 			Button setDateBtn = (Button) getActivity().findViewById(R.id.date_edit_button);
-			
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			String yearMonthDay = year + "-" + month + "-" + day;
+			try {
+				cal.setTime(sdf.parse(yearMonthDay));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//setDateBtn.setTag(cal);
+			setDateBtn.setTag(yearMonthDay);
 			setDateBtn.setText(month + ", " + day + " " + year);
 		}
 	}
