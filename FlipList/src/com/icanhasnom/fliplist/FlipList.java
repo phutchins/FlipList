@@ -4,9 +4,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -16,13 +15,10 @@ import android.app.DialogFragment;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.text.format.DateFormat;
 import android.util.Log;
-import android.util.SparseArray;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,11 +35,9 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
-import android.util.Log;
 
 // ToDo
 // Ability to assign multiple categories to tasks
@@ -427,8 +421,6 @@ public class FlipList extends Activity {
     				public void onClick(View v) {  
     					CheckBox cb = (CheckBox) v ;  
     					ListItem item = (ListItem) cb.getTag();
-    					Spinner catSpinner = (Spinner) findViewById(R.id.catSpinner);
-
     					int catSelected = catSelectedObj.getID();
     					//String itemDescription = item.getDescription();
     					String itemName = item.getName();
@@ -476,7 +468,7 @@ public class FlipList extends Activity {
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
 			Calendar cal = Calendar.getInstance();
 			Button setTimeBtn = (Button) getActivity().findViewById(R.id.time_edit_button);
-			SimpleDateFormat hmf = new SimpleDateFormat("HH:mm");
+			SimpleDateFormat hmf = new SimpleDateFormat("hh:mm", Locale.US);
 			try {
 				String setTimeBtnTag = (String) setTimeBtn.getTag();
 				if (setTimeBtnTag != null) {
@@ -496,9 +488,8 @@ public class FlipList extends Activity {
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 			Calendar cal = Calendar.getInstance();
 			Button setTimeBtn = (Button) getActivity().findViewById(R.id.time_edit_button);
-	    	//SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	    	SimpleDateFormat hmaf = new SimpleDateFormat("HH:mm aa");
-	    	SimpleDateFormat hmf = new SimpleDateFormat("HH:mm");
+	    	SimpleDateFormat hmaf = new SimpleDateFormat("hh:mm aa", Locale.US);
+	    	SimpleDateFormat hmf = new SimpleDateFormat("HH:mm", Locale.US);
 	    	String hourMinute = hourOfDay + ":" + minute;
 	    	try {
 				cal.setTime(hmf.parse(hourMinute));
@@ -522,7 +513,7 @@ public class FlipList extends Activity {
 			
 			Calendar cal = Calendar.getInstance();
 			Button setDateBtn = (Button) getActivity().findViewById(R.id.date_edit_button);
-			SimpleDateFormat hmf = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat hmf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 			try {
 				String setDateBtnTag = (String) setDateBtn.getTag();
 				if (setDateBtnTag != null) {
@@ -541,10 +532,12 @@ public class FlipList extends Activity {
 		}
 		
 		public void onDateSet(DatePicker view, int year, int month, int day) {
+			month = month + 1;
 			Calendar cal = Calendar.getInstance();
 			Button setDateBtn = (Button) getActivity().findViewById(R.id.date_edit_button);
-			SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd");
-			SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd", Locale.US);
+			SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+			Log.v("FlipList.DatePickerFragment", "year: " + year + " month: " + month + " day: " + day);
 			String yearMonthDay = year + "-" + month + "-" + day;
 			Log.v("FlipList.DatePickerFragment", "yearMonthDay: " + yearMonthDay);
 			try {
