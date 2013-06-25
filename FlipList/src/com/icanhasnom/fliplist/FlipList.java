@@ -46,9 +46,8 @@ import android.widget.Toast;
 import android.util.Log;
 
 // ToDo
-// Make list items clickable to display more info and have edit button
 // Ability to assign multiple categories to tasks
-// Format list item list display to show tiny date below description to leave more room for actual description
+// TODO: Format list item list display to show tiny date below description to leave more room for actual description
 
 // UI Design
 // Make 3 tabs, one for category list, one for task list, one for something else
@@ -58,16 +57,9 @@ import android.util.Log;
 // Third tab could be Item Edit or Add screen. If you select an item it slides over to
 //    the right and you can edit. If nothing is selected and you swipe, it lets you add one.
 
-// Settings Design
-// Make settings menu -
-//    Default category setting
-//    Choose what values are displayed for list item on main screen
-//    Default list type (grocery, todo, etc...)
-
 // Category Design
 //   In addition to having a type, categories should have the ability to choose the behavior when items are checked
 //     they could (1) go away immediately (2) stay for X time (3) Disappear after X other items are checked
-
 
 // Filter Design (Acts as a categoryList item?)
 //   Ability to make custom filters
@@ -88,6 +80,10 @@ import android.util.Log;
 // Caching and Redrawing
 // TODO: Only recreate the listmap if we've written, edited or deleted a category, item or type
 // TODO: Pull all of the items at one time from the DB into a searchable hash for parsing into itemlists
+
+// Completed Items
+// TODO: Add completed field to ListItem
+// TODO: Have item list only display items if not completed & create date is older than difference create date and current time vs when to disappear
 
 // BUGS & FIXES
 // TODO: Fix all back and "UP" buttons on navigation bar
@@ -182,8 +178,9 @@ public class FlipList extends Activity {
     		this.startActivity(addEditCatIntent);
     		break;
     	case R.id.menu_settings:
-    		//open settings menu
-    		return true;
+    		Intent settings = new Intent(this, SetPreferenceActivity.class);
+    		this.startActivity(settings);
+    		break;
     	default:
     		return super.onOptionsItemSelected(item);
     	}
@@ -524,12 +521,12 @@ public class FlipList extends Activity {
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
 			
 			Calendar cal = Calendar.getInstance();
-			Button setTimeBtn = (Button) getActivity().findViewById(R.id.time_edit_button);
-			SimpleDateFormat hmf = new SimpleDateFormat("HH:mm aa");
+			Button setDateBtn = (Button) getActivity().findViewById(R.id.date_edit_button);
+			SimpleDateFormat hmf = new SimpleDateFormat("yyyy-MM-dd");
 			try {
-				String setTimeBtnTag = (String) setTimeBtn.getTag();
-				if (setTimeBtnTag != null) {
-					cal.setTime(hmf.parse(setTimeBtnTag));
+				String setDateBtnTag = (String) setDateBtn.getTag();
+				if (setDateBtnTag != null) {
+					cal.setTime(hmf.parse(setDateBtnTag));
 				}
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
@@ -549,6 +546,7 @@ public class FlipList extends Activity {
 			SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd");
 			SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
 			String yearMonthDay = year + "-" + month + "-" + day;
+			Log.v("FlipList.DatePickerFragment", "yearMonthDay: " + yearMonthDay);
 			try {
 				cal.setTime(ymd.parse(yearMonthDay));
 			} catch (ParseException e) {

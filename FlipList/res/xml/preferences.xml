@@ -1,0 +1,39 @@
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+            android:title="Category Settings">
+
+        <ListPreference
+                android:key="default_category"
+                android:title="Default Category"
+                android:summary="Select the default category to display when launching the app" />
+        
+        <CheckBoxPreference
+            android:key="show_description_on_list"
+            android:title="Show item description"
+            android:summary="This shows a preview of the items description on the list" />
+
+    </PreferenceCategory>
+    
+    <PreferenceCategory
+        android:title="Item Completion Settings">
+        
+        <CheckBoxPreference 
+            android:key="immediately_completed"
+            android:title="Remove completed items immediately"
+            android:summary="With this enabled, completed items will immediately disappear out of its category" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="Notification Settings">
+
+        <RingtonePreference
+                android:key="default_notification_sound"
+                android:title="Default Notification Sound"
+                android:summary="Choose the notification sound to use for reminders"
+                android:dialogTitle="dialog_title_edittext_preference" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
