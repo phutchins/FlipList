@@ -40,5 +40,7 @@
     <string name="item_edit_due_text_hint">due</string>
     <string name="pick_time">Time</string>
     <string name="pick_date">Date</string>
+    <string name="no_due_time_button_text">No Time</string>
+    <string name="no_due_date_button_text">No Date</string>
 
 </resources>

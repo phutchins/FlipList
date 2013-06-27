@@ -22,7 +22,7 @@ public class ListManager implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	// TODO: Create settings ArrayList and populate from DB (maybe in constructor?)
-	ArrayList<ListCategory> categoryList = new ArrayList<ListCategory>();
+	ArrayList<Category> categoryList = new ArrayList<Category>();
     //ArrayList<ListCategory> categoryObjList = new ArrayList<ListCategory>();
     ItemList itemList = null;
     Map<Integer, ItemList> itemListMap = new HashMap<Integer, ItemList>();
@@ -45,7 +45,7 @@ public class ListManager implements Serializable {
     
     // TODO: Do we use string currentCategory? Should this be changed to an object?
     //       obj might be useful if we're passing around the reference to myListMan
-    ListCategory currentCategoryObj;
+    Category currentCategoryObj;
     String currentCategory;
     
     public ListManager(Context context) {
@@ -64,10 +64,10 @@ public class ListManager implements Serializable {
     	buildItemListMap();
     	populateCategoryList();
     }
-    public void updateItem(ListItem item) {
+    public void updateItem(Item item) {
     	db.updateItem(item);
     }
-    public void deleteItem(ListItem item) {
+    public void deleteItem(Item item) {
     	db.deleteItem(item);
     }
     public void populateCategoryList() {
@@ -77,7 +77,7 @@ public class ListManager implements Serializable {
 		itemListMap.clear();
     	ItemList myItemList = null;
     	for(int i = 0; i < categoryList.size(); i++) {
-    		ListCategory curCat = (ListCategory) categoryList.get(i);
+    		Category curCat = (Category) categoryList.get(i);
     		int curCatID = curCat.getID();
 			myItemList = db.getItemList(curCatID);
 			myItemList.setName(curCat.getName());
@@ -111,7 +111,7 @@ public class ListManager implements Serializable {
     	
     //    return myNewListCategory;
     //}
-    public void addCategory(ListCategory listCategory) {
+    public void addCategory(Category listCategory) {
     	// TODO: Merge updateObjCategory into this? Maybe make addUpdateObjCategory() which does 
     	//       a check to see if it exists and updates it if it already exists and adds it if
     	//       it doesn't.
@@ -119,19 +119,19 @@ public class ListManager implements Serializable {
     	buildItemListMap();
     	populateCategoryList();
     }
-	public ListItem addItem(int catID, String name) {
-		ListItem myItem = new ListItem(catID, name);
+	public Item addItem(int catID, String name) {
+		Item myItem = new Item(catID, name);
 		db.addItem(myItem);
 		buildItemListMap();
 		return myItem;
 	}
-    public ListItem addItem(int curCategory, String name, String description, String dueDate) {
-        ListItem myItem = new ListItem(curCategory, name, description, dueDate);
+    public Item addItem(int curCategory, String name, String description, String dueDate) {
+        Item myItem = new Item(curCategory, name, description, dueDate);
         db.addItem(myItem);
         buildItemListMap();
         return myItem;
     }
-    public void addCategoryType(CategoryType newCatType) {
+    public void addCategoryType(ItemType newCatType) {
     	// Check if type exists
     	// Add type to db if doesn't exist
     	// Add type to typeList
@@ -139,14 +139,14 @@ public class ListManager implements Serializable {
 
     
     // Updating Objects
-    public void updateObjCategory(ListCategory catToUpdate) {
+    public void updateObjCategory(Category catToUpdate) {
     	// update category in DB here & update category list (or pull from DB and refresh)
     	//int catID = catToUpdate.getID();
     	//String catName = catToUpdate.getName();
     	db.updateCategory(catToUpdate);
     	//itemListMap.put(catID, new ItemList(catName));
     }
-    public void moveItem(ListItem myItem, String fromList, String toList) {
+    public void moveItem(Item myItem, String fromList, String toList) {
         ItemList myFromList = itemListMap.get(fromList);
         ItemList myToList = itemListMap.get(toList);
         myFromList.removeListItem(myItem);
@@ -154,7 +154,7 @@ public class ListManager implements Serializable {
             myToList.addListItem(myItem);
         }
     }
-    public void completeItem(ListItem myItem, int fromList) {
+    public void completeItem(Item myItem, int fromList) {
         ItemList myFromList = itemListMap.get(fromList);
         // TODO: Put this into settings and make a settings class to cache settings
         int completedListID = completedCatID;
@@ -181,24 +181,24 @@ public class ListManager implements Serializable {
     }
     
     // Retrieving Lists
-    public ArrayList<ListCategory> getCategoryList() {
+    public ArrayList<Category> getCategoryList() {
     	// TODO: Add a variable to save the category list
     	//       check if the catlist exists (maybe see if its been updated recently?)
     	//       and populate from the DB if it doesn't exist or has been updated
     	//       Create Variable to set in in the ListManager that is true if a certain datatype
     	//       has been updated, then update the list and set the variable to false
-    	ArrayList<ListCategory> retCatListObjs = db.getCategories();
+    	ArrayList<Category> retCatListObjs = db.getCategories();
         return retCatListObjs;
     }
-    public ArrayList<ListCategory> getCategoryListAll() {
-    	ArrayList<ListCategory> retCatListObjs = db.getAllCategories();
+    public ArrayList<Category> getCategoryListAll() {
+    	ArrayList<Category> retCatListObjs = db.getAllCategories();
         return retCatListObjs;
     }
     public String[] getCategoryListStrings() {
-    	ArrayList<ListCategory> retCatList = db.getAllCategories();
+    	ArrayList<Category> retCatList = db.getAllCategories();
     	String[] catListStrings = new String[retCatList.size()];
     	int index = 0;
-    	for (ListCategory value : retCatList) {
+    	for (Category value : retCatList) {
     		catListStrings[index] = (String) value.getName();
     		index++;
     	}
@@ -212,23 +212,23 @@ public class ListManager implements Serializable {
     }
     public String[] getItemListArray(String myCat) {
         ItemList myItemList = itemListMap.get(myCat);
-        ArrayList<ListItem> myItemArrayList = myItemList.getListItems();
+        ArrayList<Item> myItemArrayList = myItemList.getListItems();
         String[] myItemArray = new String[myItemArrayList.size()];
         myItemArray = myItemArrayList.toArray(myItemArray);
         return myItemArray;
     }
-    public ArrayList<CategoryType> getCategoryTypesList() {
-    	ArrayList<CategoryType> categoryTypesList = db.getCategoryTypesList();
+    public ArrayList<ItemType> getCategoryTypesList() {
+    	ArrayList<ItemType> categoryTypesList = db.getCategoryTypesList();
     	return categoryTypesList;
     }
 
     // Retrieving Objects
-    public CategoryType getCategoryType(int typeID) {
-    	CategoryType catType = db.getCategoryType(typeID);
+    public ItemType getCategoryType(int typeID) {
+    	ItemType catType = db.getCategoryType(typeID);
     	return catType;
     }
-    public ListCategory getCategory(int catID) {
-    	ListCategory listCat = db.getCategory(catID);
+    public Category getCategory(int catID) {
+    	Category listCat = db.getCategory(catID);
     	return listCat;
     }
     
@@ -244,7 +244,7 @@ public class ListManager implements Serializable {
     	return typeName;
     }
     public String getCategoryName(int catID) {
-    	ListCategory listCat = db.getCategory(catID);
+    	Category listCat = db.getCategory(catID);
     	return listCat.getName();
     }
     

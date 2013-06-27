@@ -10,7 +10,7 @@ import java.io.*;
  *
  * @author flip
  */
-public class ListCategory implements Serializable {
+public class Category implements Serializable {
     /**
 	 * 
 	 */
@@ -23,16 +23,16 @@ public class ListCategory implements Serializable {
     boolean showDueDate = true;
     boolean showDescription = true;
     int isVisible = 1;
-    public ListCategory() {
+    public Category() {
     }
-    public ListCategory(int ID, String catName, String catDesc, int catType, int v) {
+    public Category(int ID, String catName, String catDesc, int catType, int v) {
     	catID = ID;
         name = catName;
         description = catDesc;
         type = catType;
         isVisible = v;
     }
-    public ListCategory(String catName, String catDesc, int catType, int v) {
+    public Category(String catName, String catDesc, int catType, int v) {
     	name = catName;
     	description = catDesc;
     	type = catType;

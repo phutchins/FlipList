@@ -22,7 +22,7 @@
         
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="360dp" >
+                android:layout_height="373dp" >
 
                 <TextView
                     android:id="@+id/item_edit_name_text_textview"
@@ -135,6 +135,26 @@
                     android:layout_toRightOf="@+id/time_edit_button"
                     android:onClick="showDatePickerDialog"
                     android:text="@string/pick_date" />
+
+                <Button
+                    android:id="@+id/no_due_time_button"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/time_edit_button"
+                    android:layout_alignParentLeft="true"
+                    android:onClick="itemEditNoDueTimeButtonAction"
+                    android:text="@string/no_due_time_button_text" />
+
+                <Button
+                    android:id="@+id/no_due_date_button"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+					android:layout_below="@+id/date_edit_button"
+                    android:layout_toRightOf="@+id/item_edit_category_text_textview"
+                    android:onClick="itemEditNoDueDateButtonAction"
+                    android:text="@string/no_due_date_button_text" />
 
             </RelativeLayout>
 

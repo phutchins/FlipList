@@ -146,7 +146,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	
 	
 	// Items
-	public void addItem(ListItem item) {
+	public void addItem(Item item) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		String secondaryCatsString = item.getSecondaryCatsString();
 		int hasDueDate = item.hasDueDate()? 1 : 0;
@@ -172,7 +172,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		db.insert(TABLE_ITEMS, null, values);
 		db.close();
 	}
-	public ListItem getItem(int id) throws NumberFormatException, ParseException {
+	public Item getItem(int id) throws NumberFormatException, ParseException {
 		SQLiteDatabase db = this.getReadableDatabase();
 		
 		Cursor cursor = db.query(TABLE_ITEMS, new String[] { KEY_ITEM_ID, KEY_ITEM_NAME,
@@ -192,14 +192,14 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		String itemDueDate = cursor.getString(8);
 		String itemCreateDate = cursor.getString(9);
 		
-		ListItem item = new ListItem(itemID, itemPriCat, itemSecCats, itemName, itemDesc, itemNotes, itemCreateDate, itemDueDate);
+		Item item = new Item(itemID, itemPriCat, itemSecCats, itemName, itemDesc, itemNotes, itemCreateDate, itemDueDate);
 		item.setHasDueDate(itemHasDueDate);
 		item.setHasDueTime(itemHasDueTime);
 		// return item
 		return item;
 	}
-	public ArrayList<ListItem> getAllItems() throws NumberFormatException, ParseException {
-		ArrayList<ListItem> itemList = new ArrayList<ListItem>();
+	public ArrayList<Item> getAllItems() throws NumberFormatException, ParseException {
+		ArrayList<Item> itemList = new ArrayList<Item>();
 		// Select All Query
 		String selectQuery = "SELECT * FROM " + TABLE_ITEMS;
 		
@@ -209,7 +209,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {
-				ListItem item = new ListItem();
+				Item item = new Item();
 				item.setID(cursor.getInt(0));
 				item.setName(cursor.getString(1));
 				item.setDescription(cursor.getString(2));
@@ -240,7 +240,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {
-				ListItem item = new ListItem();
+				Item item = new Item();
 				item.setID(cursor.getInt(0));
 				item.setName(cursor.getString(1));
 				item.setDescription(cursor.getString(2));
@@ -268,7 +268,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		// return count
 		return cursor.getCount();
 	}
-	public int updateItem(ListItem item) {
+	public int updateItem(Item item) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		int hasDueDate = item.hasDueDate()? 1 : 0;
@@ -289,7 +289,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		return db.update(TABLE_ITEMS, values, KEY_ITEM_ID + " = ?",
 				new String[] { String.valueOf(item.getID()) });
 	}
-	public void deleteItem(ListItem item) {
+	public void deleteItem(Item item) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		db.delete(TABLE_ITEMS, KEY_ITEM_ID + " = ?",
 				new String[] { String.valueOf(item.getID()) });
@@ -297,7 +297,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	}
 	
 	// Categories
-	public void addCategory(ListCategory category) {
+	public void addCategory(Category category) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
@@ -311,7 +311,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		db.insert(TABLE_CATEGORIES, null, values);
 		db.close();
 	}
-	public ListCategory getCategory(int id) {
+	public Category getCategory(int id) {
 		SQLiteDatabase db = this.getReadableDatabase();
 		
 		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
@@ -320,13 +320,13 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		if (cursor != null)
 			cursor.moveToFirst();
 		
-		ListCategory category = new ListCategory(cursor.getInt(0),
+		Category category = new Category(cursor.getInt(0),
 				cursor.getString(1), cursor.getString(2), cursor.getInt(3), cursor.getInt(4));
 		// return category
 		Log.v("DatabaseHandler.getCategory", "ID: " + category.getID() + " Name: " + category.getName());
 		return category;
 	}
-	public ListCategory getCategoryByName(String catName) {
+	public Category getCategoryByName(String catName) {
 		SQLiteDatabase db = this.getReadableDatabase();
 		
 		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
@@ -335,20 +335,20 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		if (cursor != null)
 			cursor.moveToFirst();
 		
-		ListCategory category = new ListCategory(Integer.parseInt(cursor.getString(0)),
+		Category category = new Category(Integer.parseInt(cursor.getString(0)),
 				cursor.getString(1), cursor.getString(2), Integer.parseInt(cursor.getString(3)), Integer.parseInt(cursor.getString(4)));
 		// return category
 		return category;
 	}
-	public CategoryType getCategoryType(int typeID) {
+	public ItemType getCategoryType(int typeID) {
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_CATEGORY_TYPES, new String[] { KEY_TYPE_ID, KEY_TYPE_NAME, KEY_TYPE_DESC }, KEY_TYPE_ID
 				+ "=?", new String[] { String.valueOf(typeID) }, null, null, null, null);
-		CategoryType myCategoryType = new CategoryType(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getString(2));
+		ItemType myCategoryType = new ItemType(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getString(2));
 		return myCategoryType;
 	}
-	public ArrayList<ListCategory> getAllCategories() {
-		ArrayList<ListCategory> categoryList = new ArrayList<ListCategory>();
+	public ArrayList<Category> getAllCategories() {
+		ArrayList<Category> categoryList = new ArrayList<Category>();
 		// Select All Query
 		String selectQuery = "SELECT * FROM " + TABLE_CATEGORIES;
 		
@@ -358,7 +358,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {
-				ListCategory category = new ListCategory();
+				Category category = new Category();
 				category.setID(Integer.parseInt(cursor.getString(0)));
 				category.setName(cursor.getString(1));
 				category.setDescription(cursor.getString(2));
@@ -373,8 +373,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		// return contact list
 		return categoryList;
 	}
-	public ArrayList<ListCategory> getCategories() {
-		ArrayList<ListCategory> categoryList = new ArrayList<ListCategory>();
+	public ArrayList<Category> getCategories() {
+		ArrayList<Category> categoryList = new ArrayList<Category>();
 		// Select All Query
 		//String selectQuery = "SELECT * FROM " + TABLE_CATEGORIES;
 		String isVisible = "1";
@@ -385,7 +385,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {
-				ListCategory category = new ListCategory();
+				Category category = new Category();
 				category.setID(Integer.parseInt(cursor.getString(0)));
 				category.setName(cursor.getString(1));
 				category.setDescription(cursor.getString(2));
@@ -441,7 +441,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_CAT_VISIBLE, isVisible);
 		db.update(TABLE_CATEGORIES, values, KEY_CAT_VISIBLE + " = " + isVisible, null);
 	}
-	public int updateCategory(ListCategory category) {
+	public int updateCategory(Category category) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
@@ -470,8 +470,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	
 	
 	// Types
-	public ArrayList<CategoryType> getCategoryTypesList() {
-		ArrayList<CategoryType> typeList = new ArrayList<CategoryType>();
+	public ArrayList<ItemType> getCategoryTypesList() {
+		ArrayList<ItemType> typeList = new ArrayList<ItemType>();
 		// Select All Query
 		String selectQuery = "SELECT * FROM " + TABLE_CATEGORY_TYPES;
 		
@@ -481,7 +481,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {
-				CategoryType type = new CategoryType();
+				ItemType type = new ItemType();
 				type.setID(Integer.parseInt(cursor.getString(0)));
 				type.setName(cursor.getString(1));
 				type.setDescription(cursor.getString(2));

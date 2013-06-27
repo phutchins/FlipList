@@ -20,7 +20,7 @@ public class ItemList implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public String listName = new String();
     public int listID;
-    ArrayList<ListItem> myItemList = new ArrayList<ListItem>();
+    ArrayList<Item> myItemList = new ArrayList<Item>();
     
     public ItemList(String ln) {
         listName = ln;
@@ -38,16 +38,16 @@ public class ItemList implements Serializable {
     public void setID(int id) {
     	listID = id;
     }
-    public ArrayList<ListItem> getListItems() {
+    public ArrayList<Item> getListItems() {
         return myItemList;
     }
     
-    public void addListItem(ListItem li) {
+    public void addListItem(Item li) {
         myItemList.add(li);
         Log.v("ItemList", "Added ListItem: " + li.getName() + ", " + li.getID() + ", " + li.getPrimaryCat());
     }
     
-    public void removeListItem(ListItem li) {
+    public void removeListItem(Item li) {
         myItemList.remove(li);
     }
 }

@@ -12,7 +12,7 @@ import android.util.Log;
 
 // TODO: Set up to take more than one category
 
-public class ListItem implements Serializable {
+public class Item implements Serializable {
     /**
 	 * 
 	 */
@@ -29,11 +29,11 @@ public class ListItem implements Serializable {
     public boolean hasDueTimeBool = false;
     public String notes = "";
     
-    public ListItem() {
+    public Item() {
     	dueDateTime = getNowDateTime();
         createDate = new Date().toString();
     }
-    public ListItem(int cat, String n, String desc, String crDate, String due) throws ParseException {
+    public Item(int cat, String n, String desc, String crDate, String due) throws ParseException {
     	name = n;
     	description = desc;
     	Log.v("ListItem", "1) due: " + due + " hasDueDateBool: " + hasDueDateBool);
@@ -46,7 +46,7 @@ public class ListItem implements Serializable {
         createDate = new Date().toString();
     	Log.v("ListItem", "1) due: " + due + " hasDueDateBool: " + hasDueDateBool);
     }
-    public ListItem(int cat, String n, String desc, String due) {
+    public Item(int cat, String n, String desc, String due) {
     	name = n;
         //stringCatsToList(cats);
     	primaryCat = cat;
@@ -65,7 +65,7 @@ public class ListItem implements Serializable {
     	createDate = new Date().toString();
     	Log.v("ListItem", "2) due: " + due + " hasDueDateBool: " + hasDueDateBool);
     }
-    public ListItem(int cat, String n, String desc) {
+    public Item(int cat, String n, String desc) {
     	name = n;
     	primaryCat = cat;
     	if (desc != null) {
@@ -76,14 +76,14 @@ public class ListItem implements Serializable {
     	createDate = new Date().toString();
     	dueDateTime = getNowDateTime();
     }
-    public ListItem(int cat, String n) {
+    public Item(int cat, String n) {
     	name = n;
     	primaryCat = cat;
     	createDate = new Date().toString();
     	Log.v("ListItem", "getNowDateTime(): " + getNowDateTime());
     	dueDateTime = getNowDateTime();
     }
-    public ListItem(int id, int priCat, String cats, String n, String desc, String itemNotes, String crDate, String dueDT) throws ParseException {
+    public Item(int id, int priCat, String cats, String n, String desc, String itemNotes, String crDate, String dueDT) throws ParseException {
     	itemID = id;
     	primaryCat = priCat;
         addToCats(cats);

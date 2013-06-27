@@ -39,9 +39,13 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-// ToDo
+// ToDo Next
 // Ability to assign multiple categories to tasks
 // TODO: Format list item list display to show tiny date below description to leave more room for actual description
+// TODO: Fix button layout on Category Edit/Add page
+// TODO: Set types to be assigned to ITEM - Determined by default type of category
+// TODO: Make filter types for category (first one will display all, and have None option)
+// TODO: Have current category displayed when returning to list view
 
 // UI Design
 // Make 3 tabs, one for category list, one for task list, one for something else
@@ -100,12 +104,12 @@ public class FlipList extends Activity {
 	ListManager myListMan;
 	int defaultCatID;
 	
-    HashMap<String, ListItem> checkListItems = new HashMap<String, ListItem>();
+    HashMap<String, Item> checkListItems = new HashMap<String, Item>();
     ItemList currentItemList;
-    ListCategory currentCategory = null;
-    ListItem currentItem;
-    ArrayList<ListCategory> catList;
-    ArrayList<ListItem> currentListItems;
+    Category currentCategory = null;
+    Item currentItem;
+    ArrayList<Category> catList;
+    ArrayList<Item> currentListItems;
     
     MyCustomAdapter itemListDataAdapter;
     MyCatSpinnerCustomAdapter catSpinnerDataAdapter;
@@ -184,7 +188,7 @@ public class FlipList extends Activity {
     
     public class SpinnerActivity extends Activity implements OnItemSelectedListener {
     	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-    		ListCategory itemSelected = (ListCategory) parent.getItemAtPosition(pos);
+    		Category itemSelected = (Category) parent.getItemAtPosition(pos);
     		currentCategory = itemSelected;
     		addItemsOnList();
     	}
@@ -203,7 +207,7 @@ public class FlipList extends Activity {
 	       catSpinner = (Spinner) findViewById(R.id.catSpinner);
 	       int position = catSpinner.getSelectedItemPosition();
 	       
-	       currentCategory = (ListCategory) catSpinner.getItemAtPosition(position);
+	       currentCategory = (Category) catSpinner.getItemAtPosition(position);
 	       int catID = currentCategory.getID();
 	       
 	       myListMan.addItem(catID, name);
@@ -240,7 +244,7 @@ public class FlipList extends Activity {
     	
     	listView.setOnItemClickListener(new OnItemClickListener() {
     		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-    			ListItem item = (ListItem) parent.getItemAtPosition(position);
+    			Item item = (Item) parent.getItemAtPosition(position);
     			editListItem(item);
     			Toast.makeText(getApplicationContext(),
     					"Clicked on Row: " + item.getName(), 
@@ -248,7 +252,7 @@ public class FlipList extends Activity {
     		}
     	});
     }
-    public void editListItem(ListItem item) {
+    public void editListItem(Item item) {
     	currentItem = item;
     	setContentView(R.layout.item_edit_layout);
     	EditText itemIDTv = (EditText) findViewById(R.id.item_edit_id_edittext);
@@ -258,6 +262,8 @@ public class FlipList extends Activity {
     	EditText itemNotesTv = (EditText) findViewById(R.id.item_edit_notes_edittext);
     	Button editTimeButton = (Button) findViewById(R.id.time_edit_button);
     	Button editDateButton = (Button) findViewById(R.id.date_edit_button);
+    	Button noTimeButton = (Button) findViewById(R.id.no_due_time_button);
+    	Button noDateButton = (Button) findViewById(R.id.no_due_date_button);
     	
     	itemIDTv.setText(String.valueOf(item.getID()));
     	itemNameTv.setText(item.getName());
@@ -268,6 +274,9 @@ public class FlipList extends Activity {
     	String myDatePretty = item.getDueDatePretty();
     	String myTime = item.getDueTime();
     	String myTimePretty = item.getDueTimePretty();
+    	
+    	if (!item.hasDueTime()) noTimeButton.setEnabled(false);
+    	if (!item.hasDueDate()) noDateButton.setEnabled(false);
 
     	editDateButton.setText(myDatePretty);
     	editDateButton.setTag(myDate);
@@ -276,7 +285,7 @@ public class FlipList extends Activity {
     	
         catList = myListMan.getCategoryList();
     	// TODO: Make this into a generic addItemsToSpinner method that I can use with the first spinner also
-        ArrayAdapter<ListCategory> itemCatSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.item_edit_layout, catList);
+        ArrayAdapter<Category> itemCatSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.item_edit_layout, catList);
         itemCatSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         itemCatSpinner.setAdapter(itemCatSpinnerDataAdapter);
         
@@ -298,13 +307,13 @@ public class FlipList extends Activity {
     	int itemID = Integer.parseInt(itemIDTv.getText().toString());
     	String itemName = itemNameTv.getText().toString();
     	String itemDesc = itemDescTv.getText().toString();
-    	ListCategory itemCategory = (ListCategory) itemCatSpinner.getItemAtPosition(itemCatSpinner.getSelectedItemPosition());
+    	Category itemCategory = (Category) itemCatSpinner.getItemAtPosition(itemCatSpinner.getSelectedItemPosition());
     	int itemCategoryID = itemCategory.getID();
     	String itemNotes = itemNotesTv.getText().toString();
     	String itemDueTime = (String) itemDueTimeBtn.getTag();
     	String itemDueDate = (String) itemDueDateBtn.getTag();
     	
-    	ListItem myItem = new ListItem();
+    	Item myItem = new Item();
     	myItem.setID(itemID);
     	myItem.setName(itemName);
     	myItem.setDescription(itemDesc);
@@ -330,22 +339,38 @@ public class FlipList extends Activity {
 		Intent flipList = new Intent(this, FlipList.class);
 		this.startActivity(flipList);
     }
+	public void itemEditNoDueTimeButtonAction(View view) {
+		currentItem.setHasDueTime(false);
+		Button dueTimeButton = (Button) findViewById(R.id.time_edit_button);
+		Button noDueTimeButton = (Button) findViewById(R.id.no_due_time_button);
+		noDueTimeButton.setEnabled(false);
+		dueTimeButton.setText("Set Time");
+		dueTimeButton.setTag(null);
+	}
+    public void itemEditNoDueDateButtonAction(View view) {
+    	currentItem.setHasDueDate(false);
+    	Button dueDateButton = (Button) findViewById(R.id.date_edit_button);
+    	Button noDueDateButton = (Button) findViewById(R.id.no_due_date_button);
+    	noDueDateButton.setEnabled(false);
+    	dueDateButton.setText("Set Date");
+    	dueDateButton.setTag(null);
+    }
     public void itemEditDeleteButtonAction(View view) {
     	myListMan.deleteItem(currentItem);
 		Intent flipList = new Intent(this, FlipList.class);
 		this.startActivity(flipList);
     }
-    private class MyCatSpinnerCustomAdapter extends ArrayAdapter<ListCategory> {
+    private class MyCatSpinnerCustomAdapter extends ArrayAdapter<Category> {
       	 
-    	private ArrayList<ListCategory> categoryList;
+    	private ArrayList<Category> categoryList;
     	private Activity activity;
     	LayoutInflater inflater;
     	//Map<Integer, Integer> myPositionMap = new HashMap<Integer, Integer>();
     	SparseIntArray myPositionMap;
     	 
-    	public MyCatSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<ListCategory> objects) {
+    	public MyCatSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<Category> objects) {
     		super(activitySpinner, textViewResourceId, objects);
-    		this.categoryList = (ArrayList<ListCategory>) objects;
+    		this.categoryList = (ArrayList<Category>) objects;
     		this.activity = activitySpinner;
     		inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     		myPositionMap = new SparseIntArray();
@@ -373,7 +398,7 @@ public class FlipList extends Activity {
     		} else {
     			holder = (ViewHolder) convertView.getTag();
     		}
-    		ListCategory category = categoryList.get(position);
+    		Category category = categoryList.get(position);
     		
 			myPositionMap.put(category.getID(), position);
     		holder.catName.setText(category.getName());
@@ -383,14 +408,14 @@ public class FlipList extends Activity {
     	 
 	}
     
-    private class MyCustomAdapter extends ArrayAdapter<ListItem> {
+    private class MyCustomAdapter extends ArrayAdapter<Item> {
     	 
-    	private ArrayList<ListItem> itemList;
-		ListCategory catSelectedObj = (ListCategory) catSpinner.getSelectedItem();
+    	private ArrayList<Item> itemList;
+		Category catSelectedObj = (Category) catSpinner.getSelectedItem();
     	 
-    	public MyCustomAdapter(Context context, int textViewResourceId, ArrayList<ListItem> itemList) {
+    	public MyCustomAdapter(Context context, int textViewResourceId, ArrayList<Item> itemList) {
     		super(context, textViewResourceId, itemList);
-    		this.itemList = new ArrayList<ListItem>();
+    		this.itemList = new ArrayList<Item>();
     		this.itemList.addAll(itemList);
     	}
     	 
@@ -420,7 +445,7 @@ public class FlipList extends Activity {
     			holder.itemCheckBox.setOnClickListener( new View.OnClickListener() {  
     				public void onClick(View v) {  
     					CheckBox cb = (CheckBox) v ;  
-    					ListItem item = (ListItem) cb.getTag();
+    					Item item = (Item) cb.getTag();
     					int catSelected = catSelectedObj.getID();
     					//String itemDescription = item.getDescription();
     					String itemName = item.getName();
@@ -432,7 +457,7 @@ public class FlipList extends Activity {
     		} else {
     		   holder = (ViewHolder) convertView.getTag();
     		}
-    		ListItem item = itemList.get(position);
+    		Item item = itemList.get(position);
     		holder.itemName.setText(item.getName());
     		String infoString = "";
     		Boolean showInfo = false;
@@ -488,6 +513,7 @@ public class FlipList extends Activity {
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 			Calendar cal = Calendar.getInstance();
 			Button setTimeBtn = (Button) getActivity().findViewById(R.id.time_edit_button);
+			Button noTimeBtn = (Button) getActivity().findViewById(R.id.no_due_time_button);
 	    	SimpleDateFormat hmaf = new SimpleDateFormat("hh:mm aa", Locale.US);
 	    	SimpleDateFormat hmf = new SimpleDateFormat("HH:mm", Locale.US);
 	    	String hourMinute = hourOfDay + ":" + minute;
@@ -498,6 +524,7 @@ public class FlipList extends Activity {
 			}
 	    	setTimeBtn.setText(hmaf.format(cal.getTime()));
 	    	setTimeBtn.setTag(hourMinute);
+	    	noTimeBtn.setEnabled(true);
 		}
 	}
     
@@ -535,6 +562,7 @@ public class FlipList extends Activity {
 			month = month + 1;
 			Calendar cal = Calendar.getInstance();
 			Button setDateBtn = (Button) getActivity().findViewById(R.id.date_edit_button);
+			Button noDateBtn = (Button) getActivity().findViewById(R.id.no_due_date_button);
 			SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd", Locale.US);
 			SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 			Log.v("FlipList.DatePickerFragment", "year: " + year + " month: " + month + " day: " + day);
@@ -547,6 +575,7 @@ public class FlipList extends Activity {
 			}
 	    	setDateBtn.setText(sdf.format(cal.getTime()));
 			setDateBtn.setTag(yearMonthDay);
+			noDateBtn.setEnabled(true);
 		}
 	}
     
