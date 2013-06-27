@@ -42,5 +42,6 @@
     <string name="pick_date">Date</string>
     <string name="no_due_time_button_text">No Time</string>
     <string name="no_due_date_button_text">No Date</string>
+    <string name="title_activity_add_edit_item">AddEditItemActivity</string>
 
 </resources>

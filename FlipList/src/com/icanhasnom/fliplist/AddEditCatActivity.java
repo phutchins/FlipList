@@ -21,7 +21,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
-import android.support.v4.app.NavUtils;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
@@ -34,7 +33,6 @@ public class AddEditCatActivity extends Activity {
 
 	ListManager myListMan;
 	ArrayList<Category> categoryList;
-	//DatabaseHandler db;
 	
 	Spinner typeSpinner;
 	MyTypeSpinnerCustomAdapter adapter;
@@ -307,6 +305,13 @@ public class AddEditCatActivity extends Activity {
 		EditText editCategoryIdNumber = (EditText) findViewById(R.id.cat_edit_id); 
 		int categoryID = Integer.parseInt(editCategoryIdNumber.getText().toString());
 		success = myListMan.rmCategory(categoryID);
+		String toastMessage;
+		if (success) {
+			toastMessage = "Category Deleted!";
+		} else { 
+			toastMessage = "Fail!";
+		}
+		Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_LONG).show();
 		
 		// TODO: Do something with success to notify user of success or not
 		//       Use a toast to display success or failure

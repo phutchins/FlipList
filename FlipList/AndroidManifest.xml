@@ -40,6 +40,10 @@
             android:name="com.icanhasnom.fliplist.SetPreferenceActivity"
             android:label="@string/title_activity_set_preference" >
         </activity>
+        <activity
+            android:name="com.icanhasnom.fliplist.AddEditItemActivity"
+            android:label="@string/title_activity_add_edit_item" >
+        </activity>
     </application>
 
 </manifest>
