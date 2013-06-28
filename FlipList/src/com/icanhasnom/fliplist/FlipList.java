@@ -6,8 +6,10 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
@@ -163,14 +165,37 @@ public class FlipList extends Activity {
     		this.startActivity(addEditCatIntent);
     		break;
     	case R.id.menu_settings:
-    		Intent settings = new Intent(this, SetPreferenceActivity.class);
-    		this.startActivity(settings);
+    		 Intent intent = new Intent();
+    		 intent.setClass(FlipList.this, SetPreferenceActivity.class);
+    	     startActivityForResult(intent, 0);
     		break;
     	default:
     		return super.onOptionsItemSelected(item);
     	}
     	return true;
     	
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	//super.onActivityResult(requestCode, resultCode, data);
+     
+    	/*
+    	 * To make it simple, always re-load Preference setting.
+    	 */
+     
+    	loadPref();
+    }
+       
+    private void loadPref(){
+    	SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+     
+    	boolean my_checkbox_preference = mySharedPreferences.getBoolean("checkbox_preference", false);
+    	//prefCheckBox.setChecked(my_checkbox_preference);
+
+    	String my_edittext_preference = mySharedPreferences.getString("edittext_preference", "");
+        //prefEditText.setText(my_edittext_preference);
+
     }
     
     public class SpinnerActivity extends Activity implements OnItemSelectedListener {

@@ -7,7 +7,9 @@
         <ListPreference
                 android:key="default_category"
                 android:title="Default Category"
-                android:summary="Select the default category to display when launching the app" />
+                android:summary="Select the default category to display when launching the app"
+
+                android:dialogTitle="dialog_title_default_category_list" />
         
         <CheckBoxPreference
             android:key="show_description_on_list"

@@ -1,6 +1,7 @@
 package com.icanhasnom.fliplist;
 
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
 
 public class PrefsFragment extends PreferenceFragment {

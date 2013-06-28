@@ -1,6 +1,7 @@
 package com.icanhasnom.fliplist;
 
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Intent;
@@ -18,7 +19,7 @@ public class Preferences extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_preferences_layout);
         
         prefCheckBox = (CheckBox)findViewById(R.id.prefCheckBox);
         prefEditText = (TextView)findViewById(R.id.prefEditText);
@@ -36,14 +37,14 @@ public class Preferences extends Activity {
  public boolean onOptionsItemSelected(MenuItem item) {
 
   /*
-   * Because it's onlt ONE option in the menu.
+   * Because it's only ONE option in the menu.
    * In order to make it simple, We always start SetPreferenceActivity
    * without checking.
    */
   
-  Intent intent = new Intent();
-        intent.setClass(Preferences.this, SetPreferenceActivity.class);
-        startActivityForResult(intent, 0); 
+	 Intent intent = new Intent();
+	 intent.setClass(Preferences.this, SetPreferenceActivity.class);
+     startActivityForResult(intent, 0); 
   
         return true;
  }

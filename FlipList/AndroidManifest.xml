@@ -37,6 +37,10 @@
                 android:value="com.icanhasnom.fliplist.FlipList" />
         </activity>
         <activity
+            android:name="com.icanhasnom.fliplist.Preferences"
+            android:label="@string/title_activity_preferences" >
+        </activity>
+        <activity
             android:name="com.icanhasnom.fliplist.SetPreferenceActivity"
             android:label="@string/title_activity_set_preference" >
         </activity>
