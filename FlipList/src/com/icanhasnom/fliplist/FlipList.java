@@ -38,11 +38,12 @@ import android.widget.Toast;
 
 // UI Design
 // Make 3 tabs, one for category list, one for task list, one for something else
-//   like its done in the tunein android app
+//   like its done in the tunein android app (use actionBar.addTab()), example in PrefsFragment
 // Make buttons smoother
 // Add swipe sideways from category to category?
 // Third tab could be Item Edit or Add screen. If you select an item it slides over to
 //    the right and you can edit. If nothing is selected and you swipe, it lets you add one.
+// Have save icon on the action bar, as well as the menu items in a 3dot drop down
 
 // Category Design
 //   In addition to having a type, categories should have the ability to choose the behavior when items are checked
@@ -95,7 +96,7 @@ public class FlipList extends Activity {
 	
     HashMap<String, Item> checkListItems = new HashMap<String, Item>();
     ItemList currentItemList;
-    Category currentCategory = null;
+    Category currentCategory;
     Item currentItem;
     ArrayList<Category> catList;
     ArrayList<Item> currentListItems;
@@ -200,8 +201,8 @@ public class FlipList extends Activity {
     
     public class SpinnerActivity extends Activity implements OnItemSelectedListener {
     	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-    		Category itemSelected = (Category) parent.getItemAtPosition(pos);
-    		currentCategory = itemSelected;
+    		Category catSelected = (Category) parent.getItemAtPosition(pos);
+    		currentCategory = catSelected;
     		addItemsOnList();
     	}
     	public void onNothingSelected(AdapterView<?> parent) {
@@ -217,9 +218,9 @@ public class FlipList extends Activity {
 					"Please enter an item name!", Toast.LENGTH_LONG).show();
        } else {
 	       catSpinner = (Spinner) findViewById(R.id.catSpinner);
-	       int position = catSpinner.getSelectedItemPosition();
-	       
-	       currentCategory = (Category) catSpinner.getItemAtPosition(position);
+	       //int position = catSpinner.getSelectedItemPosition();
+	       // TODO: COmmented these out to try to fix remembering category
+	       //currentCategory = (Category) catSpinner.getItemAtPosition(position);
 	       int catID = currentCategory.getID();
 	       
 	       myListMan.addItem(catID, name);
@@ -257,7 +258,7 @@ public class FlipList extends Activity {
     	listView.setOnItemClickListener(new OnItemClickListener() {
     		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
     			Item item = (Item) parent.getItemAtPosition(position);
-
+    			Log.v("FlipList.addItemsOnList", "Item Name: " + item.getName() + " Position: " + position);
     			editListItem(item);
     			Toast.makeText(getApplicationContext(),
     					"Clicked on Row: " + item.getName(), 
@@ -269,6 +270,7 @@ public class FlipList extends Activity {
 		Intent addEditItem = new Intent(this, AddEditItemActivity.class);
 		Bundle b = new Bundle();
 		b.putSerializable("item", item);
+		Log.v("FlipList.editListItem", "Item Name: " + item.getName());
 		addEditItem.putExtras(b);
 		this.startActivity(addEditItem);
     }

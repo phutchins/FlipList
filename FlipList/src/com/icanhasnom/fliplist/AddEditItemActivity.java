@@ -99,7 +99,10 @@ public class AddEditItemActivity extends Activity {
         itemCatSpinner.setAdapter(itemCatSpinnerDataAdapter);
         
         int myCatID = item.getPrimaryCat();
+        Log.v("FlipList.editListItem", "Item Name: " + item.getName() + " Primary Cat: " + myCatID);
         int spinnerPosition = catSpinnerDataAdapter.getPosition(myCatID);
+        // TODO: Fix this its returning 0!!! Why? :(
+        Log.v("FlipList.editListItem", "spinnerPosition: " + spinnerPosition);
         itemCatSpinner.setSelection(spinnerPosition);
 
         itemNotesTv.setText(item.getNotes());
@@ -309,6 +312,7 @@ public class AddEditItemActivity extends Activity {
     		Category category = categoryList.get(position);
     		
 			myPositionMap.put(category.getID(), position);
+			Log.v("AddEditItemActivity.catSpinnerCustomAdapter", "Adding CatID: " + category.getID() + " with position " + position);
     		holder.catName.setText(category.getName());
     		holder.catName.setTag(category);
     		return convertView;

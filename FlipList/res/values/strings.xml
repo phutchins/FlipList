@@ -44,5 +44,7 @@
     <string name="no_due_date_button_text">No Date</string>
     <string name="title_activity_add_edit_item">AddEditItemActivity</string>
     <string name="title_activity_preferences">Preferences</string>
+    <string name="test_string1">testing</string>
+    <string name="test_string2">yeah</string>
 
 </resources>
