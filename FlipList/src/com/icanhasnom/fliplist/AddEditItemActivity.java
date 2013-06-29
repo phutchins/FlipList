@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
+import com.icanhasnom.fliplist.AddEditCatActivity.MyTypeSpinnerCustomAdapter;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.DatePickerDialog;
@@ -32,26 +34,25 @@ import android.widget.TimePicker;
 public class AddEditItemActivity extends Activity {
 	Item currentItem;
 	ListManager myListMan;
-	
     Spinner itemCatSpinner;
-    ArrayList<Category> catList;
     MyCatSpinnerCustomAdapter catSpinnerDataAdapter;
-    
+	SparseIntArray myPositionMap;
+	ArrayList<Category> categoryList;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_edit_item);
+		myPositionMap = new SparseIntArray();
 		myListMan = new ListManager(this);
-		Item myItem = null;
+		categoryList = myListMan.getCategoryList();
+		buildIndex(categoryList);
 		Bundle b = this.getIntent().getExtras();
 		if(b != null) {
-			myItem = (Item) b.getSerializable("item");
-			Log.v("AddEditItemActivity.onCreate", "Getting Serialized Item: " + myItem.getName());
+			currentItem = (Item) b.getSerializable("item");
+			Log.v("AddEditItemActivity.onCreate", "Getting Serialized Item: " + currentItem.getName());
 		}
-        catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.activity_main_cat_spinner, catList);
-        catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		editListItem(myItem);
+		editListItem();
 	}
 
 	@Override
@@ -61,52 +62,72 @@ public class AddEditItemActivity extends Activity {
 		return true;
 	}
 	
-    public void editListItem(Item item) {
-    	currentItem = item;
-    	setContentView(R.layout.activity_add_edit_item);
+	public void addCategoriesToSpinner() {
+		
+        catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.activity_add_edit_item, categoryList);
+        catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    	itemCatSpinner = (Spinner) findViewById(R.id.item_edit_category_spinner);
+        itemCatSpinner.setAdapter(catSpinnerDataAdapter);
+	}
+	public void buildIndex(ArrayList<Category> myCatList) {
+		Integer position = 0;
+		for (Category myCat : myCatList) {
+			myPositionMap.put(myCat.getID(), position);
+			position++;
+		}
+	}
+	public int getPosition(int myListCategoryID) {
+		//Log.v("AddEditItemActivity.MyCatspinnerCustomAdapter (1)", "myPositionMap: " + myPositionMap.toString());
+		//Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "getPosition.myListCategoryID: " + myListCategoryID);
+		int myPosition = myPositionMap.get(myListCategoryID);
+		//Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "getPosition.myPosition: " + myPosition);
+		//Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "myPosition(0): " + myPositionMap.get(0) + " myPosition(1): " + myPositionMap.get(1) + " myPosition.get(2): " + myPositionMap.get(2));
+		return myPosition;
+	}
+	
+    public void editListItem() {
     	EditText itemIDTv = (EditText) findViewById(R.id.item_edit_id_edittext);
     	EditText itemNameTv = (EditText) findViewById(R.id.item_edit_name_edittext);
     	EditText itemDescTv = (EditText) findViewById(R.id.item_edit_description_edittext);
-    	itemCatSpinner = (Spinner) findViewById(R.id.item_edit_category_spinner);
+
     	EditText itemNotesTv = (EditText) findViewById(R.id.item_edit_notes_edittext);
     	Button editTimeButton = (Button) findViewById(R.id.time_edit_button);
     	Button editDateButton = (Button) findViewById(R.id.date_edit_button);
     	Button noTimeButton = (Button) findViewById(R.id.no_due_time_button);
     	Button noDateButton = (Button) findViewById(R.id.no_due_date_button);
     	
-    	itemIDTv.setText(String.valueOf(item.getID()));
-    	itemNameTv.setText(item.getName());
-    	itemDescTv.setText(item.getDescription());
-    	itemNotesTv.setText(item.getNotes());
+    	itemIDTv.setText(String.valueOf(currentItem.getID()));
+    	itemNameTv.setText(currentItem.getName());
+    	itemDescTv.setText(currentItem.getDescription());
+    	itemNotesTv.setText(currentItem.getNotes());
 
-    	String myDate = item.getDueDate();
-    	String myDatePretty = item.getDueDatePretty();
-    	String myTime = item.getDueTime();
-    	String myTimePretty = item.getDueTimePretty();
+    	String myDate = currentItem.getDueDate();
+    	String myDatePretty = currentItem.getDueDatePretty();
+    	String myTime = currentItem.getDueTime();
+    	String myTimePretty = currentItem.getDueTimePretty();
     	
-    	if (!item.hasDueTime()) noTimeButton.setEnabled(false);
-    	if (!item.hasDueDate()) noDateButton.setEnabled(false);
+    	if (!currentItem.hasDueTime()) noTimeButton.setEnabled(false);
+    	if (!currentItem.hasDueDate()) noDateButton.setEnabled(false);
 
     	editDateButton.setText(myDatePretty);
     	editDateButton.setTag(myDate);
     	editTimeButton.setText(myTimePretty);
     	editTimeButton.setTag(myTime);
-    	
-        catList = myListMan.getCategoryList();
-    	// TODO: Make this into a generic addItemsToSpinner method that I can use with the first spinner also
-        ArrayAdapter<Category> itemCatSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.activity_add_edit_item, catList);
-        itemCatSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        itemCatSpinner.setAdapter(itemCatSpinnerDataAdapter);
+        itemNotesTv.setText(currentItem.getNotes());
         
-        int myCatID = item.getPrimaryCat();
-        Log.v("FlipList.editListItem", "Item Name: " + item.getName() + " Primary Cat: " + myCatID);
-        int spinnerPosition = catSpinnerDataAdapter.getPosition(myCatID);
-        // TODO: Fix this its returning 0!!! Why? :(
-        Log.v("FlipList.editListItem", "spinnerPosition: " + spinnerPosition);
+        addCategoriesToSpinner();
+        
+        int spinnerPosition = getPosition(currentItem.getPrimaryCat());
         itemCatSpinner.setSelection(spinnerPosition);
-
-        itemNotesTv.setText(item.getNotes());
         
+		Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "myPosition(0): " + myPositionMap.get(0) + " myPosition(1): " + myPositionMap.get(1) + " myPosition.get(2): " + myPositionMap.get(2));
+        Log.v("AddEditItemActivity.editListItem", "****spinnerPosition: " + spinnerPosition);
+
+    	// TODO: Make this into a generic addItemsToSpinner method that I can use with the first spinner also
+        //Log.v("AddEditItemActivity.editListItem", "catSpinnerDataAdapter: " + catSpinnerDataAdapter);
+        Log.v("AddEditItemActivity.editListItem", "Item Name: " + currentItem.getName() + " Primary Cat: " + currentItem.getPrimaryCat());
+        
+
     }
     public void itemEditSaveButtonAction(View view) {
     	EditText itemIDTv = (EditText) findViewById(R.id.item_edit_id_edittext);
@@ -141,9 +162,9 @@ public class AddEditItemActivity extends Activity {
     		itemDueDate = year + "-" + month + "-" + day;
     	}
     	myItem.setDueDate(itemDueDate);
-    	Log.v("FlipList.itemEditSaveButtonAction", "itemDueTime: " + itemDueTime + " itemDueDate: " + itemDueDate);
+    	//Log.v("FlipList.itemEditSaveButtonAction", "itemDueTime: " + itemDueTime + " itemDueDate: " + itemDueDate);
     	myItem.setCreateDate(currentItem.getCreateDate());
-    	Log.v("FlipList.itemEditSaveButtonAction", "hasDueDate: " + myItem.hasDueDate() + " hasDueTime: " + myItem.hasDueTime());
+    	//Log.v("FlipList.itemEditSaveButtonAction", "hasDueDate: " + myItem.hasDueDate() + " hasDueTime: " + myItem.hasDueTime());
 
     	//Set up constructor to be able to take all this stuff
     	//myListMan.updateItem(new ListItem(itemCategoryID, itemID, itemName, itemDesc));
@@ -252,9 +273,9 @@ public class AddEditItemActivity extends Activity {
 			Button noDateBtn = (Button) getActivity().findViewById(R.id.no_due_date_button);
 			SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd", Locale.US);
 			SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-			Log.v("FlipList.DatePickerFragment", "year: " + year + " month: " + month + " day: " + day);
+			//Log.v("FlipList.DatePickerFragment", "year: " + year + " month: " + month + " day: " + day);
 			String yearMonthDay = year + "-" + month + "-" + day;
-			Log.v("FlipList.DatePickerFragment", "yearMonthDay: " + yearMonthDay);
+			//Log.v("FlipList.DatePickerFragment", "yearMonthDay: " + yearMonthDay);
 			try {
 				cal.setTime(ymd.parse(yearMonthDay));
 			} catch (ParseException e) {
@@ -277,19 +298,17 @@ public class AddEditItemActivity extends Activity {
     	private Activity activity;
     	LayoutInflater inflater;
     	//Map<Integer, Integer> myPositionMap = new HashMap<Integer, Integer>();
-    	SparseIntArray myPositionMap;
+
     	 
     	public MyCatSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<Category> objects) {
     		super(activitySpinner, textViewResourceId, objects);
     		this.categoryList = (ArrayList<Category>) objects;
     		this.activity = activitySpinner;
     		inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    		myPositionMap = new SparseIntArray();
+    		//Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "Initializing myPositionMap");
+    		
     	}
-    	public int getPosition(int myListCategoryID) {
-    		int myPosition = myPositionMap.get(myListCategoryID);
-			return myPosition;
-		}
+
 		private class ViewHolder {
     		TextView catName;
     	}
@@ -311,10 +330,13 @@ public class AddEditItemActivity extends Activity {
     		}
     		Category category = categoryList.get(position);
     		
-			myPositionMap.put(category.getID(), position);
+
 			Log.v("AddEditItemActivity.catSpinnerCustomAdapter", "Adding CatID: " + category.getID() + " with position " + position);
     		holder.catName.setText(category.getName());
     		holder.catName.setTag(category);
+    		//Log.v("AddEditItemActivity.catSpinnerCustomAdapter", "System.identifyHashCode(): " + this);
+    		//Log.v("AddEditItemActivity.MyCatspinnerCustomAdapter (2)", "myPositionMap: " + myPositionMap.toString());
+    		//Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "myPosition(0): " + myPositionMap.get(0) + " myPosition(1): " + myPositionMap.get(1) + " myPosition.get(2): " + myPositionMap.get(2));
     		return convertView;
     	}
     	 

@@ -188,8 +188,6 @@ public class AddEditCatActivity extends Activity {
     	});
     }
     
-
-	
     private class MyCatListCustomAdapter extends ArrayAdapter<Category> {
    	 
     	private ArrayList<Category> categoryList;

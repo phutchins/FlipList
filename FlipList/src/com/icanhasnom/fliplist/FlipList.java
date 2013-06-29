@@ -35,6 +35,7 @@ import android.widget.Toast;
 // TODO: Set types to be assigned to ITEM - Determined by default type of category
 // TODO: Make filter types for category (first one will display all, and have None option)
 // TODO: Have current category displayed when returning to list view
+// TODO: Add completed field to item and isChecked so it knows to be checked if its completed
 
 // UI Design
 // Make 3 tabs, one for category list, one for task list, one for something else
@@ -72,17 +73,14 @@ import android.widget.Toast;
 // Completed Items
 // TODO: Add completed field to ListItem
 // TODO: Have item list only display items if not completed & create date is older than difference create date and current time vs when to disappear
+// TODO: Add archive time? Might start taking a long time to load all items if we dont' move them somewhere else... 
 
 // BUGS & FIXES
 // TODO: Fix all back and "UP" buttons on navigation bar
-// TODO: Fix unresponsive category listeners
 
 // General Todo
 // TODO: Make cancel button on item edit and category edit (or just use up button?)
-// TODO: Make date/time selection on item edit layout
 // TODO: Set input validity check for fields (Date)
-// TODO: Make notes field work
-// TODO: On category creation, get category settings from type if they exist
 
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -90,20 +88,26 @@ public class FlipList extends Activity {
 	public final static String EXTRA_MESSAGE = "com.icanhasnom.FlipList.MESSAGE";
 	public static final String TAG = "FlipList";
 	
-    //ListManager myListMan = new ListManager();
 	ListManager myListMan;
 	int defaultCatID;
+	
+	Boolean prefShowItemDescriptionGlobal;
+	Boolean prefShowDueDateGlobal;
+	Boolean prefRemoveCompletedItems;
 	
     HashMap<String, Item> checkListItems = new HashMap<String, Item>();
     ItemList currentItemList;
     Category currentCategory;
+    Integer currentCategoryID;
     Item currentItem;
     ArrayList<Category> catList;
     ArrayList<Item> currentListItems;
+    Boolean removeCompletedItems;
+	SparseIntArray myPositionMap;
     
     MyCustomAdapter itemListDataAdapter;
     MyCatSpinnerCustomAdapter catSpinnerDataAdapter;
-    MyCatSpinnerCustomAdapter itemCatSpinnerDataAdapter;
+    SharedPreferences mySharedPreferences;
     
     Spinner catSpinner;
     Spinner itemCatSpinner;
@@ -115,10 +119,9 @@ public class FlipList extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
-        // Fix this, its returning null
-        //defaultCatID = db.getDefaultCatID();
-        defaultCatID = 1;
+		myPositionMap = new SparseIntArray();
+		myListMan = new ListManager(this);
+    	loadPref();
         
         db = new DatabaseHandler(this);
         
@@ -126,18 +129,13 @@ public class FlipList extends Activity {
         	restoreState(savedInstanceState);
         	Log.v("FlipList.onCreate", "Restoring saved instance state");
         } else {
-        	// Load saved data from somewhere, maybe SqlLite
         	myListMan = new ListManager(this);
-        	Log.v("FlipList.onCreate", "Created new ListManager Object");
+        	loadPref();
     		currentItemList = myListMan.getItemList(defaultCatID);
-    		currentCategory = myListMan.getCategory(defaultCatID);
         }
         
     	catSpinner = (Spinner) findViewById(R.id.catSpinner);
     	catSpinner.setOnItemSelectedListener(new SpinnerActivity());
-    	
-		// Do we need this? Might come in handy later...
-		updateState();
 		
         addItemsOnSpinner();
         addItemsOnList();
@@ -145,6 +143,7 @@ public class FlipList extends Activity {
     
     public void restoreState(Bundle savedInstanceState) {
     	myListMan = (ListManager) savedInstanceState.getSerializable("ListManager");
+    	Log.v("FlipList.restoreState", "Restored ListManager!");
     }
     
     @Override
@@ -179,30 +178,30 @@ public class FlipList extends Activity {
     
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	//super.onActivityResult(requestCode, resultCode, data);
-     
-    	/*
-    	 * To make it simple, always re-load Preference setting.
-    	 */
-     
     	loadPref();
+    	addItemsOnList();
     }
        
     private void loadPref(){
-    	SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-     
-    	boolean my_checkbox_preference = mySharedPreferences.getBoolean("checkbox_preference", false);
-    	//prefCheckBox.setChecked(my_checkbox_preference);
-
-    	String my_edittext_preference = mySharedPreferences.getString("edittext_preference", "");
-        //prefEditText.setText(my_edittext_preference);
-
+    	mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        defaultCatID = Integer.parseInt(mySharedPreferences.getString(getString(R.string.default_category_key), getString(R.integer.default_category_default)));
+        removeCompletedItems = mySharedPreferences.getBoolean(getString(R.string.remove_completed_key), getResources().getBoolean(R.bool.remove_completed_default));
+        prefShowItemDescriptionGlobal = mySharedPreferences.getBoolean(getString(R.string.show_description_global_key), getResources().getBoolean(R.bool.show_description_global_default));
+        prefShowDueDateGlobal = mySharedPreferences.getBoolean(getString(R.string.show_due_date_global_key), getResources().getBoolean(R.bool.show_due_date_global_default));
+        prefRemoveCompletedItems = mySharedPreferences.getBoolean(getString(R.string.remove_completed_key), getResources().getBoolean(R.bool.remove_completed_default));
+        currentCategoryID = mySharedPreferences.getInt("current_category_id", defaultCatID);
+        currentCategory = myListMan.getCategory(currentCategoryID);
+        Log.v("FlipList.loadPrefs", "(1) Setting currentCategory to " + currentCategory.getName());
     }
     
     public class SpinnerActivity extends Activity implements OnItemSelectedListener {
     	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
     		Category catSelected = (Category) parent.getItemAtPosition(pos);
     		currentCategory = catSelected;
+    		SharedPreferences.Editor prefEditor = mySharedPreferences.edit();
+    		prefEditor.putInt("current_category_id", currentCategory.getID());
+    		prefEditor.commit();
+            Log.v("FlipList.loadPrefs", "(2) Setting currentCategory to " + currentCategory.getName());
     		addItemsOnList();
     	}
     	public void onNothingSelected(AdapterView<?> parent) {
@@ -218,34 +217,34 @@ public class FlipList extends Activity {
 					"Please enter an item name!", Toast.LENGTH_LONG).show();
        } else {
 	       catSpinner = (Spinner) findViewById(R.id.catSpinner);
-	       //int position = catSpinner.getSelectedItemPosition();
-	       // TODO: COmmented these out to try to fix remembering category
-	       //currentCategory = (Category) catSpinner.getItemAtPosition(position);
 	       int catID = currentCategory.getID();
-	       
 	       myListMan.addItem(catID, name);
-	
 	       addItemsOnList();
 	       editText.setText("");
        }
     }
-    public void updateState() {
-    	// Use this later if needed
-    }
     public void addItemsOnSpinner() {
         catList = myListMan.getCategoryList();
-        
+        buildIndex(catList);
         catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.activity_main_cat_spinner, catList);
         catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         
         catSpinner.setAdapter(catSpinnerDataAdapter);
         catSpinner.setOnItemSelectedListener(new SpinnerActivity());
-        
-        // TODO: Get this setting the lastSelected or Current category
-        Log.v("FlipList.addItemsOnSpinner", "currentCategory.getID:" + currentCategory.getID());
-        catSpinner.setSelection(catSpinnerDataAdapter.getPosition(currentCategory.getID()));
+        catSpinner.setSelection(getPosition(currentCategory.getID()));
         catSpinnerDataAdapter.notifyDataSetChanged();
     }
+	public void buildIndex(ArrayList<Category> myCatList) {
+		Integer position = 0;
+		for (Category myCat : myCatList) {
+			myPositionMap.put(myCat.getID(), position);
+			position++;
+		}
+	}
+	public int getPosition(int myListCategoryID) {
+		int myPosition = myPositionMap.get(myListCategoryID);
+		return myPosition;
+	}
     
     public void addItemsOnList()  {
     	int catID = currentCategory.getID();
@@ -258,7 +257,6 @@ public class FlipList extends Activity {
     	listView.setOnItemClickListener(new OnItemClickListener() {
     		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
     			Item item = (Item) parent.getItemAtPosition(position);
-    			Log.v("FlipList.addItemsOnList", "Item Name: " + item.getName() + " Position: " + position);
     			editListItem(item);
     			Toast.makeText(getApplicationContext(),
     					"Clicked on Row: " + item.getName(), 
@@ -270,7 +268,7 @@ public class FlipList extends Activity {
 		Intent addEditItem = new Intent(this, AddEditItemActivity.class);
 		Bundle b = new Bundle();
 		b.putSerializable("item", item);
-		Log.v("FlipList.editListItem", "Item Name: " + item.getName());
+		//Log.v("FlipList.editListItem", "Item Name: " + item.getName());
 		addEditItem.putExtras(b);
 		this.startActivity(addEditItem);
     }
@@ -290,10 +288,6 @@ public class FlipList extends Activity {
     		inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     		myPositionMap = new SparseIntArray();
     	}
-    	public int getPosition(int myListCategoryID) {
-    		int myPosition = myPositionMap.get(myListCategoryID);
-			return myPosition;
-		}
 		private class ViewHolder {
     		TextView catName;
     	}
@@ -344,7 +338,7 @@ public class FlipList extends Activity {
     	public View getView(int position, View convertView, ViewGroup parent) {
     	 
     		ViewHolder holder = null;
-    		Log.v("ConvertView", String.valueOf(position));
+    		//Log.v("ConvertView", String.valueOf(position));
     	 
     		if (convertView == null) {
     			LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -376,7 +370,7 @@ public class FlipList extends Activity {
     		holder.itemName.setText(item.getName());
     		String infoString = "";
     		Boolean showInfo = false;
-    		if (catSelectedObj.showDueDate()) {
+    		if (catSelectedObj.showDueDate() && prefShowDueDateGlobal) {
     			if (item.hasDueTime() == true) {
     				infoString = "Due: " + item.getDueDatePretty() + " @ " + item.getDueTimePretty();
     				showInfo = true;
@@ -385,7 +379,7 @@ public class FlipList extends Activity {
     				showInfo = true;
     			}
     		}
-	    	if (catSelectedObj.showDescription()) {
+	    	if (catSelectedObj.showDescription() && prefShowItemDescriptionGlobal) {
 	    		if (!item.getDescription().isEmpty()) {
 	    			infoString = infoString + " (" + item.getDescription() + ")";
 	    			showInfo = true;

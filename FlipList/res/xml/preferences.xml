@@ -5,15 +5,23 @@
             android:title="Category Settings">
 
         <ListPreference
-                android:key="default_category"
+                android:key="@string/default_category_key"
+				android:defaultValue="@integer/default_category_default"
                 android:title="Default Category"
                 android:summary="Select the default category to display when launching the app"
-                android:dialogTitle="dialog_title_default_category_list" />
+                android:dialogTitle="Default Category" />
         
         <CheckBoxPreference
-            android:key="show_description_on_list"
+            android:key="@string/show_description_global_key"
+            android:defaultValue="@bool/show_description_global_default"
             android:title="Show item description"
             android:summary="This shows a preview of the items description on the list" />
+        
+        <CheckBoxPreference
+            android:key="@string/show_due_date_global_key"
+            android:defaultValue="@bool/show_due_date_global_default"
+            android:title="Show due date"
+            android:summary="This displays the due date for an item on the list" />
 
     </PreferenceCategory>
     
@@ -21,7 +29,8 @@
         android:title="Item Completion Settings">
         
         <CheckBoxPreference 
-            android:key="immediately_completed"
+            android:key="@string/remove_completed_key"
+            android:defaultValue="@bool/remove_completed_default"
             android:title="Remove completed items immediately"
             android:summary="With this enabled, completed items will immediately disappear out of its category" />
     </PreferenceCategory>

@@ -18,7 +18,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int DATABASE_VERSION = 30;
+	private static final int DATABASE_VERSION = 31;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
@@ -163,11 +163,11 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_ITEM_DUE_DATETIME, item.getDueDateTime());
 		values.put(KEY_ITEM_CREATE_DATE, item.getCreateDate());
 		
-		Log.v("DatabaseHandler.addItem", "Adding Item " + item.getName() + " to the DB");
-		Log.v("DatabaseHandler.addItem", "item.getDueDateTime(): " + item.getDueDateTime());
-		Log.v("DatabaseHandler.addItem", " *item info: " + item.getName() + "," + item.getDescription() + "," + item.getNotes() + "," 
-		+ item.getPrimaryCat() + "," + secondaryCatsString + "," + item.getCreateDate() + "," + hasDueDate + "," + hasDueTime
-		+ item.getDueDateTime());
+		//Log.v("DatabaseHandler.addItem", "Adding Item " + item.getName() + " to the DB");
+		//Log.v("DatabaseHandler.addItem", "item.getDueDateTime(): " + item.getDueDateTime());
+		//Log.v("DatabaseHandler.addItem", " *item info: " + item.getName() + "," + item.getDescription() + "," + item.getNotes() + "," 
+		//+ item.getPrimaryCat() + "," + secondaryCatsString + "," + item.getCreateDate() + "," + hasDueDate + "," + hasDueTime
+		//+ item.getDueDateTime());
 		
 		db.insert(TABLE_ITEMS, null, values);
 		db.close();
@@ -236,7 +236,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				KEY_ITEM_HAS_DUE_DATE, KEY_ITEM_HAS_DUE_TIME, KEY_ITEM_DUE_DATETIME, KEY_ITEM_CREATE_DATE }, 
 				KEY_ITEM_PRIMARY_CAT + "=?", new String[] { String.valueOf(catID) }, null, null, null, null);
 		
-		Log.v("DatabaseHandler.getItemList", "Trying to get ItemList for catID: " + catID);
+		//Log.v("DatabaseHandler.getItemList", "Trying to get ItemList for catID: " + catID);
 		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {
@@ -252,11 +252,11 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				item.setDueDateTime(cursor.getString(8));
 				item.setCreateDate(cursor.getString(9));
 				
-				Log.v("DatabaseHandler", "getItemList - Getting item - Name (" + item.getName() + ") ID: (" + item.getID() + ") PriCatID: " + item.getPrimaryCat());
+				//Log.v("DatabaseHandler", "getItemList - Getting item - Name (" + item.getName() + ") ID: (" + item.getID() + ") PriCatID: " + item.getPrimaryCat());
 				// Adding category to list
 				itemList.addListItem(item);
 			} while (cursor.moveToNext());
-			Log.v("DatabaseHandler.getItemList", "cursor.size(): " + cursor.getCount());
+			//Log.v("DatabaseHandler.getItemList", "cursor.size(): " + cursor.getCount());
 		}
 		// return contact list
 		return itemList;
@@ -283,7 +283,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_ITEM_HAS_DUE_DATE, hasDueDate);
 		values.put(KEY_ITEM_HAS_DUE_TIME, hasDueTime);
 		values.put(KEY_ITEM_DUE_DATETIME, item.getDueDateTime());
-		Log.v("DatabaseHandler.updateItem", "hasDueDate: " + hasDueDate + " hasDueTime: " + hasDueTime + " item.getDueDateTime: " + item.getDueDateTime());
+		//Log.v("DatabaseHandler.updateItem", "hasDueDate: " + hasDueDate + " hasDueTime: " + hasDueTime + " item.getDueDateTime: " + item.getDueDateTime());
 		
 		// updating row
 		return db.update(TABLE_ITEMS, values, KEY_ITEM_ID + " = ?",
@@ -306,7 +306,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_CAT_TYPE, category.getType());
 		values.put(KEY_CAT_VISIBLE, category.getVisible());
 		
-		Log.v("addCategory", "DatabaseHandler.category.getName: " + category.getName());
+		//Log.v("addCategory", "DatabaseHandler.category.getName: " + category.getName());
 		
 		db.insert(TABLE_CATEGORIES, null, values);
 		db.close();
@@ -323,7 +323,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		Category category = new Category(cursor.getInt(0),
 				cursor.getString(1), cursor.getString(2), cursor.getInt(3), cursor.getInt(4));
 		// return category
-		Log.v("DatabaseHandler.getCategory", "ID: " + category.getID() + " Name: " + category.getName());
+		//Log.v("DatabaseHandler.getCategory", "ID: " + category.getID() + " Name: " + category.getName());
 		return category;
 	}
 	public Category getCategoryByName(String catName) {
@@ -450,7 +450,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_CAT_TYPE, category.getType());
 		values.put(KEY_CAT_VISIBLE, category.getVisible());
 		String keyID = String.valueOf(category.getID());
-		Log.v("updateCategory", "DatabaseHandler.updateCategory.keyID: " + keyID);
+		//Log.v("updateCategory", "DatabaseHandler.updateCategory.keyID: " + keyID);
 		// updating row
 		//return db.update(TABLE_CATEGORIES, values, KEY_CAT_ID + " = ?",
 		//		new String[] { String.valueOf(category.getID()) });

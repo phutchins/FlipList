@@ -8,7 +8,9 @@ import java.util.*;
 import java.io.*;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Parcel;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
@@ -36,31 +38,13 @@ public class ListManager implements Serializable {
     public String defaultType = "Generic";
     // TODO: Put this in settings and DB
     public int completedCatID = 1;
-    
-    // TODO: Still using these?
-    //ItemList defaultList = new ItemList(defaultCategory);
-    //ItemList completedList = new ItemList(completedCategory);
+    public Category currentCategory;
     
     DatabaseHandler db;
     
-    // TODO: Do we use string currentCategory? Should this be changed to an object?
-    //       obj might be useful if we're passing around the reference to myListMan
-    Category currentCategoryObj;
-    String currentCategory;
-    
     public ListManager(Context context) {
-        //itemListMap.put(defaultCategoryID, defaultList);
-        //categoryList.add(defaultCategory);
-        //itemListMap.put(completedCategoryID, completedList);
-        //categoryList.add(completedCategory);
-    	
     	db = new DatabaseHandler(context);
-    	
-    	int currentCategoryID = db.getDefaultCatID();
-    	Log.v("ListManager", "constructor db.getDefaultCatID: " + currentCategoryID);
-    	currentCategoryObj = db.getCategory(currentCategoryID);
-    	currentCategory = currentCategoryObj.getName();
-    	
+
     	buildItemListMap();
     	populateCategoryList();
     }
@@ -82,9 +66,9 @@ public class ListManager implements Serializable {
 			myItemList = db.getItemList(curCatID);
 			myItemList.setName(curCat.getName());
 			myItemList.setID(curCat.getID());
-			Log.v("ListManager.buildItemListMap", "Got ItemList for " + myItemList.getName());
+			//Log.v("ListManager.buildItemListMap", "Got ItemList for " + myItemList.getName());
     		itemListMap.put(curCatID, myItemList);
-    		Log.v("ListManager.buildItemListMap", "Building ItemList for " + curCat.getName() + " with ID " + curCatID);
+    		//Log.v("ListManager.buildItemListMap", "Building ItemList for " + curCat.getName() + " with ID " + curCatID);
     		//BROKEN
     		//Log.v("ListManager.buildItemListMap", "itemCount: " + db.getItemsCount());
     	}	
@@ -160,7 +144,7 @@ public class ListManager implements Serializable {
         int completedListID = completedCatID;
         // TODO: Get completed cat ID from settings class
         //ItemList myToList = itemListMap.get(completedListID);
-        Log.v("ListManager.completeItem", "myFromList Name: " + myFromList.getName());
+        //Log.v("ListManager.completeItem", "myFromList Name: " + myFromList.getName());
         //Log.v("ListManager.completeItem", "myToList Name: " + myToList.getName());
         myItem.setPrimaryCat(completedListID);
         if (fromList != completedListID) {
@@ -232,13 +216,6 @@ public class ListManager implements Serializable {
     	return listCat;
     }
     
-    // Get/Set Primitives
-    public String getCurrentCategory() {
-    	return currentCategory;
-    }
-    public void setCurrentCategory(String curCat) {
-    	currentCategory = curCat;
-    }
     public String getCategoryTypeName(int typeID) {
     	String typeName = db.getCategoryTypeName(typeID);
     	return typeName;
