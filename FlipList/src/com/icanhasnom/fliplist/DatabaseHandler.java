@@ -26,7 +26,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int DATABASE_VERSION = 35;
+	private static final int DATABASE_VERSION = 36;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
@@ -89,8 +89,10 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	
 	public transient Context context;
 	
-	public DatabaseHandler(Context context) {
-		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+	public DatabaseHandler(Context c) {
+		super(c, DATABASE_NAME, null, DATABASE_VERSION);
+		context = c;
+		Log.v("DatabaseHandler.constructor", "5) context: " + context);
 	}
 	
 	// Creating Tables
@@ -111,8 +113,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				+ KEY_ITEM_HAS_DUE_TIME + " TEXT,"
 				+ KEY_ITEM_DUE_DATETIME + " TEXT," 
 				+ KEY_ITEM_CREATE_DATE + " TEXT,"
-				+ KEY_ITEM_IS_COMPLETED + " INTEGER"
-				+ KEY_ITEM_COMPLETED_DATE + ")";
+				+ KEY_ITEM_IS_COMPLETED + " INTEGER,"
+				+ KEY_ITEM_COMPLETED_DATE + " TEXT" + ")";
 		String CREATE_TYPES_TABLE = "CREATE TABLE " + TABLE_CATEGORY_TYPES + "("
 				+ KEY_TYPE_ID + " INTEGER PRIMARY KEY," 
 				+ KEY_TYPE_NAME + " TEXT,"
@@ -149,12 +151,9 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		String CREATE_FILTER_ALL = "insert into " + TABLE_FILTERS + "(" + KEY_FILTER_ID + "," + KEY_FILTER_NAME + ","
 				+ KEY_FILTER_DESC + "," + KEY_FILTER_QUERY + "," + KEY_FILTER_VALUES + "," + KEY_FILTER_HIDDEN
 				+ ") values(1, 'All', 'Show All items', \"" + FILTER_ALL_QUERY + " \",\"" + FILTER_ALL_VALUES + "\", 0)";
-		//CREATE_FILTER_ALL = DatabaseUtils.sqlEscapeString(CREATE_FILTER_ALL);
 		
 		String FILTER_ACTIVE_QUERY = "SELECT * FROM items";
-		//FILTER_ACTIVE_QUERY = DatabaseUtils.sqlEscapeString(FILTER_ACTIVE_QUERY);
-		String FILTER_ACTIVE_VALUES = "is_completed=0";
-		//FILTER_ACTIVE_VALUES = DatabaseUtils.sqlEscapeString(FILTER_ACTIVE_VALUES);
+		String FILTER_ACTIVE_VALUES = "is_completed='0' AND cat=";
 		String CREATE_FILTER_ACTIVE = "insert into " + TABLE_FILTERS + "(" + KEY_FILTER_ID + "," + KEY_FILTER_NAME + ","
 				+ KEY_FILTER_DESC + "," + KEY_FILTER_QUERY + "," + KEY_FILTER_VALUES + "," + KEY_FILTER_HIDDEN
 				+ ") values(2, 'Active', 'Show Active Items', \"" + FILTER_ACTIVE_QUERY + " \",\"" + FILTER_ACTIVE_VALUES + "\", 0)";
@@ -186,7 +185,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		//db.execSQL(CREATE_SETTING_COMPLETED);
 		//db.execSQL(CREATE_SETTING_PROTECTED_CATS);
 		
-		getPreferences();
+
 	}
 		
 	// Upgrading database
@@ -203,25 +202,32 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	}
 	
 	public void getPreferences() {
+		//PreferencesHelper myPrefs= new PreferencesHelper(getApplicationContext());  
+
+		//myPrefs.GetPreferences(R.string.remove_completed_key, R.integer.remove_completed_default);  
 		//mySharedPreferences = (PreferenceManager) context.getSharedPreferences();
+		Log.v("DatabaseHandler.getPreferences()", "4) context: " + context);
     	mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         prefRemoveCompletedItems = mySharedPreferences.getString(context.getString(R.string.remove_completed_key), context.getResources().getString(R.integer.remove_completed_default));
         prefRemoveCompletedItemsDelay = mySharedPreferences.getString(context.getString(R.string.remove_completed_delay_key), context.getResources().getString(R.integer.remove_completed_delay_default));
 	}
 	public String getQueryValuesFromPrefs() {
 		// TODO: Move this to ListManager
+		getPreferences();
 		String queryStringValues = "";
 		String dateTimeNow = null;
 		String compareDateString = null;
     	Calendar compareDate = Calendar.getInstance();
+		Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "prefRemoveCompletedItemsDelay: " + prefRemoveCompletedItemsDelay);
+		Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "prefRemoveCompletedItems: " + prefRemoveCompletedItems);
 		// Only show Non-Completed items
-		if (prefRemoveCompletedItems == "0") {
+		if (prefRemoveCompletedItems.equals("0")) {
 			queryStringValues = KEY_ITEM_IS_COMPLETED + "=0";
 		}
 		// Show completed items after delay
-		if (prefRemoveCompletedItems == "1") {
+		if (prefRemoveCompletedItems.equals("1")) {
 			SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-
+			Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "prefRemoveCompletedItemsDelay: " + prefRemoveCompletedItemsDelay);
 	    	// TODO: make this use the result from prefRemoveCompletedItemsDelay preference as a negative number
 	    	compareDate.add(Calendar.MINUTE,  -1);
 	    	try {
@@ -233,7 +239,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	    	queryStringValues = KEY_ITEM_COMPLETED_DATE + " BETWEEN " + dateTimeNow + " AND " + compareDate;
 		}
 		// Show all items always
-		if (prefRemoveCompletedItems == "2") {
+		if (prefRemoveCompletedItems.equals("2")) {
 			// Do nothing
 		}
 		return queryStringValues;
@@ -285,7 +291,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		
 		Cursor cursor = db.query(TABLE_ITEMS, new String[] { KEY_ITEM_ID, KEY_ITEM_NAME,
 				KEY_ITEM_DESC, KEY_ITEM_NOTES, KEY_ITEM_PRIMARY_CAT, KEY_ITEM_SECONDARY_CATS, 
-				KEY_ITEM_HAS_DUE_DATE, KEY_ITEM_HAS_DUE_TIME, KEY_ITEM_DUE_DATETIME, KEY_ITEM_CREATE_DATE, }, 
+				KEY_ITEM_HAS_DUE_DATE, KEY_ITEM_HAS_DUE_TIME, KEY_ITEM_DUE_DATETIME, 
+				KEY_ITEM_CREATE_DATE, KEY_ITEM_COMPLETED_DATE }, 
 				KEY_ITEM_ID + "?", new String[] { String.valueOf(id) }, null, null, null, null);
 		if (cursor != null)
 			cursor.moveToFirst();
@@ -299,6 +306,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		Integer itemHasDueTime = cursor.getInt(7);
 		String itemDueDate = cursor.getString(8);
 		String itemCreateDate = cursor.getString(9);
+		String itemCompletedDate = cursor.getString(10);
 		
 		Item item = new Item(itemID, itemPriCat, itemSecCats, itemName, itemDesc, itemNotes, itemCreateDate, itemDueDate);
 		item.setHasDueDate(itemHasDueDate);
@@ -329,6 +337,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				item.setDueDateTime(cursor.getString(8));
 				item.setCreateDate(cursor.getString(9));
 				item.setCompleted(cursor.getInt(10));
+				item.setCompletedDate(cursor.getString(11));
 				// Adding category to list
 				itemList.add(item);
 			} while (cursor.moveToNext());
@@ -341,17 +350,21 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		SQLiteDatabase db = this.getReadableDatabase();
 		
 		String defaultQueryValues = getQueryValuesFromPrefs();
+		Log.v("DatabaseHandler.getItemList", "defaultQueryValues: " + defaultQueryValues);
 
 		String dbQuery = "SELECT * FROM items";
-		String dbQueryValues = "cat=" + catID;
+		String dbQueryValues = "cat='" + catID + "'";
 		
 		// Get show completed items preference
 		// Get sql query for current preferences (immediately remove, do not remove, remove after X)
 
 		Category myCat = getCategory(catID);
 		int filterID = myCat.getFilterID();
+		Log.v("DatabaseHandler.getItemList", "filterID: " + filterID);
 		if (filterID == 0) {
-			// Apply default filter created from preference
+			if (defaultQueryValues != "") {
+				dbQueryValues = defaultQueryValues + " AND " + dbQueryValues;
+			}
 		} else {
 			// Get the selected filter and do not use defaults or preferences
 			Filter myFilter = getFilter(filterID);
@@ -362,7 +375,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				dbQuery = dbQuery + " WHERE " + dbQueryValues + catID;
 			}
 		}
-		
+		dbQuery = dbQuery + " WHERE " + dbQueryValues;
 		Log.v("DatabaseHandler.getItemList", "Query: " + dbQuery);
 		Cursor cursor = db.rawQuery(dbQuery , null);
 		

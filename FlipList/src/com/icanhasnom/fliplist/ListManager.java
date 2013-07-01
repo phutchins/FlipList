@@ -34,9 +34,10 @@ public class ListManager implements Serializable {
     public int archiveCategory = 1;
     public Category currentCategory;
     
-    DatabaseHandler db;
+    public transient DatabaseHandler db;
     public ListManager(Context context) {
     	db = new DatabaseHandler(context);
+		Log.v("ListManager.constructor", "3) context: " + context);
 
     	buildItemListMap();
     	populateCategoryList();

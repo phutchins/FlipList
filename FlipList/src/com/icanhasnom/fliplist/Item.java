@@ -38,8 +38,8 @@ public class Item implements Serializable {
 	    createDate = getCurrentDateTime();
     }
     public String getCurrentDateTime() {
-	    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ", Locale.ENGLISH);
-	    String currentDateTime = sdf.format(new Date());
+	    SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+	    String currentDateTime = sdfDateTime.format(new Date());
 	    return currentDateTime;
     }
     public Item(int cat, String n, String desc, String crDate, String due) throws ParseException {
@@ -130,6 +130,14 @@ public class Item implements Serializable {
     		completedDate = null;
     	}
     }
+    public Boolean setCompletedDate(String cd) {
+    	Boolean success = false;
+    	if (isDateTimeValid(cd)) {
+    		completedDate = cd;
+    		success = true;
+    	}
+    	return success;
+    }
     public void setHasDueTime(Boolean hasDT) {
     	hasDueTimeBool = hasDT;
     }
@@ -173,7 +181,7 @@ public class Item implements Serializable {
     public Boolean setDueDate(String dd) {
     	Calendar curDateCal = Calendar.getInstance();
     	Boolean success = false;
-    	SimpleDateFormat sdfDateTime = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
+    	SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
     	try {
 			curDateCal.setTime(sdfDateTime.parse(dueDateTime));
 		} catch (ParseException e1) {
@@ -278,16 +286,16 @@ public class Item implements Serializable {
     public String getDueTimePretty() {
     	String timeStr = "Set Time";
     	if (hasDueTimeBool && dueDateTime != null) {
-    		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa", Locale.US);
-    		timeStr = sdf.format(stringToDate(dueDateTime));
+    		SimpleDateFormat sdfTimePretty = new SimpleDateFormat("hh:mm aa", Locale.US);
+    		timeStr = sdfTimePretty.format(stringToDate(dueDateTime));
     	}
 		return timeStr;
     }
     public String getDueTime() {
     	String timeStr = null;
     	if (hasDueTimeBool) {
-    		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.US);
-    		timeStr = sdf.format(stringToDate(dueDateTime));
+    		SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.US);
+    		timeStr = sdfTime.format(stringToDate(dueDateTime));
     	}
     	return timeStr;
     }
@@ -295,32 +303,32 @@ public class Item implements Serializable {
     	String dateStr = "Set Date";
     	Log.v("ListItem.getDueDatePretty", "hasDueDateBool: " + hasDueDateBool + " hasDueTimeBool: " + hasDueTimeBool + " dueDate: " + dueDateTime);
     	if (hasDueDateBool && dueDateTime != null) {
-    		SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd", Locale.US);
-    		dateStr = sdf.format(stringToDate(dueDateTime));
+    		SimpleDateFormat sdfDatePretty = new SimpleDateFormat("MMMM dd", Locale.US);
+    		dateStr = sdfDatePretty.format(stringToDate(dueDateTime));
     	}
     	return dateStr;
     }
     public String getDueDate() {
     	String dateStr = null;
     	if (hasDueDateBool) {
-    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    		dateStr = sdf.format(stringToDate(dueDateTime));
+    		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    		dateStr = sdfDate.format(stringToDate(dueDateTime));
     	}
     	return dateStr;
     }
     
     // Date Methods
     public String dateToString(Date date) {
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-    	String dateStr = sdf.format(date);
+    	SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+    	String dateStr = sdfDateTime.format(date);
     	return dateStr;
     }
     public boolean isDateTimeValid(String dateTimeToValidate) {
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-    	sdf.setLenient(false);
+    	SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+    	sdfDateTime.setLenient(false);
     	
     	try {
-    		sdf.parse(dateTimeToValidate);
+    		sdfDateTime.parse(dateTimeToValidate);
     		Log.v("DateTime Validator", "DateTime: " + dateTimeToValidate + " is valid.");
     	} catch (ParseException e) {
     		e.printStackTrace();
@@ -329,11 +337,11 @@ public class Item implements Serializable {
     	return true;
     }
     public boolean isDateValid(String dateToValidate) {
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    	sdf.setLenient(false);
+    	SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    	sdfDate.setLenient(false);
     	
     	try {
-    		sdf.parse(dateToValidate);
+    		sdfDate.parse(dateToValidate);
     		Log.v("Date Validator", "Date: " + dateToValidate + " is valid.");
     	} catch (ParseException e) {
     		e.printStackTrace();
@@ -342,11 +350,11 @@ public class Item implements Serializable {
     	return true;
     }
     public boolean isTimeValid(String timeToValidate) {
-    	SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.US);
-    	sdf.setLenient(false);
+    	SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.US);
+    	sdfTime.setLenient(false);
     	
     	try {
-    		sdf.parse(timeToValidate);
+    		sdfTime.parse(timeToValidate);
     		Log.v("Time Validator", "Time: " + timeToValidate + " is valid.");
     	} catch (ParseException e) {
     		e.printStackTrace();
@@ -356,18 +364,18 @@ public class Item implements Serializable {
     }
     // TODO: Set time zone somewhere ?
     public Date stringToDate(String dateStr) {
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+    	SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
     	Date date = null;
 		try {
-			date = sdf.parse(dateStr);
+			date = sdfDateTime.parse(dateStr);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
     	return date;
     }
     public String dateToStringPretty(Date date) {
-    	SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, hh:mm aa", Locale.US);
-    	String dateStr = sdf.format(date);
+    	SimpleDateFormat sdfDateTimePretty = new SimpleDateFormat("MMMM dd, hh:mm aa", Locale.US);
+    	String dateStr = sdfDateTimePretty.format(date);
     	return dateStr;
     }
 

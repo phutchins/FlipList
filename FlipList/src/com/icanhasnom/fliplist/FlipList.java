@@ -128,15 +128,17 @@ public class FlipList extends Activity {
         setContentView(R.layout.activity_main);
 		myPositionMap = new SparseIntArray();
 		myListMan = new ListManager(this);
+		Log.v("FlipList.onCreate", "1) this: " + this);
     	loadPref();
         
         db = new DatabaseHandler(this);
+		Log.v("FlipList.onCreate", "2) this: " + this);
         
         if(savedInstanceState != null) {
         	restoreState(savedInstanceState);
         	Log.v("FlipList.onCreate", "Restoring saved instance state");
         } else {
-        	myListMan = new ListManager(this);
+        	//myListMan = new ListManager(this);
         	loadPref();
     		currentItemList = myListMan.getItemList(defaultCatID);
         }
