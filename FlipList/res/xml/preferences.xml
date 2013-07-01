@@ -28,11 +28,24 @@
     <PreferenceCategory
         android:title="Item Completion Settings">
         
-        <CheckBoxPreference 
+        <ListPreference
             android:key="@string/remove_completed_key"
-            android:defaultValue="@bool/remove_completed_default"
+            android:defaultValue="@integer/remove_completed_default"
+            android:entries="@array/pref_remove_completed_options"
+            android:entryValues="@array/pref_remove_completed_values"
             android:title="Remove completed items immediately"
-            android:summary="With this enabled, completed items will immediately disappear out of its category" />
+            android:summary="With this enabled, completed items will immediately disappear out of its category" 
+            android:dialogTitle="Remove Completed" />
+        
+        <ListPreference
+            android:key="@string/remove_completed_delay_key"
+            android:defaultValue="@integer/remove_completed_delay_default"
+            android:entries="@array/pref_remove_completed_delay_options"
+            android:entryValues="@array/pref_remove_completed_delay_values"
+            android:title="Remove completed items immediately"
+            android:summary="With this enabled, completed items will immediately disappear out of its category" 
+            android:dialogTitle="Remove Completed" />
+        
     </PreferenceCategory>
 
     <PreferenceCategory

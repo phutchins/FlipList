@@ -22,6 +22,7 @@ public class Category implements Serializable {
     boolean isNew = false;
     boolean showDueDate = true;
     boolean showDescription = true;
+    int filterID = 0;
     int isVisible = 1;
     public Category() {
     }
@@ -94,5 +95,12 @@ public class Category implements Serializable {
 	}
 	public void setVisible(int v) {
 		isVisible = v;
+	}
+	public int getFilterID() {
+		// TODO Auto-generated method stub
+		return filterID;
+	}
+	public void setFilterID(int fid) {
+		filterID = fid;
 	}
 }

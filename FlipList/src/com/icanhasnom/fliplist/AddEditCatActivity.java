@@ -35,6 +35,7 @@ public class AddEditCatActivity extends Activity {
 	ArrayList<Category> categoryList;
 	
 	Spinner typeSpinner;
+	Spinner filterSpinner;
 	MyTypeSpinnerCustomAdapter adapter;
 
 
@@ -88,12 +89,15 @@ public class AddEditCatActivity extends Activity {
 		// Make this catID a hidden text field or something to store the value
 		EditText catID = (EditText) findViewById(R.id.cat_edit_id);
 		typeSpinner = (Spinner) findViewById(R.id.cat_type_spinner);
+		filterSpinner = (Spinner) findViewById(R.id.category_edit_filter_spinner);
 		CheckBox isVisibleBox = (CheckBox) findViewById(R.id.cat_visible_check_box);
 		isVisibleBox.setChecked(isVisible);
 		
 		// Populate type spinner and select the categories type (will be default if new)
 		addTypesToSpinner();
 		typeSpinner.setSelection(lc.getType());
+		addFiltersToSpinner();
+		filterSpinner.setSelection(lc.getFilterID());
 		
 		// fill out layout variables using the currentCategory object
 		if (isNew) {
@@ -115,6 +119,13 @@ public class AddEditCatActivity extends Activity {
         ArrayAdapter<ItemType> myTypeAdapter = new MyTypeSpinnerCustomAdapter(this, R.layout.activity_add_edit_cat, myTypeList);
         myTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeSpinner.setAdapter(myTypeAdapter);
+    }
+    public void addFiltersToSpinner() {
+        ArrayList<Filter> myFilterList = myListMan.getFilterList();
+        filterSpinner = (Spinner) findViewById(R.id.category_edit_filter_spinner);
+        ArrayAdapter<Filter> myFilterAdapter = new MyFilterSpinnerCustomAdapter(this, R.layout.activity_add_edit_cat, myFilterList);
+        myFilterAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        filterSpinner.setAdapter(myFilterAdapter);
     }
     
     public class MyTypeSpinnerCustomAdapter extends ArrayAdapter<ItemType>{
@@ -164,6 +175,57 @@ public class AddEditCatActivity extends Activity {
     		holder.typeName.setText(myTypes.get(position).getName());
     		holder.typeName.setTag(type);
     		Log.v("TypeSpinner", myTypes.get(position).getName());
+    		return convertView;
+    	}
+    }
+    
+    public class MyFilterSpinnerCustomAdapter extends ArrayAdapter<Filter>{
+    	private Activity activity;
+    	private ArrayList<Filter> myFilters;
+    	LayoutInflater inflater;
+    	
+    	public MyFilterSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<Filter> myFilters) {
+    		super(activitySpinner, textViewResourceId, myFilters);
+    		this.activity = activitySpinner;
+    		this.myFilters = myFilters;
+    		inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    	}
+    	private class ViewHolder {
+    		TextView filterName;
+    	}
+    	public int getCount() {
+    		return myFilters.size();
+    	}
+    	public Filter getItem(int position) {
+    		return myFilters.get(position);
+    	}
+    	public long getFilterId(int position) {
+    		return position;
+    	}
+    	
+    	public View getDropDownView(int position, View convertView, ViewGroup parent) {
+    		return getCustomView(position, convertView, parent);
+    	}
+    	public View getView(int position, View convertView, ViewGroup parent) {
+    		return getCustomView(position, convertView, parent);
+    	}
+    	
+    	public View getCustomView(int position, View convertView, ViewGroup parent) {
+    		ViewHolder holder;
+    		if (convertView == null) {
+    			convertView = inflater.inflate(R.layout.activity_filter_spinner, null);
+    			holder = new ViewHolder();
+    			holder.filterName = (TextView) convertView.findViewById(R.id.filter_spinner_text);
+    			convertView.setTag(holder);
+    		} else {
+    			holder = (ViewHolder) convertView.getTag();
+    		}
+    		//TextView label = (TextView) convertView.findViewById(R.id.type_spinner_text);
+    		Filter filter = myFilters.get(position);
+    		holder.filterName.setTextColor(Color.BLACK);
+    		holder.filterName.setText(myFilters.get(position).getName());
+    		holder.filterName.setTag(filter);
+    		Log.v("TypeSpinner", myFilters.get(position).getName());
     		return convertView;
     	}
     }
@@ -328,30 +390,30 @@ public class AddEditCatActivity extends Activity {
     	String categoryDesc = editCategoryDescText.getText().toString();
     	
     	Spinner typeSpinner = (Spinner) findViewById(R.id.cat_type_spinner);
+    	Spinner filterSpinner = (Spinner) findViewById(R.id.category_edit_filter_spinner);
     	CheckBox visibleCheckBox = (CheckBox) findViewById(R.id.cat_visible_check_box);
     	
-    	// TODO: Fix this
-    	int position = typeSpinner.getSelectedItemPosition();
-    	categoryType = (ItemType) typeSpinner.getItemAtPosition(position);
+    	categoryType = (ItemType) typeSpinner.getItemAtPosition(typeSpinner.getSelectedItemPosition());
     	int categoryTypeID = categoryType.getID();
     	boolean isVisible = visibleCheckBox.isChecked();
     	int isVisibleInt = (isVisible) ? 1 : 0;
 
-    	Log.v("MySaveCatButtonAction", "categoryName: " + categoryName);
-    	Log.v("MySaveCatButtonAction", "categoryDesc: " + categoryDesc);
-    	Log.v("MySaveCatButtonAction", "categoryTypeID: " + categoryTypeID);
-    	Log.v("MySaveCatButtonAction", "categoryVisible: " + isVisible + ", " + isVisibleInt);
+    	//Log.v("MySaveCatButtonAction", "categoryName: " + categoryName);
+    	//Log.v("MySaveCatButtonAction", "categoryDesc: " + categoryDesc);
+    	//Log.v("MySaveCatButtonAction", "categoryTypeID: " + categoryTypeID);
+    	//Log.v("MySaveCatButtonAction", "categoryVisible: " + isVisible + ", " + isVisibleInt);
     	
     	Category myNewCat = new Category(categoryName, categoryDesc, categoryTypeID, isVisibleInt);
+    	myNewCat.setFilterID(filterSpinner.getSelectedItemPosition());
 
     	if (currentCategory.isNew()) {
-    		Log.v("AddEditCatActivity", "Adding new category " + currentCategory.getName());
+    		//Log.v("AddEditCatActivity", "Adding new category " + currentCategory.getName());
     		myListMan.addCategory(myNewCat);
     	} else {
     		int categoryID = Integer.parseInt(editCategoryIdNumber.getText().toString());
     		myNewCat.setID(categoryID);
-        	Log.v("MySaveCatButtonAction", "categoryID: " + categoryID);
-    		Log.v("AddEditCatActivity", "Updating category " + currentCategory.getName());
+        	//Log.v("MySaveCatButtonAction", "categoryID: " + categoryID);
+    		//Log.v("AddEditCatActivity", "Updating category " + currentCategory.getName());
     		myListMan.updateObjCategory(myNewCat);
     	}
     	

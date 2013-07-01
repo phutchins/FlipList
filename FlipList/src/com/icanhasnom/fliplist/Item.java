@@ -28,27 +28,35 @@ public class Item implements Serializable {
     public boolean hasDueDateBool = false;
     public boolean hasDueTimeBool = false;
     public String notes = "";
+    public boolean isCompleted = false;
+    public String completedDate = null;
     
+    // Constructors
+    // TODO: Do i need this many?
     public Item() {
-    	dueDateTime = getNowDateTime();
-        createDate = new Date().toString();
+    	dueDateTime = getCurrentDateTime();
+	    createDate = getCurrentDateTime();
+    }
+    public String getCurrentDateTime() {
+	    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ", Locale.ENGLISH);
+	    String currentDateTime = sdf.format(new Date());
+	    return currentDateTime;
     }
     public Item(int cat, String n, String desc, String crDate, String due) throws ParseException {
     	name = n;
     	description = desc;
-    	Log.v("ListItem", "1) due: " + due + " hasDueDateBool: " + hasDueDateBool);
         if (due != null) {
         	dueDateTime = due;
         	hasDueDateBool = true;
-        	Log.v("ListItem.hasDueDateBool", "1) Setting hasDueDateBool to true");
+        	Log.v("Item Constructor", "dueDateTime: " + due);
         }
     	primaryCat = cat;
-        createDate = new Date().toString();
-    	Log.v("ListItem", "1) due: " + due + " hasDueDateBool: " + hasDueDateBool);
+	    createDate = getCurrentDateTime();
+    	Log.v("Item Constructor", "createDate: " + createDate);
+
     }
     public Item(int cat, String n, String desc, String due) {
     	name = n;
-        //stringCatsToList(cats);
     	primaryCat = cat;
     	Log.v("ListItem", "1) due: " + due + " hasDueDateBool: " + hasDueDateBool);
 
@@ -62,7 +70,7 @@ public class Item implements Serializable {
         	dueDateTime = due;
         	Log.v("ListItem.hasDueDateBool", "2) Setting hasDueDateBool to true");
         }
-    	createDate = new Date().toString();
+	    createDate = getCurrentDateTime();
     	Log.v("ListItem", "2) due: " + due + " hasDueDateBool: " + hasDueDateBool);
     }
     public Item(int cat, String n, String desc) {
@@ -73,15 +81,14 @@ public class Item implements Serializable {
     	} else {
     		description = "";
     	}
-    	createDate = new Date().toString();
-    	dueDateTime = getNowDateTime();
+	    createDate = getCurrentDateTime();
+    	dueDateTime = getCurrentDateTime();
     }
     public Item(int cat, String n) {
     	name = n;
     	primaryCat = cat;
-    	createDate = new Date().toString();
-    	Log.v("ListItem", "getNowDateTime(): " + getNowDateTime());
-    	dueDateTime = getNowDateTime();
+	    createDate = getCurrentDateTime();
+    	dueDateTime = getCurrentDateTime();
     }
     public Item(int id, int priCat, String cats, String n, String desc, String itemNotes, String crDate, String dueDT) throws ParseException {
     	itemID = id;
@@ -93,25 +100,76 @@ public class Item implements Serializable {
         createDate = crDate;
     	dueDateTime = dueDT;
     }
-    public String getNowDateTime() {
-    	String nowDateTime;
-    	SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
-    	Calendar cal = Calendar.getInstance();
-    	nowDateTime = sdf.format(cal.getTime());
-    	return nowDateTime;
-    }
-    public String getDueDateTime() {
-    	return dueDateTime;
-    }
-    public String getDueDateTimePretty() {
-    	return dateToStringPretty(stringToDate(dueDateTime));
-    }
-    public Date getDueDateObj() {
-    	return stringToDate(dueDateTime);
-    }
+    
+    // Setting Values //
     public void setDueDateTime(String ddt) {
     	dueDateTime = ddt;
     }
+    public void setHasDueDate(Boolean hasDD) {
+    	hasDueDateBool = hasDD;
+    }
+    public void setHasDueDate(int hasDD) {
+    	if (hasDD == 1) {
+    		hasDueDateBool = true;
+    	} else {
+    		hasDueDateBool = false;
+    	}
+    }
+    public void setCompleted(Boolean completed) {
+    	isCompleted = completed;
+    	if (completed) completedDate = getCurrentDateTime();
+    	else completedDate = null;
+    }
+    public void setCompleted(Integer completed) {
+    	// TODO: Remove completedDate if its unchecked?
+    	if (completed == 1) {
+    		isCompleted = true;
+    		completedDate = getCurrentDateTime();
+    	} else {
+    		isCompleted = false;
+    		completedDate = null;
+    	}
+    }
+    public void setHasDueTime(Boolean hasDT) {
+    	hasDueTimeBool = hasDT;
+    }
+    public void setHasDueTime(int hasDT) {
+    	if (hasDT == 1) {
+    		hasDueTimeBool = true;
+    	} else {
+    		hasDueTimeBool = false;
+    	}
+    }
+    public void setCreateDate(String cd) {
+    	// Do some checking here?
+    	createDate = cd;
+    }
+    public void setDescription(String d) {
+        description = d;
+    }
+    public void setName(String n) {
+    	name = n;
+    }
+    public void setID(int id) {
+    	itemID = id;
+    }
+    public void addToCats(String cats) {
+    	String[] catList = cats.split(",");
+        int catListSize = catList.length;
+        for (int i = 0; i < catListSize; i++) {
+        	secondaryCats.add(catList[i]);
+        }
+    }
+    public void addSecondaryCat(String cat) {
+    	secondaryCats.add(cat);
+    }
+    public void setPrimaryCat(int cat) {
+    	primaryCat = cat;
+    }
+    public void setNotes(String n) {
+    	notes = n;
+    }
+    // Time & Date
     public Boolean setDueDate(String dd) {
     	Calendar curDateCal = Calendar.getInstance();
     	Boolean success = false;
@@ -141,7 +199,7 @@ public class Item implements Serializable {
     public Boolean setDueTime(String dt) {
     	Calendar curTimeCal = Calendar.getInstance();
     	Boolean success = false;
-    	SimpleDateFormat sdfDateTime = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
+    	SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
     	try {
 			curTimeCal.setTime(sdfDateTime.parse(dueDateTime));
 		} catch (ParseException e1) {
@@ -166,40 +224,56 @@ public class Item implements Serializable {
     	}
     	return success;
     }
-    public void setHasDueDate(Boolean hasDD) {
-    	hasDueDateBool = hasDD;
+    
+    // Get Values //
+    public String getName() {
+    	return name;
     }
-    public void setHasDueDate(int hasDD) {
-    	if (hasDD == 1) {
-    		hasDueDateBool = true;
-    	} else {
-    		hasDueDateBool = false;
-    	}
+    public int getID() {
+    	return itemID;
     }
-    public void setHasDueTime(Boolean hasDT) {
-    	hasDueTimeBool = hasDT;
+    public String getCreateDate() {
+        return createDate;
     }
-    public void setHasDueTime(int hasDT) {
-    	if (hasDT == 1) {
-    		hasDueTimeBool = true;
-    	} else {
-    		hasDueTimeBool = false;
-    	}
+    public int getPrimaryCat() {
+    	return primaryCat;
     }
+    public List<String> getSecondaryCats() {
+        return secondaryCats;
+    }
+    public Boolean isCompleted() {
+    	return isCompleted;
+    }
+    //public int isCompletedInt() {
+    //	Integer isCompletedInt = 0;
+    //	if (isCompleted) isCompletedInt = 1;
+    //	return isCompletedInt;
+    //}
+    public String getSecondaryCatsString() {
+    	String secondaryCatsString = secondaryCats.toArray().toString();
+    	return secondaryCatsString;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public String getNotes() {
+    	return notes;
+    }
+    // Time & Date
     public boolean hasDueDate() {
     	return hasDueDateBool;
     }
     public boolean hasDueTime() {
     	return hasDueTimeBool;
     }
-    public void setCreateDate(String cd) {
-    	// Do some checking here?
-    	createDate = cd;
+    public String getDueDateTime() {
+    	return dueDateTime;
     }
-    public String dateToStringPretty(Date date) {
-    	SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, hh:mm aa", Locale.US);
-    	String dateStr = sdf.format(date);
-    	return dateStr;
+    public String getDueDateTimePretty() {
+    	return dateToStringPretty(stringToDate(dueDateTime));
+    }
+    public Date getDueDateObj() {
+    	return stringToDate(dueDateTime);
     }
     public String getDueTimePretty() {
     	String timeStr = "Set Time";
@@ -234,6 +308,8 @@ public class Item implements Serializable {
     	}
     	return dateStr;
     }
+    
+    // Date Methods
     public String dateToString(Date date) {
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
     	String dateStr = sdf.format(date);
@@ -278,8 +354,9 @@ public class Item implements Serializable {
     	}
     	return true;
     }
+    // TODO: Set time zone somewhere ?
     public Date stringToDate(String dateStr) {
-    	SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
     	Date date = null;
 		try {
 			date = sdf.parse(dateStr);
@@ -288,57 +365,14 @@ public class Item implements Serializable {
 		}
     	return date;
     }
-    public void setDescription(String d) {
-        description = d;
+    public String dateToStringPretty(Date date) {
+    	SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, hh:mm aa", Locale.US);
+    	String dateStr = sdf.format(date);
+    	return dateStr;
     }
-    public void setName(String n) {
-    	name = n;
-    }
-    public String getName() {
-    	return name;
-    }
-    public void setID(int id) {
-    	itemID = id;
-    }
-    public int getID() {
-    	return itemID;
-    }
-    public String getCreateDate() {
-        return createDate;
-    }
-    public int getPrimaryCat() {
-    	return primaryCat;
-    }
-    public List<String> getSecondaryCats() {
-        return secondaryCats;
-    }
-    public String getSecondaryCatsString() {
-    	String secondaryCatsString = secondaryCats.toArray().toString();
-    	return secondaryCatsString;
-    }
-    public void addToCats(String cats) {
-    	String[] catList = cats.split(",");
-        int catListSize = catList.length;
-        for (int i = 0; i < catListSize; i++) {
-        	secondaryCats.add(catList[i]);
-        }
-    }
-    public void addSecondaryCat(String cat) {
-    	secondaryCats.add(cat);
-    }
-    public void setPrimaryCat(int cat) {
-    	primaryCat = cat;
-    }
+
+    // Remove Values
     public void rmCategory(String cat) {
     	secondaryCats.remove(cat);
-    }
-    public String getDescription() {
-        return description;
-    }
-    public String getNotes() {
-    	return notes;
-    }
-    public void setNotes(String n) {
-    	notes = n;
     }
 }

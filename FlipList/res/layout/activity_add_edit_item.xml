@@ -30,26 +30,6 @@
                 android:layout_height="373dp" >
 
                 <TextView
-                    android:id="@+id/item_edit_name_text_textview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:text="@string/item_edit_name_text"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                <EditText
-                    android:id="@+id/item_edit_name_edittext"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/item_edit_name_text_textview"
-                    android:ems="10"
-                    android:hint="@string/item_edit_name_text_hint" >
-
-                    <requestFocus />
-                </EditText>
-
-                <TextView
                     android:id="@+id/item_edit_text_textview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -160,6 +140,23 @@
                     android:layout_toRightOf="@+id/item_edit_category_text_textview"
                     android:onClick="itemEditNoDueDateButtonAction"
                     android:text="@string/no_due_date_button_text" />
+
+                <CheckBox
+                    android:id="@+id/item_completed_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/item_edit_text_textview"
+                    android:layout_alignParentLeft="true" />
+
+                <EditText
+                    android:id="@+id/item_edit_name_edittext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/item_edit_due_text_textview"
+                    android:ems="10"
+                    android:hint="@string/item_edit_name_text_hint" />
 
             </RelativeLayout>
 

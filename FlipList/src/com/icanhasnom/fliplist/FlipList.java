@@ -75,12 +75,18 @@ import android.widget.Toast;
 // TODO: Have item list only display items if not completed & create date is older than difference create date and current time vs when to disappear
 // TODO: Add archive time? Might start taking a long time to load all items if we dont' move them somewhere else... 
 
+// UI:
+// TODO: Move the categories drop down to the action bar
+
 // BUGS & FIXES
 // TODO: Fix all back and "UP" buttons on navigation bar
 
 // General Todo
 // TODO: Make cancel button on item edit and category edit (or just use up button?)
 // TODO: Set input validity check for fields (Date)
+// TODO: Show tiny category default type on main dropdown on right (just use a different layout, and maybe adapter)
+// TODO: When adding a new category, set the currentCategory to that category so it displays it when you return (or have it return the id)
+// TODO: Make completed items move to the bottom of list in order of most recently completed at the top
 
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -93,8 +99,9 @@ public class FlipList extends Activity {
 	
 	Boolean prefShowItemDescriptionGlobal;
 	Boolean prefShowDueDateGlobal;
-	Boolean prefRemoveCompletedItems;
-	
+	Integer prefRemoveCompletedItems;
+    Integer prefRemoveCompletedItemsDelay;
+    
     HashMap<String, Item> checkListItems = new HashMap<String, Item>();
     ItemList currentItemList;
     Category currentCategory;
@@ -102,7 +109,7 @@ public class FlipList extends Activity {
     Item currentItem;
     ArrayList<Category> catList;
     ArrayList<Item> currentListItems;
-    Boolean removeCompletedItems;
+
 	SparseIntArray myPositionMap;
     
     MyCustomAdapter itemListDataAdapter;
@@ -185,10 +192,11 @@ public class FlipList extends Activity {
     private void loadPref(){
     	mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         defaultCatID = Integer.parseInt(mySharedPreferences.getString(getString(R.string.default_category_key), getString(R.integer.default_category_default)));
-        removeCompletedItems = mySharedPreferences.getBoolean(getString(R.string.remove_completed_key), getResources().getBoolean(R.bool.remove_completed_default));
+        //removeCompletedItems = mySharedPreferences.getBoolean(getString(R.string.remove_completed_key), getResources().getBoolean(R.integer.remove_completed_default));
         prefShowItemDescriptionGlobal = mySharedPreferences.getBoolean(getString(R.string.show_description_global_key), getResources().getBoolean(R.bool.show_description_global_default));
         prefShowDueDateGlobal = mySharedPreferences.getBoolean(getString(R.string.show_due_date_global_key), getResources().getBoolean(R.bool.show_due_date_global_default));
-        prefRemoveCompletedItems = mySharedPreferences.getBoolean(getString(R.string.remove_completed_key), getResources().getBoolean(R.bool.remove_completed_default));
+        //prefRemoveCompletedItems = mySharedPreferences.getInt(getString(R.string.remove_completed_key), getResources().getInteger(R.integer.remove_completed_default));
+        //prefRemoveCompletedItemsDelay = mySharedPreferences.getInt(getString(R.string.remove_completed_delay_key), getResources().getInteger(R.integer.remove_completed_delay_default));
         currentCategoryID = mySharedPreferences.getInt("current_category_id", defaultCatID);
         currentCategory = myListMan.getCategory(currentCategoryID);
         Log.v("FlipList.loadPrefs", "(1) Setting currentCategory to " + currentCategory.getName());
@@ -336,10 +344,7 @@ public class FlipList extends Activity {
     	 
     	@Override
     	public View getView(int position, View convertView, ViewGroup parent) {
-    	 
     		ViewHolder holder = null;
-    		//Log.v("ConvertView", String.valueOf(position));
-    	 
     		if (convertView == null) {
     			LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     			convertView = vi.inflate(R.layout.list_layout, null);
@@ -355,11 +360,9 @@ public class FlipList extends Activity {
     				public void onClick(View v) {  
     					CheckBox cb = (CheckBox) v ;  
     					Item item = (Item) cb.getTag();
-    					int catSelected = catSelectedObj.getID();
-    					//String itemDescription = item.getDescription();
     					String itemName = item.getName();
     					Toast.makeText(getApplicationContext(), "Completed: " + itemName, Toast.LENGTH_LONG).show();
-    					myListMan.completeItem(item, catSelected);
+    					myListMan.completeItem(item);
     					addItemsOnList();
     				}  
     			});  
@@ -390,6 +393,7 @@ public class FlipList extends Activity {
 	    	} else {
 	    		holder.itemInfo.setVisibility(View.GONE);
 	    	}
+	    	if (item.isCompleted) holder.itemCheckBox.setChecked(true); 
     		holder.itemCheckBox.setText("");
     		holder.itemCheckBox.setTag(item);
     		return convertView;

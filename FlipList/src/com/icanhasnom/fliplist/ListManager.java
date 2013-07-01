@@ -18,14 +18,8 @@ import android.util.Log;
  * @author flip
  */
 public class ListManager implements Serializable {
-//public class ListManager {
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	// TODO: Create settings ArrayList and populate from DB (maybe in constructor?)
 	ArrayList<Category> categoryList = new ArrayList<Category>();
-    //ArrayList<ListCategory> categoryObjList = new ArrayList<ListCategory>();
     ItemList itemList = null;
     Map<Integer, ItemList> itemListMap = new HashMap<Integer, ItemList>();
     //Map<String,ListCategory> categoryListMap = new HashMap<String,ListCategory>();
@@ -36,12 +30,11 @@ public class ListManager implements Serializable {
     
     public int defaultTypeID = 0;
     public String defaultType = "Generic";
-    // TODO: Put this in settings and DB
-    public int completedCatID = 1;
+    //public int completedCatID = 1;
+    public int archiveCategory = 1;
     public Category currentCategory;
     
     DatabaseHandler db;
-    
     public ListManager(Context context) {
     	db = new DatabaseHandler(context);
 
@@ -66,11 +59,7 @@ public class ListManager implements Serializable {
 			myItemList = db.getItemList(curCatID);
 			myItemList.setName(curCat.getName());
 			myItemList.setID(curCat.getID());
-			//Log.v("ListManager.buildItemListMap", "Got ItemList for " + myItemList.getName());
     		itemListMap.put(curCatID, myItemList);
-    		//Log.v("ListManager.buildItemListMap", "Building ItemList for " + curCat.getName() + " with ID " + curCatID);
-    		//BROKEN
-    		//Log.v("ListManager.buildItemListMap", "itemCount: " + db.getItemsCount());
     	}	
     }
     public void populateItemList(int catID) {
@@ -105,6 +94,7 @@ public class ListManager implements Serializable {
     }
 	public Item addItem(int catID, String name) {
 		Item myItem = new Item(catID, name);
+		
 		db.addItem(myItem);
 		buildItemListMap();
 		return myItem;
@@ -138,20 +128,9 @@ public class ListManager implements Serializable {
             myToList.addListItem(myItem);
         }
     }
-    public void completeItem(Item myItem, int fromList) {
-        ItemList myFromList = itemListMap.get(fromList);
-        // TODO: Put this into settings and make a settings class to cache settings
-        int completedListID = completedCatID;
-        // TODO: Get completed cat ID from settings class
-        //ItemList myToList = itemListMap.get(completedListID);
-        //Log.v("ListManager.completeItem", "myFromList Name: " + myFromList.getName());
-        //Log.v("ListManager.completeItem", "myToList Name: " + myToList.getName());
-        myItem.setPrimaryCat(completedListID);
-        if (fromList != completedListID) {
-            db.updateItem(myItem);
-        } else {
-        	db.deleteItem(myItem);
-        }
+    public void completeItem(Item myItem) {
+        myItem.setCompleted(true);
+        db.updateItem(myItem);
     }
     
     // Removing Objects
@@ -189,6 +168,8 @@ public class ListManager implements Serializable {
     	return catListStrings;
     }
     public ItemList getItemList(int catID) {
+    	// Get filter ID from category
+    	// 
     	ItemList myItemList;
     	buildItemListMap();
     	myItemList = itemListMap.get(catID);
@@ -204,6 +185,10 @@ public class ListManager implements Serializable {
     public ArrayList<ItemType> getCategoryTypesList() {
     	ArrayList<ItemType> categoryTypesList = db.getCategoryTypesList();
     	return categoryTypesList;
+    }
+    public ArrayList<Filter> getFilterList() {
+    	ArrayList<Filter> filterList = db.getFilterList();
+    	return filterList;
     }
 
     // Retrieving Objects
@@ -225,14 +210,6 @@ public class ListManager implements Serializable {
     	return listCat.getName();
     }
     
-    // Do we need these? Don't think so if we're not doing parcelable any more
-	public int describeContents() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	public void writeToParcel(Parcel arg0, int arg1) {
-		// TODO Auto-generated method stub
-		
-	}
+
 
 }

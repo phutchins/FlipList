@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -88,6 +89,7 @@ public class AddEditItemActivity extends Activity {
     public void editListItem() {
     	EditText itemIDTv = (EditText) findViewById(R.id.item_edit_id_edittext);
     	EditText itemNameTv = (EditText) findViewById(R.id.item_edit_name_edittext);
+    	CheckBox itemCompleted = (CheckBox) findViewById(R.id.item_completed_checkbox);
     	EditText itemDescTv = (EditText) findViewById(R.id.item_edit_description_edittext);
 
     	EditText itemNotesTv = (EditText) findViewById(R.id.item_edit_notes_edittext);
@@ -108,6 +110,7 @@ public class AddEditItemActivity extends Activity {
     	
     	if (!currentItem.hasDueTime()) noTimeButton.setEnabled(false);
     	if (!currentItem.hasDueDate()) noDateButton.setEnabled(false);
+    	if (currentItem.isCompleted()) itemCompleted.setChecked(true);
 
     	editDateButton.setText(myDatePretty);
     	editDateButton.setTag(myDate);
@@ -132,6 +135,7 @@ public class AddEditItemActivity extends Activity {
     public void itemEditSaveButtonAction(View view) {
     	EditText itemIDTv = (EditText) findViewById(R.id.item_edit_id_edittext);
     	EditText itemNameTv = (EditText) findViewById(R.id.item_edit_name_edittext);
+    	CheckBox itemCompleted = (CheckBox) findViewById(R.id.item_completed_checkbox);
     	EditText itemDescTv = (EditText) findViewById(R.id.item_edit_description_edittext);
     	Spinner itemCatSpinner = (Spinner) findViewById(R.id.item_edit_category_spinner);
     	EditText itemNotesTv = (EditText) findViewById(R.id.item_edit_notes_edittext);
@@ -154,6 +158,7 @@ public class AddEditItemActivity extends Activity {
     	myItem.setPrimaryCat(itemCategoryID);
     	myItem.setNotes(itemNotes);
     	myItem.setDueTime(itemDueTime);
+    	myItem.setCompleted(itemCompleted.isChecked());
     	if (itemDueTime != null && itemDueDate == null) {
     		Calendar cal = Calendar.getInstance();
     		int day = cal.get(Calendar.DAY_OF_MONTH);
