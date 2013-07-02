@@ -13,5 +13,5 @@
     <item type="integer" name="remove_completed_default">0</item>
     
     <string name="remove_completed_delay_key">remove_completed_delay</string>
-    <item type="integer" name="remove_completed_delay_default">0</item>
+    <item type="integer" name="remove_completed_delay_default">1</item>
 </resources>

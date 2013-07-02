@@ -4,8 +4,9 @@ public class Filter {
 	Integer id;
 	String name;
 	String description;
-	String query;
-	String values;
+	String query = null;
+	String values = null;
+	Boolean filterByCategory = false;
 	int hidden;
 
 	public Filter(int filterID) {
@@ -32,9 +33,22 @@ public class Filter {
 	public void setHidden(int h) {
 		hidden = h;
 	}
+	public void setFilterByCategory(Boolean bool) {
+		filterByCategory = bool;
+	}
 
 	public String getQueryValues() {
 		return values;
+	}
+	public String getQueryValues(Integer catID) {
+		String query = null;
+		if (values.equals("")) {
+			if (filterByCategory) query = "cat=" + catID;
+		} else {
+			if (filterByCategory) query = values + "AND cat=" + catID;
+			else query = values;
+		}
+		return query;
 	}
 
 	public String getQueryString() {

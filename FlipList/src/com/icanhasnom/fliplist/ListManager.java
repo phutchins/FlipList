@@ -38,9 +38,12 @@ public class ListManager implements Serializable {
     public ListManager(Context context) {
     	db = new DatabaseHandler(context);
 		Log.v("ListManager.constructor", "3) context: " + context);
-
-    	buildItemListMap();
+		updateListManagerState();
+    }
+    public void updateListManagerState() {
+    	// TODO: Use this to replace the below calls everywhere in here
     	populateCategoryList();
+    	buildItemListMap();
     }
     public void updateItem(Item item) {
     	db.updateItem(item);
@@ -85,13 +88,14 @@ public class ListManager implements Serializable {
     	
     //    return myNewListCategory;
     //}
-    public void addCategory(Category listCategory) {
+    public int addCategory(Category listCategory) {
     	// TODO: Merge updateObjCategory into this? Maybe make addUpdateObjCategory() which does 
     	//       a check to see if it exists and updates it if it already exists and adds it if
     	//       it doesn't.
-    	db.addCategory(listCategory);
+    	Integer newCatID = db.addCategory(listCategory);
     	buildItemListMap();
     	populateCategoryList();
+    	return newCatID;
     }
 	public Item addItem(int catID, String name) {
 		Item myItem = new Item(catID, name);
@@ -169,10 +173,8 @@ public class ListManager implements Serializable {
     	return catListStrings;
     }
     public ItemList getItemList(int catID) {
-    	// Get filter ID from category
-    	// 
     	ItemList myItemList;
-    	buildItemListMap();
+    	updateListManagerState();
     	myItemList = itemListMap.get(catID);
         return myItemList;
     }

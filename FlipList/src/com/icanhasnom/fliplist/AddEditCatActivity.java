@@ -372,11 +372,14 @@ public class AddEditCatActivity extends Activity {
 			toastMessage = "Fail!";
 		}
 		Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_LONG).show();
-		
-		// TODO: Do something with success to notify user of success or not
-		//       Use a toast to display success or failure
-		Intent flipList = new Intent(this, FlipList.class);
-		this.startActivity(flipList);
+
+		// TODO: return result saying category deleted and choose a sane default category in FlipList
+		Intent intent = new Intent();
+		intent.putExtra("delCatID", categoryID);
+		setResult(RESULT_CANCELED, intent);
+		super.finish();
+		//Intent flipList = new Intent(this, FlipList.class);
+		//this.startActivity(flipList);
 	}
     public void mySaveCatButtonAction(View view) {
     	ItemType categoryType;
@@ -403,22 +406,31 @@ public class AddEditCatActivity extends Activity {
     	//Log.v("MySaveCatButtonAction", "categoryTypeID: " + categoryTypeID);
     	//Log.v("MySaveCatButtonAction", "categoryVisible: " + isVisible + ", " + isVisibleInt);
     	
-    	Category myNewCat = new Category(categoryName, categoryDesc, categoryTypeID, isVisibleInt);
-    	myNewCat.setFilterID(filterSpinner.getSelectedItemPosition());
+    	Category myCat = new Category(categoryName, categoryDesc, categoryTypeID, isVisibleInt);
+    	Log.v("AddEditCatActivity.mySaveCatAction", "filterSpinner.getSelectedItemPosition(): " + filterSpinner.getSelectedItemPosition());
+    	myCat.setFilterID(filterSpinner.getSelectedItemPosition());
 
     	if (currentCategory.isNew()) {
     		//Log.v("AddEditCatActivity", "Adding new category " + currentCategory.getName());
-    		myListMan.addCategory(myNewCat);
+    		int newCatID = myListMan.addCategory(myCat);
+    		myCat.setID(newCatID);
     	} else {
     		int categoryID = Integer.parseInt(editCategoryIdNumber.getText().toString());
-    		myNewCat.setID(categoryID);
+    		myCat.setID(categoryID);
         	//Log.v("MySaveCatButtonAction", "categoryID: " + categoryID);
     		//Log.v("AddEditCatActivity", "Updating category " + currentCategory.getName());
-    		myListMan.updateObjCategory(myNewCat);
+    		myListMan.updateObjCategory(myCat);
     	}
     	
-		Intent flipList = new Intent(this, FlipList.class);
-		this.startActivity(flipList);
+    	Intent intent = new Intent();
+    	intent.putExtra("catID", myCat.getID());
+    	Log.v("AddEditCatActivity.mySaveButtonAction", "myNewCat.getID(): " + myCat.getID());
+    	setResult(RESULT_OK, intent);
+    	super.finish();
+		//Intent flipList = new Intent(this, FlipList.class);
+		//Bundle flipBundle = new Bundle();
+		//flipBundle.putInt("newCatID", myNewCat.getID());
+		//this.startActivity(flipList);
     }
 
 }

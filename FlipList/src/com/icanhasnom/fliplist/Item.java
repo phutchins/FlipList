@@ -38,7 +38,7 @@ public class Item implements Serializable {
 	    createDate = getCurrentDateTime();
     }
     public String getCurrentDateTime() {
-	    SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+	    SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 	    String currentDateTime = sdfDateTime.format(new Date());
 	    return currentDateTime;
     }
@@ -119,6 +119,7 @@ public class Item implements Serializable {
     	isCompleted = completed;
     	if (completed) completedDate = getCurrentDateTime();
     	else completedDate = null;
+    	Log.v("Item.setCompleted", "completedDate: " + completedDate);
     }
     public void setCompleted(Integer completed) {
     	// TODO: Remove completedDate if its unchecked?
@@ -315,6 +316,9 @@ public class Item implements Serializable {
     		dateStr = sdfDate.format(stringToDate(dueDateTime));
     	}
     	return dateStr;
+    }
+    public String getCompletedDate() {
+    	return completedDate;
     }
     
     // Date Methods

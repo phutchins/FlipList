@@ -26,7 +26,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int DATABASE_VERSION = 36;
+	private static final int DATABASE_VERSION = 43;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
@@ -66,6 +66,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	private static final String KEY_FILTER_QUERY = "query";
 	private static final String KEY_FILTER_VALUES = "query_values";
 	private static final String KEY_FILTER_HIDDEN = "hidden";
+	private static final String KEY_FILTER_BY_CATEGORY = "filter_by_cat";
 	
 	// Settings Table
 	private static final String TABLE_SETTINGS = "settings";
@@ -125,7 +126,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				+ KEY_FILTER_DESC + " TEXT," 
 				+ KEY_FILTER_QUERY + " TEXT,"
 				+ KEY_FILTER_VALUES + " TEXT," 
-				+ KEY_FILTER_HIDDEN + " INTEGER" + ")";
+				+ KEY_FILTER_HIDDEN + " INTEGER,"
+				+ KEY_FILTER_BY_CATEGORY + " INTEGER"+ ")";
 		
 		//String CREATE_SETTINGS_TABLE = "CREATE TABLE " + TABLE_SETTINGS + "("
 		//		+ KEY_SETTING_ID + " INTEGER PRIMARY KEY," + KEY_SETTING_NAME + " TEXT,"
@@ -135,9 +137,9 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		//       Undeletable setting mande, make delete method check undeletable before deleting category
 		//        and notify user in a tost if category cannot be deleted.
 		String CREATE_DEFAULT_CATEGORY = "insert into " + TABLE_CATEGORIES + "(" + KEY_CAT_ID + "," + KEY_CAT_NAME + ","
-                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + "," + KEY_CAT_VISIBLE + "," + KEY_CAT_FILTER + ") values(0, 'Default', 'Default Category','0', '1', 1)";
+                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + "," + KEY_CAT_VISIBLE + "," + KEY_CAT_FILTER + ") values(0, 'Default', 'Default Category','0', '1', 0)";
 		String CREATE_ARCHIVE_CATEGORY = "insert into " + TABLE_CATEGORIES + "(" + KEY_CAT_ID + "," + KEY_CAT_NAME + ","
-                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + "," + KEY_CAT_VISIBLE + "," + KEY_CAT_FILTER + ") values(1, 'Archive', 'Archive Category','0', '0', 1)";
+                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + "," + KEY_CAT_VISIBLE + "," + KEY_CAT_FILTER + ") values(1, 'Archive', 'Archive Category','0', '0', 0)";
 		
 		String CREATE_TYPE_GENERIC = "insert into " + TABLE_CATEGORY_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
 				+ KEY_TYPE_DESC + ") values(0, 'Generic', 'Generic items')";
@@ -146,17 +148,21 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		String CREATE_TYPE_TODO = "insert into " + TABLE_CATEGORY_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
 				+ KEY_TYPE_DESC + ") values(2, 'ToDo', 'Tasks that you need to complete')";
 		
+		String CREATE_FILTER_NONE = "insert into " + TABLE_FILTERS + "(" + KEY_FILTER_ID + "," + KEY_FILTER_NAME + ","
+				+ KEY_FILTER_DESC + "," + KEY_FILTER_QUERY + "," + KEY_FILTER_VALUES + "," + KEY_FILTER_HIDDEN + "," + KEY_FILTER_BY_CATEGORY
+				+ ") values(0, 'None', 'No Filter', '', '', 0, 1)";
 		String FILTER_ALL_QUERY = "SELECT * FROM items";
 		String FILTER_ALL_VALUES = "";
 		String CREATE_FILTER_ALL = "insert into " + TABLE_FILTERS + "(" + KEY_FILTER_ID + "," + KEY_FILTER_NAME + ","
-				+ KEY_FILTER_DESC + "," + KEY_FILTER_QUERY + "," + KEY_FILTER_VALUES + "," + KEY_FILTER_HIDDEN
-				+ ") values(1, 'All', 'Show All items', \"" + FILTER_ALL_QUERY + " \",\"" + FILTER_ALL_VALUES + "\", 0)";
-		
+				+ KEY_FILTER_DESC + "," + KEY_FILTER_QUERY + "," + KEY_FILTER_VALUES + "," + KEY_FILTER_HIDDEN + "," + KEY_FILTER_BY_CATEGORY
+				+ ") values(1, 'All', 'Show All items', \"" + FILTER_ALL_QUERY + " \",\"" + FILTER_ALL_VALUES + "\", 0, 1)";
 		String FILTER_ACTIVE_QUERY = "SELECT * FROM items";
-		String FILTER_ACTIVE_VALUES = "is_completed='0' AND cat=";
+		String FILTER_ACTIVE_VALUES = "is_completed='0'";
 		String CREATE_FILTER_ACTIVE = "insert into " + TABLE_FILTERS + "(" + KEY_FILTER_ID + "," + KEY_FILTER_NAME + ","
-				+ KEY_FILTER_DESC + "," + KEY_FILTER_QUERY + "," + KEY_FILTER_VALUES + "," + KEY_FILTER_HIDDEN
-				+ ") values(2, 'Active', 'Show Active Items', \"" + FILTER_ACTIVE_QUERY + " \",\"" + FILTER_ACTIVE_VALUES + "\", 0)";
+				+ KEY_FILTER_DESC + "," + KEY_FILTER_QUERY + "," + KEY_FILTER_VALUES + "," + KEY_FILTER_HIDDEN + "," + KEY_FILTER_BY_CATEGORY
+				+ ") values(2, 'Active', 'Show Active Items', \"" + FILTER_ACTIVE_QUERY + " \",\"" + FILTER_ACTIVE_VALUES + "\", 0, 1)";
+		
+
 		//CREATE_FILTER_ACTIVE = DatabaseUtils.sqlEscapeString(CREATE_FILTER_ACTIVE);
 
 		//String CREATE_SETTING_DEFCAT = "insert into " + TABLE_SETTINGS + "(" + KEY_SETTING_ID + "," + KEY_SETTING_NAME + ","
@@ -178,6 +184,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		db.execSQL(CREATE_TYPE_GENERIC);
 		db.execSQL(CREATE_TYPE_GROCERY);
 		db.execSQL(CREATE_TYPE_TODO);
+		db.execSQL(CREATE_FILTER_NONE);
 		db.execSQL(CREATE_FILTER_ALL);
 		db.execSQL(CREATE_FILTER_ACTIVE);
 		//db.execSQL(CREATE_SETTING_DEFCAT);
@@ -216,27 +223,29 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		getPreferences();
 		String queryStringValues = "";
 		String dateTimeNow = null;
-		String compareDateString = null;
-    	Calendar compareDate = Calendar.getInstance();
-		Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "prefRemoveCompletedItemsDelay: " + prefRemoveCompletedItemsDelay);
+		String compareDate = null;
+		//String dateTimeNowString = null;
+		//String compareDateString = null;
+    	Calendar compareDateCal = Calendar.getInstance();
+    	Calendar nowDateCal = Calendar.getInstance();
 		Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "prefRemoveCompletedItems: " + prefRemoveCompletedItems);
+		Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "prefRemoveCompletedItemsDelay: " + prefRemoveCompletedItemsDelay);
 		// Only show Non-Completed items
 		if (prefRemoveCompletedItems.equals("0")) {
 			queryStringValues = KEY_ITEM_IS_COMPLETED + "=0";
 		}
-		// Show completed items after delay
+		// Remove completed items after delay
 		if (prefRemoveCompletedItems.equals("1")) {
+			Integer delayInt = Integer.valueOf(prefRemoveCompletedItemsDelay);
 			SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 			Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "prefRemoveCompletedItemsDelay: " + prefRemoveCompletedItemsDelay);
 	    	// TODO: make this use the result from prefRemoveCompletedItemsDelay preference as a negative number
-	    	compareDate.add(Calendar.MINUTE,  -1);
-	    	try {
-		    	dateTimeNow = sdfDateTime.parse(compareDate.toString()).toString();
-				compareDateString = sdfDateTime.parse(compareDate.toString()).toString();
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-	    	queryStringValues = KEY_ITEM_COMPLETED_DATE + " BETWEEN " + dateTimeNow + " AND " + compareDate;
+	    	compareDateCal.add(Calendar.MINUTE, -delayInt);
+
+		    dateTimeNow = sdfDateTime.format(nowDateCal.getTime());
+			compareDate = sdfDateTime.format(compareDateCal.getTime());
+
+	    	queryStringValues = "(" + KEY_ITEM_IS_COMPLETED + "=0 OR " + KEY_ITEM_COMPLETED_DATE + " >= datetime('" + compareDate + "'))";
 		}
 		// Show all items always
 		if (prefRemoveCompletedItems.equals("2")) {
@@ -248,7 +257,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		// TODO: Use whats needed in this and remove it
 	    Calendar date = Calendar.getInstance();
 	    try {
-			date.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).parse(datetime));
+			date.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).parse(datetime));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -363,19 +372,22 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		Log.v("DatabaseHandler.getItemList", "filterID: " + filterID);
 		if (filterID == 0) {
 			if (defaultQueryValues != "") {
+				// TEMP TEST
+				//defaultQueryValues = "is_completed=0 OR completed_date >= datetime('2000-07-02 03:02:09')";
 				dbQueryValues = defaultQueryValues + " AND " + dbQueryValues;
+				//dbQuery = dbQuery + " WHERE " + dbQueryValues;
 			}
 		} else {
 			// Get the selected filter and do not use defaults or preferences
+			// TODO: use something like myFilter.getQuery(catID) to build and return the full query
 			Filter myFilter = getFilter(filterID);
 			dbQuery = myFilter.getQueryString();
-			dbQueryValues = myFilter.getQueryValues();
-			
-			if (dbQueryValues != null) {
-				dbQuery = dbQuery + " WHERE " + dbQueryValues + catID;
-			}
+			dbQueryValues = myFilter.getQueryValues(catID);
 		}
-		dbQuery = dbQuery + " WHERE " + dbQueryValues;
+		if (dbQueryValues != null) {
+			dbQuery = dbQuery + " WHERE " + dbQueryValues;
+		}
+
 		Log.v("DatabaseHandler.getItemList", "Query: " + dbQuery);
 		Cursor cursor = db.rawQuery(dbQuery , null);
 		
@@ -399,7 +411,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				item.setCreateDate(cursor.getString(9));
 				item.setCompleted(cursor.getInt(10));
 				itemList.addListItem(item);
-				Log.v("DatabaseHandler.getItemList", "createDate: " + cursor.getString(9) + " dueDate: " + cursor.getString(8));
+				Log.v("DatabaseHandler.getItemList", "createDate: " + cursor.getString(9) + " dueDate: " + cursor.getString(8) + " completedDate: " + cursor.getInt(10));
 			} while (cursor.moveToNext());
 		}
 		// return contact list
@@ -407,6 +419,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	}
 	public Filter getFilter(int filterID) {
 		Filter myFilter = null;
+		Boolean filterByCategory = false;
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.rawQuery("SELECT * FROM 'filters' WHERE id=" + filterID, null);
 		if (cursor.moveToFirst()) {
@@ -417,6 +430,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				myFilter.setQuery(cursor.getString(3));
 				myFilter.setValues(cursor.getString(4));
 				myFilter.setHidden(cursor.getInt(5));
+				if (cursor.getInt(6) == 1) filterByCategory = true;
+				myFilter.setFilterByCategory(filterByCategory);
 			} while (cursor.moveToNext());
 		}
 		return myFilter;
@@ -445,6 +460,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_ITEM_HAS_DUE_TIME, hasDueTime);
 		values.put(KEY_ITEM_DUE_DATETIME, item.getDueDateTime());
 		values.put(KEY_ITEM_IS_COMPLETED, isCompleted);
+		values.put(KEY_ITEM_COMPLETED_DATE, item.getCompletedDate());
 		return db.update(TABLE_ITEMS, values, KEY_ITEM_ID + " = ?",
 				new String[] { String.valueOf(item.getID()) });
 	}
@@ -456,25 +472,33 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	}
 	
 	// Categories
-	public void addCategory(Category category) {
+	public int addCategory(Category category) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(KEY_CAT_NAME, category.getName());
 		values.put(KEY_CAT_DESC, category.getDescription());
 		values.put(KEY_CAT_TYPE, category.getType());
 		values.put(KEY_CAT_VISIBLE, category.getVisible());
+		values.put(KEY_CAT_FILTER, category.getFilterID());
 		db.insert(TABLE_CATEGORIES, null, values);
+		Cursor cursor = db.rawQuery("SELECT last_insert_rowid() FROM " + TABLE_CATEGORIES, null);
+		cursor.moveToFirst();
+		int newCatID = cursor.getInt(0);
+		cursor.close();
 		db.close();
+		return newCatID;
 	}
 	public Category getCategory(int id) {
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
-				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE }, KEY_CAT_ID + "=?",
+				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE, KEY_CAT_FILTER }, KEY_CAT_ID + "=?",
 				new String[] { String.valueOf(id) }, null, null, null, null);
 		if (cursor != null)
 			cursor.moveToFirst();
 		Category category = new Category(cursor.getInt(0),
 				cursor.getString(1), cursor.getString(2), cursor.getInt(3), cursor.getInt(4));
+		// TOOD: should this be in the constructor? or not?
+		category.setFilterID(cursor.getInt(5));
 		return category;
 	}
 	public Category getCategoryByName(String catName) {
@@ -530,7 +554,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		String isVisible = "1";
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
-				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE }, KEY_CAT_VISIBLE + "=?",
+				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE, KEY_CAT_FILTER }, KEY_CAT_VISIBLE + "=?",
 				new String[] { isVisible }, null, null, null, null);
 		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
@@ -541,6 +565,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				category.setDescription(cursor.getString(2));
 				category.setType(Integer.parseInt(cursor.getString(3)));
 				category.setVisible(Integer.parseInt(cursor.getString(4)));
+				category.setFilterID(cursor.getInt(5));
 				// Adding category to list
 				categoryList.add(category);
 			} while (cursor.moveToNext());
@@ -595,6 +620,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_CAT_DESC, category.getDescription().toString());
 		values.put(KEY_CAT_TYPE, category.getType());
 		values.put(KEY_CAT_VISIBLE, category.getVisible());
+		values.put(KEY_CAT_FILTER,  category.getFilterID());
 		String keyID = String.valueOf(category.getID());
 		//Log.v("updateCategory", "DatabaseHandler.updateCategory.keyID: " + keyID);
 		// updating row

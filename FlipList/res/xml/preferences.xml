@@ -42,8 +42,8 @@
             android:defaultValue="@integer/remove_completed_delay_default"
             android:entries="@array/pref_remove_completed_delay_options"
             android:entryValues="@array/pref_remove_completed_delay_values"
-            android:title="Remove completed items immediately"
-            android:summary="With this enabled, completed items will immediately disappear out of its category" 
+            android:title="Completed item removal delay"
+            android:summary="Choose the delay time for removing completed items from the list" 
             android:dialogTitle="Remove Completed" />
         
     </PreferenceCategory>

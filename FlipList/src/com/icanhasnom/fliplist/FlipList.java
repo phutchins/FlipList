@@ -128,17 +128,16 @@ public class FlipList extends Activity {
         setContentView(R.layout.activity_main);
 		myPositionMap = new SparseIntArray();
 		myListMan = new ListManager(this);
-		Log.v("FlipList.onCreate", "1) this: " + this);
-    	loadPref();
-        
+		//Log.v("FlipList.onCreate", "1) this: " + this);
+		loadPref();
+        Log.v("FlipList.onCreate", "defaultCatID: " + defaultCatID);
         db = new DatabaseHandler(this);
-		Log.v("FlipList.onCreate", "2) this: " + this);
+		//Log.v("FlipList.onCreate", "2) this: " + this);
         
         if(savedInstanceState != null) {
         	restoreState(savedInstanceState);
         	Log.v("FlipList.onCreate", "Restoring saved instance state");
         } else {
-        	//myListMan = new ListManager(this);
         	loadPref();
     		currentItemList = myListMan.getItemList(defaultCatID);
         }
@@ -171,7 +170,7 @@ public class FlipList extends Activity {
     	switch (item.getItemId()) {
     	case R.id.menu_add_edit_cat:
     		Intent addEditCatIntent = new Intent(this, AddEditCatActivity.class);
-    		this.startActivity(addEditCatIntent);
+    		startActivityForResult(addEditCatIntent, 1);
     		break;
     	case R.id.menu_settings:
     		 Intent intent = new Intent();
@@ -187,19 +186,39 @@ public class FlipList extends Activity {
     
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	loadPref();
-    	addItemsOnList();
+		Log.v("FlipList.onActivityResult", "requestCode: " + requestCode + " resultCode: " + resultCode);
+    	if (requestCode == 0) {
+        	loadPref();
+    	}
+    	if (requestCode == 1 && resultCode == RESULT_OK) {
+            currentCategoryID = data.getIntExtra("catID", currentCategoryID);
+            currentCategory = myListMan.getCategory(currentCategoryID);
+            Log.v("FlipList.onActivityResult", "Got Result Code -1, currentCategoryID: " + currentCategoryID + " currentCategory.getName(): " + currentCategory.getName());
+    	} else if (requestCode == 1 && resultCode == RESULT_CANCELED) {
+
+    		Integer deletedCatID = data.getIntExtra("delCatID", 0);
+    		if (defaultCatID == deletedCatID) {
+    			defaultCatID = 0;
+    		}
+    		// TODO: change the preferences to an existing category if we deleted the default
+    		// TODO: Should we be able to have no categories at all? If no default, display empty dropdown, etc...?
+    	}
+    	addItemsOnSpinner();
+    	//addItemsOnList();
     }
        
     private void loadPref(){
     	mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         defaultCatID = Integer.parseInt(mySharedPreferences.getString(getString(R.string.default_category_key), getString(R.integer.default_category_default)));
+        Log.v("FlipList.loadPref", "defaultCatID: " + defaultCatID);
         //removeCompletedItems = mySharedPreferences.getBoolean(getString(R.string.remove_completed_key), getResources().getBoolean(R.integer.remove_completed_default));
         prefShowItemDescriptionGlobal = mySharedPreferences.getBoolean(getString(R.string.show_description_global_key), getResources().getBoolean(R.bool.show_description_global_default));
         prefShowDueDateGlobal = mySharedPreferences.getBoolean(getString(R.string.show_due_date_global_key), getResources().getBoolean(R.bool.show_due_date_global_default));
         //prefRemoveCompletedItems = mySharedPreferences.getInt(getString(R.string.remove_completed_key), getResources().getInteger(R.integer.remove_completed_default));
         //prefRemoveCompletedItemsDelay = mySharedPreferences.getInt(getString(R.string.remove_completed_delay_key), getResources().getInteger(R.integer.remove_completed_delay_default));
         currentCategoryID = mySharedPreferences.getInt("current_category_id", defaultCatID);
+        if (currentCategoryID == null) currentCategoryID = defaultCatID;
+        Log.v("FlipList.loadPref", "currentCategoryID: " + currentCategoryID);
         currentCategory = myListMan.getCategory(currentCategoryID);
         Log.v("FlipList.loadPrefs", "(1) Setting currentCategory to " + currentCategory.getName());
     }
@@ -259,6 +278,8 @@ public class FlipList extends Activity {
     public void addItemsOnList()  {
     	int catID = currentCategory.getID();
 		currentItemList = myListMan.getItemList(catID);
+		Log.v("FlipList.addItemsOnList", "catID: " + catID );
+		Log.v("FLipList.addItemsonList", "currentItemList: " + currentItemList);
 		currentListItems = currentItemList.getListItems();
     	itemListDataAdapter = new MyCustomAdapter(this, R.layout.list_layout, currentListItems);
     	ListView listView = (ListView) findViewById(R.id.itemList);
