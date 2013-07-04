@@ -1,9 +1,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
+    <item 
+        android:id="@+id/action_save_item"
+        android:orderInCategory="200"
+        android:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_menu_save"
+        android:title="@string/item_edit_save_text"/>
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_delete_item"
+        android:orderInCategory="300"
+        android:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="@string/item_edit_delete_text"/>
+    <item
+        android:id="@+id/action_cancel_item"
         android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/>
+        android:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:title="@string/item_edit_cancel_text"/>
 
 </menu>

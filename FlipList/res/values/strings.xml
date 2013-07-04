@@ -2,6 +2,7 @@
 <resources>
 
 
+    <string name="add_item_button_description">Add Item</string>
     <string name="app_name">fliplist</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_add_edit_cat">Manage Categories</string>
@@ -37,6 +38,7 @@
     <string name="item_edit_notes_text_hint">notes</string>
     <string name="item_edit_save_text">Save</string>
     <string name="item_edit_delete_text">Delete</string>
+    <string name="item_edit_cancel_text">Cancel</string>
     <string name="item_edit_due_text">Due</string>
     <string name="item_edit_due_text_hint">due</string>
     <string name="pick_time">Time</string>

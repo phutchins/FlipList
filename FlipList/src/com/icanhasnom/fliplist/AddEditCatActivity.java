@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.ActionBar;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
@@ -29,6 +30,7 @@ import android.graphics.Color;
 import android.os.Build;
 
 public class AddEditCatActivity extends Activity {
+	Menu myMenu;
 	Category currentCategory;
 	MyCatListCustomAdapter catListDataAdapter;
 	public final static int RESULT_DELETED = 3;
@@ -47,7 +49,8 @@ public class AddEditCatActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_edit_cat_list);
-
+		final ActionBar bar = getActionBar();
+		bar.setHomeButtonEnabled(true);
 		//catList = getIntent().getExtras().getStringArray("catList");
 		
 		myListMan = new ListManager(this);
@@ -68,6 +71,7 @@ public class AddEditCatActivity extends Activity {
     	// Create blank new category to add to the list so there is an option to add new at the top
     	Category newCategory = new Category();
     	newCategory.setIsNew();
+    	
     	//newCategory.setName("+ Add New Category");
     	newCategory.setType(myListMan.defaultTypeID);
     	currentCategory = newCategory;
@@ -100,6 +104,7 @@ public class AddEditCatActivity extends Activity {
 		return myPosition;
 	}
 	public void addEditCategory(Category lc) {
+		getMenuInflater().inflate(R.menu.add_edit_cat, myMenu);
 		// TODO: Do I need to pass in the ListCategory? or just use the global currentCategory
 		setContentView(R.layout.activity_add_edit_cat);
 		boolean isNew = lc.isNew();
@@ -107,8 +112,6 @@ public class AddEditCatActivity extends Activity {
 		Log.v("addEditCategory", "isNew: " + isNew);
     	
     	if (isNew) {
-    		Button categoryDeleteButton = (Button)findViewById(R.id.category_delete_button);
-    		categoryDeleteButton.setEnabled(false);
     		isVisible = true;
     	} else {
     		isVisible = lc.isVisible();
@@ -116,7 +119,6 @@ public class AddEditCatActivity extends Activity {
 
 		
 		// Get all of the View Objects
-		CheckedTextView pageTitle = (CheckedTextView) findViewById(R.id.catNameOrNewCat);
 		EditText catName = (EditText) findViewById(R.id.cat_edit_name);
 		EditText catDesc = (EditText) findViewById(R.id.cat_edit_desc);
 		// Make this catID a hidden text field or something to store the value
@@ -135,9 +137,7 @@ public class AddEditCatActivity extends Activity {
 		Log.v("AddEditCatActivity.addEditCategory", "filterPosition: " + getFilterPosition(lc.getFilterID(), myFilterPositionMap));
 		// fill out layout variables using the currentCategory object
 		if (isNew) {
-			pageTitle.setText("New Category");
 		} else {
-			pageTitle.setText("Edit Category");
 			catName.setText(lc.getName());
 			catDesc.setText(lc.getDescription());
 			//Log.v("addEditCategory", "lc.getID(): " + lc.getID());
@@ -371,14 +371,23 @@ public class AddEditCatActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		myMenu = menu;
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.add_edit_cat, menu);
+		getMenuInflater().inflate(R.menu.add_edit_cat_list, menu);
 		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+    	case R.id.action_save_item:
+    		mySaveCatButtonAction(findViewById(android.R.id.content));
+    		break;
+    	case R.id.action_delete_item:
+    		myDeleteCatButtonAction(findViewById(android.R.id.content));
+    		break;
+    	case R.id.action_cancel_item:
+    		finish();
 		case android.R.id.home:
 			finish();
 			return true;

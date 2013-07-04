@@ -6,9 +6,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
-import com.icanhasnom.fliplist.AddEditCatActivity.MyTypeSpinnerCustomAdapter;
-
 import android.os.Bundle;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -21,6 +20,7 @@ import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -46,6 +46,8 @@ public class AddEditItemActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_edit_item);
+		final ActionBar bar = getActionBar();
+		bar.setHomeButtonEnabled(true);
 		myListMan = new ListManager(this);
 		categoryList = myListMan.getCategoryList();
 		myPositionMap = new SparseIntArray();
@@ -64,6 +66,22 @@ public class AddEditItemActivity extends Activity {
 		getMenuInflater().inflate(R.menu.add_edit_item, menu);
 		return true;
 	}
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch (item.getItemId()) {
+    	case R.id.action_save_item:
+    		itemEditSaveButtonAction(findViewById(android.R.id.content));
+    		break;
+    	case R.id.action_delete_item:
+    		itemEditDeleteButtonAction(findViewById(android.R.id.content));
+    		break;
+    	case R.id.action_cancel_item:
+    		finish();
+    	default:
+    		return super.onOptionsItemSelected(item);
+    	}
+    	return true;
+    	
+    }
 	
 	public void addCategoriesToSpinner() {
         catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.activity_add_edit_item, categoryList);

@@ -55,6 +55,10 @@ import android.widget.Toast;
 //     they could (1) go away immediately (2) stay for X time (3) Disappear after X other items are checked
 //   Items would be created into uncategorized by default
 
+// Item Edit Design
+//    Let the user add attributes one at a time (name is always there) like description, notes, etc...
+//    The type of item determines the attributes that are able to be added, or additional to the standard attributes
+
 // Filter Design (Acts as a categoryList item?)
 //   Ability to make custom filters
 
@@ -88,8 +92,6 @@ import android.widget.Toast;
 
 // BUGS & FIXES
 // TODO: Sometimes click listener for categories only works on description
-// TODO: Fix buttons on add/edit category layout. They are drooping below the bottom of the screen a bit
-
 
 // General Todo
 // TODO: Show tiny category default type on main dropdown on right (just use a different layout, and maybe adapter)
@@ -98,6 +100,7 @@ import android.widget.Toast;
 // TODO: Rename main category to List. (i.e. manage lists, not categories)
 // TODO: Add ability to add items to multiple categories. It will default to default. Must always be in one category. (default undeletable)
 // TODO: Turn Due Date RED if its past current date
+// TODO: Make each field on edit screen show up only if assigned & create + button to add each one
 
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)

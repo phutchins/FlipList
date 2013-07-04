@@ -1,183 +1,214 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".AddEditItemActivity" >
-    
-        <TextView
-        android:id="@+id/item_edit_title_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/item_edit_title_text"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-    
-        <ScrollView
-        android:id="@+id/scrollView1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/item_edit_title_textview"
-        android:layout_marginTop="12dp" >
-        
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="373dp" >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	    xmlns:tools="http://schemas.android.com/tools"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent" 
+	    android:background="#D8D8D8"
+	    android:orientation="vertical"
+	    tools:context=".AddEditItemActivity" >
 
-                <TextView
-                    android:id="@+id/item_edit_text_textview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/item_edit_name_edittext"
-                    android:text="@string/item_edit_description_text"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+	<ScrollView
+	    android:layout_width="match_parent"
+	    android:layout_height="0dp"
+	    android:layout_weight="1" >
+	    
+		<LinearLayout
+			android:layout_width="match_parent"
+		    android:layout_height="wrap_content" 
+	
+		    android:background="#D8D8D8"
+		    android:orientation="vertical"
+		    tools:context=".AddEditItemActivity" >
+		    
+		    <RelativeLayout
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_margin="@dimen/padding_medium"
+		        android:padding="@dimen/padding_small"
+		        android:background="#FFFFFF" >
+		
+		        <CheckBox
+		            android:id="@+id/item_completed_checkbox"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_alignParentLeft="true" />
+		
+		        <EditText
+		            android:id="@+id/item_edit_name_edittext"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_alignParentTop="true"
+		            android:layout_toRightOf="@+id/item_completed_checkbox"
+		            android:ems="10"
+		            android:hint="@string/item_edit_name_text_hint" >
+		
+		            <requestFocus
+		                android:layout_width="wrap_content"
+		                android:layout_height="wrap_content" />
+		
+		        </EditText>
+		
+		    </RelativeLayout>
+		
+		    <RelativeLayout
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_margin="@dimen/padding_medium"
+		        android:padding="@dimen/padding_small"
+		        android:background="#FFFFFF" >
+		
+		        <TextView
+		            android:id="@+id/item_edit_text_textview"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:text="@string/item_edit_description_text"
+		            android:textAppearance="?android:attr/textAppearanceMedium" />
+		
+		        <EditText
+		            android:id="@+id/item_edit_description_edittext"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_below="@id/item_edit_text_textview"
+		            android:ems="10"
+		            android:hint="@string/item_edit_description_text_hint" />
+		
+		    </RelativeLayout>
+		
+		    <RelativeLayout
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_margin="@dimen/padding_medium"
+		        android:padding="@dimen/padding_small"
+		        android:background="#FFFFFF" >
+		
+		        <TextView
+		            android:id="@+id/item_edit_category_text_textview"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:text="@string/item_edit_category_text"
+		            android:textAppearance="?android:attr/textAppearanceMedium" />
+		
+		        <Spinner
+		            android:id="@+id/item_edit_category_spinner"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_below="@id/item_edit_category_text_textview" />
+		        
+		    </RelativeLayout>
+		
+		    <RelativeLayout
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_margin="@dimen/padding_medium"
+		        android:background="#FFFFFF"
+		        android:padding="@dimen/padding_small" >
+		
+		        <TextView
+		            android:id="@+id/item_edit_notes_text_textview"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_alignParentLeft="true"
+		            android:text="@string/item_edit_notes_text"
+		            android:textAppearance="?android:attr/textAppearanceMedium" />
+		
+		        <EditText
+		            android:id="@+id/item_edit_notes_edittext"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_alignParentLeft="true"
+		            android:layout_alignParentRight="true"
+		            android:layout_below="@+id/item_edit_notes_text_textview"
+		            android:ems="10"
+		            android:hint="@string/item_edit_notes_text_hint"
+		            android:inputType="textMultiLine" />
+		        
+		    </RelativeLayout>
+		
+		    <RelativeLayout
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_margin="@dimen/padding_medium"
+		        android:background="#FFFFFF"
+		        android:padding="@dimen/padding_small" >
+		
+		        <TextView
+		            android:id="@+id/item_edit_due_text_textview"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_alignParentLeft="true"
+		            android:text="@string/item_edit_due_text"
+		            android:textAppearance="?android:attr/textAppearanceMedium" />
+		
+		        <Button
+		            android:id="@+id/time_edit_button"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_alignParentLeft="true"
+		            android:layout_below="@+id/item_edit_due_text_textview"
+		            android:onClick="showTimePickerDialog"
+		            android:text="@string/pick_time" />
+		
+		        <Button
+		            android:id="@+id/date_edit_button"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_alignBaseline="@+id/time_edit_button"
+		            android:layout_alignBottom="@+id/time_edit_button"
+		            android:layout_toRightOf="@+id/time_edit_button"
+		            android:onClick="showDatePickerDialog"
+		            android:text="@string/pick_date" />
+		
+		        <Button
+		            android:id="@+id/no_due_time_button"
+		            style="?android:attr/buttonStyleSmall"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_alignParentLeft="true"
+		            android:layout_below="@+id/time_edit_button"
+		            android:onClick="itemEditNoDueTimeButtonAction"
+		            android:text="@string/no_due_time_button_text" />
+		
+		        <Button
+		            android:id="@+id/no_due_date_button"
+		            style="?android:attr/buttonStyleSmall"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_below="@+id/date_edit_button"
+		            android:layout_toRightOf="@id/no_due_time_button"
+		            android:onClick="itemEditNoDueDateButtonAction"
+		            android:text="@string/no_due_date_button_text" />
+		
+		        <EditText
+		            android:id="@+id/item_edit_id_edittext"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:inputType="none"
+		            android:hint=""
+		            android:ems="10"
+		            android:visibility="gone" />
+		
+		    </RelativeLayout>
+		</LinearLayout>
+	</ScrollView>
+	    
+	<LinearLayout
+	    android:id="@+id/item_edit_bottom_layout"
+	    android:layout_width="match_parent"
+	    android:layout_height="34dp" 
+	    android:background="#FFFFFF"
+	    android:orientation="vertical" >
+		<RelativeLayout
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:background="#FFFFFF" >
 
-                <EditText
-                    android:id="@+id/item_edit_description_edittext"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/item_edit_text_textview"
-                    android:ems="10"
-                    android:hint="@string/item_edit_description_text_hint" />
+			<ImageButton
+	            android:layout_alignParentRight="true"
+	            android:id="@+id/item_edit_add_item_button"
+	            android:contentDescription="@string/add_item_button_description"
+	            android:layout_width="wrap_content"
+	            android:layout_height="match_parent"
+	            android:background="@android:drawable/ic_menu_add" />
+		</RelativeLayout>
+	</LinearLayout>
+</LinearLayout>
 
-                <TextView
-                    android:id="@+id/item_edit_notes_text_textview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/item_edit_category_spinner"
-                    android:text="@string/item_edit_notes_text"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                <EditText
-                    android:id="@+id/item_edit_notes_edittext"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_below="@+id/item_edit_notes_text_textview"
-                    android:ems="10"
-                    android:hint="@string/item_edit_notes_text_hint"
-                    android:inputType="textMultiLine" />
-
-                <TextView
-                    android:id="@+id/item_edit_due_text_textview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/item_edit_notes_edittext"
-                    android:text="@string/item_edit_due_text"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                <EditText
-                    android:id="@+id/item_edit_id_edittext"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/item_edit_name_edittext"
-                    android:layout_alignBottom="@+id/item_edit_name_edittext"
-                    android:layout_alignParentRight="true"
-                    android:ems="10"
-                    android:visibility="gone" />
-
-                <TextView
-                    android:id="@+id/item_edit_category_text_textview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/item_edit_description_edittext"
-                    android:text="@string/item_edit_category_text"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                <Spinner
-                    android:id="@+id/item_edit_category_spinner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/item_edit_category_text_textview" />
-
-                <Button
-                    android:id="@+id/time_edit_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/item_edit_due_text_textview"
-                    android:onClick="showTimePickerDialog"
-                    android:text="@string/pick_time" />
-
-                <Button
-                    android:id="@+id/date_edit_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/time_edit_button"
-                    android:layout_alignBottom="@+id/time_edit_button"
-                    android:layout_toRightOf="@+id/time_edit_button"
-                    android:onClick="showDatePickerDialog"
-                    android:text="@string/pick_date" />
-
-                <Button
-                    android:id="@+id/no_due_time_button"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/time_edit_button"
-                    android:layout_alignParentLeft="true"
-                    android:onClick="itemEditNoDueTimeButtonAction"
-                    android:text="@string/no_due_time_button_text" />
-
-                <Button
-                    android:id="@+id/no_due_date_button"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-					android:layout_below="@+id/date_edit_button"
-                    android:layout_toRightOf="@+id/item_edit_category_text_textview"
-                    android:onClick="itemEditNoDueDateButtonAction"
-                    android:text="@string/no_due_date_button_text" />
-
-                <CheckBox
-                    android:id="@+id/item_completed_checkbox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@+id/item_edit_text_textview"
-                    android:layout_alignParentLeft="true" />
-
-                <EditText
-                    android:id="@+id/item_edit_name_edittext"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_toRightOf="@+id/item_edit_due_text_textview"
-                    android:ems="10"
-                    android:hint="@string/item_edit_name_text_hint" />
-
-            </RelativeLayout>
-
-    </ScrollView>
-    
-    <Button
-        android:id="@+id/item_edit_save_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:onClick="itemEditSaveButtonAction"
-        android:text="@string/item_edit_save_text" />
-
-    <Button
-        android:id="@+id/item_edit_delete_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:onClick="itemEditDeleteButtonAction"
-        android:text="@string/item_edit_delete_text" />
-
-</RelativeLayout>
