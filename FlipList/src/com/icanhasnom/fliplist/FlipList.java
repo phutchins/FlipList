@@ -46,12 +46,20 @@ import android.widget.Toast;
 //    the right and you can edit. If nothing is selected and you swipe, it lets you add one.
 // Have save icon on the action bar, as well as the menu items in a 3dot drop down
 
+// List Design
+//   Lists would apply filters. If lists have only one category, an item could be quick added and apply the
+//   default type for that category.
+
 // Category Design
 //   In addition to having a type, categories should have the ability to choose the behavior when items are checked
 //     they could (1) go away immediately (2) stay for X time (3) Disappear after X other items are checked
+//   Items would be created into uncategorized by default
 
 // Filter Design (Acts as a categoryList item?)
 //   Ability to make custom filters
+
+// Sorting Lists (change categories to lists and have categories be adable to lists)
+//   Or should sorting just be added to the filter?
 
 // Widget Design
 // Make widget class that does only one category (for grocery list etc...)
@@ -65,34 +73,38 @@ import android.widget.Toast;
 //           maybe have it add list items by using a song finder app
 // Make type creation tool that lets you change all options and set sizes display characteristics
 
+// Event Logging
+//   Where should i log events? In the item itself? Or have a log?
 
 // Caching and Redrawing
 // TODO: Only recreate the listmap if we've written, edited or deleted a category, item or type
 // TODO: Pull all of the items at one time from the DB into a searchable hash for parsing into itemlists
 
 // Completed Items
-// TODO: Add completed field to ListItem
-// TODO: Have item list only display items if not completed & create date is older than difference create date and current time vs when to disappear
 // TODO: Add archive time? Might start taking a long time to load all items if we dont' move them somewhere else... 
 
 // UI:
 // TODO: Move the categories drop down to the action bar
 
 // BUGS & FIXES
-// TODO: Fix all back and "UP" buttons on navigation bar
+// TODO: Sometimes click listener for categories only works on description
+// TODO: Fix buttons on add/edit category layout. They are drooping below the bottom of the screen a bit
+
 
 // General Todo
-// TODO: Make cancel button on item edit and category edit (or just use up button?)
-// TODO: Set input validity check for fields (Date)
 // TODO: Show tiny category default type on main dropdown on right (just use a different layout, and maybe adapter)
-// TODO: When adding a new category, set the currentCategory to that category so it displays it when you return (or have it return the id)
-// TODO: Make completed items move to the bottom of list in order of most recently completed at the top
+// TODO: Set up defaults for item creation depending on category type (i.e. todo would have a due date default to a week away)
+// TODO: Should I allow creation of items in groups with certain filters or types? Like next 7 days, it would not necessarily show all items in that category
+// TODO: Rename main category to List. (i.e. manage lists, not categories)
+// TODO: Add ability to add items to multiple categories. It will default to default. Must always be in one category. (default undeletable)
+// TODO: Turn Due Date RED if its past current date
 
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class FlipList extends Activity {
 	public final static String EXTRA_MESSAGE = "com.icanhasnom.FlipList.MESSAGE";
 	public static final String TAG = "FlipList";
+	public final static int RESULT_DELETED = 3;
 	
 	ListManager myListMan;
 	int defaultCatID;
@@ -194,16 +206,13 @@ public class FlipList extends Activity {
             currentCategoryID = data.getIntExtra("catID", currentCategoryID);
             currentCategory = myListMan.getCategory(currentCategoryID);
             Log.v("FlipList.onActivityResult", "Got Result Code -1, currentCategoryID: " + currentCategoryID + " currentCategory.getName(): " + currentCategory.getName());
+    	} else if (requestCode == 1 && resultCode == RESULT_DELETED) {
+    		loadPref();
     	} else if (requestCode == 1 && resultCode == RESULT_CANCELED) {
-
-    		Integer deletedCatID = data.getIntExtra("delCatID", 0);
-    		if (defaultCatID == deletedCatID) {
-    			defaultCatID = 0;
-    		}
-    		// TODO: change the preferences to an existing category if we deleted the default
-    		// TODO: Should we be able to have no categories at all? If no default, display empty dropdown, etc...?
+    		// Do nothing
     	}
     	addItemsOnSpinner();
+    	// TODO: Do i need this?
     	//addItemsOnList();
     }
        
@@ -211,12 +220,12 @@ public class FlipList extends Activity {
     	mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         defaultCatID = Integer.parseInt(mySharedPreferences.getString(getString(R.string.default_category_key), getString(R.integer.default_category_default)));
         Log.v("FlipList.loadPref", "defaultCatID: " + defaultCatID);
-        //removeCompletedItems = mySharedPreferences.getBoolean(getString(R.string.remove_completed_key), getResources().getBoolean(R.integer.remove_completed_default));
+
         prefShowItemDescriptionGlobal = mySharedPreferences.getBoolean(getString(R.string.show_description_global_key), getResources().getBoolean(R.bool.show_description_global_default));
         prefShowDueDateGlobal = mySharedPreferences.getBoolean(getString(R.string.show_due_date_global_key), getResources().getBoolean(R.bool.show_due_date_global_default));
-        //prefRemoveCompletedItems = mySharedPreferences.getInt(getString(R.string.remove_completed_key), getResources().getInteger(R.integer.remove_completed_default));
-        //prefRemoveCompletedItemsDelay = mySharedPreferences.getInt(getString(R.string.remove_completed_delay_key), getResources().getInteger(R.integer.remove_completed_delay_default));
-        currentCategoryID = mySharedPreferences.getInt("current_category_id", defaultCatID);
+
+        // TODO: Create sanity check to ensure that default category exists
+        //defaultCatID = mySharedPreferences.getInt("current_category_id", 0);
         if (currentCategoryID == null) currentCategoryID = defaultCatID;
         Log.v("FlipList.loadPref", "currentCategoryID: " + currentCategoryID);
         currentCategory = myListMan.getCategory(currentCategoryID);
@@ -247,6 +256,12 @@ public class FlipList extends Activity {
        } else {
 	       catSpinner = (Spinner) findViewById(R.id.catSpinner);
 	       int catID = currentCategory.getID();
+	       
+	       // Get the default type of category
+	       //Category myCat = myListMan.getCategory(catID);
+	       // myTypeID = myCat.getType();
+	       //ItemType myType = myListMan.getItemType(myTypeID);
+	       
 	       myListMan.addItem(catID, name);
 	       addItemsOnList();
 	       editText.setText("");
@@ -299,9 +314,8 @@ public class FlipList extends Activity {
 		Intent addEditItem = new Intent(this, AddEditItemActivity.class);
 		Bundle b = new Bundle();
 		b.putSerializable("item", item);
-		//Log.v("FlipList.editListItem", "Item Name: " + item.getName());
 		addEditItem.putExtras(b);
-		this.startActivity(addEditItem);
+		this.startActivityForResult(addEditItem, 1);
     }
 
     private class MyCatSpinnerCustomAdapter extends ArrayAdapter<Category> {
@@ -309,7 +323,6 @@ public class FlipList extends Activity {
     	private ArrayList<Category> categoryList;
     	private Activity activity;
     	LayoutInflater inflater;
-    	//Map<Integer, Integer> myPositionMap = new HashMap<Integer, Integer>();
     	SparseIntArray myPositionMap;
     	 
     	public MyCatSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<Category> objects) {
@@ -384,9 +397,14 @@ public class FlipList extends Activity {
     					CheckBox cb = (CheckBox) v ;  
     					Item item = (Item) cb.getTag();
     					String itemName = item.getName();
-    					Toast.makeText(getApplicationContext(), "Completed: " + itemName, Toast.LENGTH_LONG).show();
-    					myListMan.completeItem(item);
-    					addItemsOnList();
+    					if (item.isCompleted()) {
+    						cb.setChecked(false);
+    						myListMan.unCompleteItem(item);
+    					} else {
+	    					//Toast.makeText(getApplicationContext(), "Completed: " + itemName, Toast.LENGTH_LONG).show();
+	    					myListMan.completeItem(item);
+	    					addItemsOnList();
+    					}
     				}  
     			});  
     		} else {

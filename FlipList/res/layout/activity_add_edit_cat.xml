@@ -130,8 +130,17 @@
         android:id="@+id/category_edit_filter_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/cat_visible_check_box"
+        android:layout_toRightOf="@+id/cat_filter_text" />
+
+    <TextView
+        android:id="@+id/cat_filter_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/category_edit_filter_spinner"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/cat_visible_check_box" />
+        android:text="@string/cat_filter_text"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
         </RelativeLayout>
     </ScrollView>

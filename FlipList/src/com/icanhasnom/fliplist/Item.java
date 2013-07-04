@@ -31,6 +31,13 @@ public class Item implements Serializable {
     public boolean isCompleted = false;
     public String completedDate = null;
     
+	SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+	SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.US);
+	SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+	SimpleDateFormat sdfDateTimePretty = new SimpleDateFormat("MMMM dd, hh:mm aa", Locale.US);
+	SimpleDateFormat sdfTimePretty = new SimpleDateFormat("hh:mm aa", Locale.US);
+	SimpleDateFormat sdfDatePretty = new SimpleDateFormat("MMMM dd", Locale.US);
+    
     // Constructors
     // TODO: Do i need this many?
     public Item() {
@@ -38,7 +45,6 @@ public class Item implements Serializable {
 	    createDate = getCurrentDateTime();
     }
     public String getCurrentDateTime() {
-	    SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 	    String currentDateTime = sdfDateTime.format(new Date());
 	    return currentDateTime;
     }
@@ -126,6 +132,7 @@ public class Item implements Serializable {
     	if (completed == 1) {
     		isCompleted = true;
     		completedDate = getCurrentDateTime();
+    		Log.v("Item.setCompleted", "Setting " + name + " to completed with completedDate: " + completedDate);
     	} else {
     		isCompleted = false;
     		completedDate = null;
@@ -133,9 +140,10 @@ public class Item implements Serializable {
     }
     public Boolean setCompletedDate(String cd) {
     	Boolean success = false;
-    	if (isDateTimeValid(cd)) {
+    	if (cd != null && isDateTimeValid(cd)) {
     		completedDate = cd;
     		success = true;
+    		Log.v("Item.setCompletedDate: ", "CompletedDate: " + cd);
     	}
     	return success;
     }
@@ -189,13 +197,12 @@ public class Item implements Serializable {
 			e1.printStackTrace();
 		}
     	Calendar newDateCal = Calendar.getInstance();
-    	SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     	if (dd != null && isDateValid(dd)) {
 	    	try {
 				newDateCal.setTime(sdfDate.parse(dd));
 				Log.v("setDueDate", "New DueDate: " + sdfDateTime.format(newDateCal.getTime()));
 				curDateCal.set(newDateCal.get(Calendar.YEAR),  newDateCal.get(Calendar.MONTH), newDateCal.get(Calendar.DAY_OF_MONTH));
-				dueDateTime = curDateCal.getTime().toString();
+				dueDateTime = sdfDateTime.format(newDateCal.getTime());
 				Log.v("setDueDate", "dueDateTime String: " + dueDateTime);
 				hasDueDateBool = true;
 				success = true;
@@ -208,14 +215,13 @@ public class Item implements Serializable {
     public Boolean setDueTime(String dt) {
     	Calendar curTimeCal = Calendar.getInstance();
     	Boolean success = false;
-    	SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+
     	try {
 			curTimeCal.setTime(sdfDateTime.parse(dueDateTime));
 		} catch (ParseException e1) {
 			e1.printStackTrace();
 		}
     	Calendar newTimeCal = Calendar.getInstance();
-    	SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.US);
     	if (dt != null && isTimeValid(dt)) {
 	    	try {
 
@@ -223,7 +229,7 @@ public class Item implements Serializable {
 				Log.v("setDueTime", "New DueTime: " + sdfDateTime.format(newTimeCal.getTime()));
 				curTimeCal.set(Calendar.HOUR_OF_DAY, newTimeCal.get(Calendar.HOUR_OF_DAY));
 				curTimeCal.set(Calendar.MINUTE, newTimeCal.get(Calendar.MINUTE));
-				dueDateTime = curTimeCal.getTime().toString();
+				dueDateTime = sdfDateTime.format(newTimeCal.getTime());
 				Log.v("setDueTime", "dueDateTime String: " + dueDateTime);
 				hasDueTimeBool = true;
 				success = true;
@@ -287,7 +293,6 @@ public class Item implements Serializable {
     public String getDueTimePretty() {
     	String timeStr = "Set Time";
     	if (hasDueTimeBool && dueDateTime != null) {
-    		SimpleDateFormat sdfTimePretty = new SimpleDateFormat("hh:mm aa", Locale.US);
     		timeStr = sdfTimePretty.format(stringToDate(dueDateTime));
     	}
 		return timeStr;
@@ -304,7 +309,6 @@ public class Item implements Serializable {
     	String dateStr = "Set Date";
     	Log.v("ListItem.getDueDatePretty", "hasDueDateBool: " + hasDueDateBool + " hasDueTimeBool: " + hasDueTimeBool + " dueDate: " + dueDateTime);
     	if (hasDueDateBool && dueDateTime != null) {
-    		SimpleDateFormat sdfDatePretty = new SimpleDateFormat("MMMM dd", Locale.US);
     		dateStr = sdfDatePretty.format(stringToDate(dueDateTime));
     	}
     	return dateStr;
@@ -312,7 +316,6 @@ public class Item implements Serializable {
     public String getDueDate() {
     	String dateStr = null;
     	if (hasDueDateBool) {
-    		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     		dateStr = sdfDate.format(stringToDate(dueDateTime));
     	}
     	return dateStr;
@@ -323,12 +326,10 @@ public class Item implements Serializable {
     
     // Date Methods
     public String dateToString(Date date) {
-    	SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
     	String dateStr = sdfDateTime.format(date);
     	return dateStr;
     }
     public boolean isDateTimeValid(String dateTimeToValidate) {
-    	SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
     	sdfDateTime.setLenient(false);
     	
     	try {
@@ -341,9 +342,7 @@ public class Item implements Serializable {
     	return true;
     }
     public boolean isDateValid(String dateToValidate) {
-    	SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     	sdfDate.setLenient(false);
-    	
     	try {
     		sdfDate.parse(dateToValidate);
     		Log.v("Date Validator", "Date: " + dateToValidate + " is valid.");
@@ -354,7 +353,6 @@ public class Item implements Serializable {
     	return true;
     }
     public boolean isTimeValid(String timeToValidate) {
-    	SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.US);
     	sdfTime.setLenient(false);
     	
     	try {
@@ -368,7 +366,6 @@ public class Item implements Serializable {
     }
     // TODO: Set time zone somewhere ?
     public Date stringToDate(String dateStr) {
-    	SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
     	Date date = null;
 		try {
 			date = sdfDateTime.parse(dateStr);
@@ -378,7 +375,6 @@ public class Item implements Serializable {
     	return date;
     }
     public String dateToStringPretty(Date date) {
-    	SimpleDateFormat sdfDateTimePretty = new SimpleDateFormat("MMMM dd, hh:mm aa", Locale.US);
     	String dateStr = sdfDateTimePretty.format(date);
     	return dateStr;
     }

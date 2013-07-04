@@ -37,21 +37,23 @@ public class AddEditItemActivity extends Activity {
 	ListManager myListMan;
     Spinner itemCatSpinner;
     MyCatSpinnerCustomAdapter catSpinnerDataAdapter;
-	SparseIntArray myPositionMap;
+    SparseIntArray myPositionMap;
+
 	ArrayList<Category> categoryList;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_edit_item);
-		myPositionMap = new SparseIntArray();
 		myListMan = new ListManager(this);
 		categoryList = myListMan.getCategoryList();
-		buildIndex(categoryList);
+		myPositionMap = new SparseIntArray();
+		myPositionMap = buildIndex(categoryList);
+		
 		Bundle b = this.getIntent().getExtras();
 		if(b != null) {
 			currentItem = (Item) b.getSerializable("item");
-			Log.v("AddEditItemActivity.onCreate", "Getting Serialized Item: " + currentItem.getName());
 		}
 		editListItem();
 	}
@@ -64,25 +66,22 @@ public class AddEditItemActivity extends Activity {
 	}
 	
 	public void addCategoriesToSpinner() {
-		
         catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.activity_add_edit_item, categoryList);
         catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     	itemCatSpinner = (Spinner) findViewById(R.id.item_edit_category_spinner);
         itemCatSpinner.setAdapter(catSpinnerDataAdapter);
 	}
-	public void buildIndex(ArrayList<Category> myCatList) {
+	public SparseIntArray buildIndex(ArrayList<Category> myCatList) {
 		Integer position = 0;
+		SparseIntArray myPositionMap = new SparseIntArray();
 		for (Category myCat : myCatList) {
 			myPositionMap.put(myCat.getID(), position);
 			position++;
 		}
+		return myPositionMap;
 	}
-	public int getPosition(int myListCategoryID) {
-		//Log.v("AddEditItemActivity.MyCatspinnerCustomAdapter (1)", "myPositionMap: " + myPositionMap.toString());
-		//Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "getPosition.myListCategoryID: " + myListCategoryID);
+	public int getPosition(int myListCategoryID, SparseIntArray myPositionMap) {
 		int myPosition = myPositionMap.get(myListCategoryID);
-		//Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "getPosition.myPosition: " + myPosition);
-		//Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "myPosition(0): " + myPositionMap.get(0) + " myPosition(1): " + myPositionMap.get(1) + " myPosition.get(2): " + myPositionMap.get(2));
 		return myPosition;
 	}
 	
@@ -120,7 +119,7 @@ public class AddEditItemActivity extends Activity {
         
         addCategoriesToSpinner();
         
-        int spinnerPosition = getPosition(currentItem.getPrimaryCat());
+        int spinnerPosition = getPosition(currentItem.getPrimaryCat(), myPositionMap);
         itemCatSpinner.setSelection(spinnerPosition);
         
 		Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "myPosition(0): " + myPositionMap.get(0) + " myPosition(1): " + myPositionMap.get(1) + " myPosition.get(2): " + myPositionMap.get(2));
@@ -175,8 +174,13 @@ public class AddEditItemActivity extends Activity {
     	//myListMan.updateItem(new ListItem(itemCategoryID, itemID, itemName, itemDesc));
     	myListMan.updateItem(myItem);
     	
-		Intent flipList = new Intent(this, FlipList.class);
-		this.startActivity(flipList);
+    	Intent intent = new Intent();
+    	intent.putExtra("catID", itemCategoryID);
+    	setResult(RESULT_OK, intent);
+    	super.finish();
+    	
+		//Intent flipList = new Intent(this, FlipList.class);
+		//this.startActivity(flipList);
     }
 	public void itemEditNoDueTimeButtonAction(View view) {
 		currentItem.setHasDueTime(false);

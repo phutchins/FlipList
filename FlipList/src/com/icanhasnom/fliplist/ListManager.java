@@ -110,7 +110,7 @@ public class ListManager implements Serializable {
         buildItemListMap();
         return myItem;
     }
-    public void addCategoryType(ItemType newCatType) {
+    public void addCategoryType(ItemTypeToDo newCatType) {
     	// Check if type exists
     	// Add type to db if doesn't exist
     	// Add type to typeList
@@ -135,6 +135,10 @@ public class ListManager implements Serializable {
     }
     public void completeItem(Item myItem) {
         myItem.setCompleted(true);
+        db.updateItem(myItem);
+    }
+    public void unCompleteItem(Item myItem) {
+        myItem.setCompleted(false);
         db.updateItem(myItem);
     }
     
@@ -185,8 +189,8 @@ public class ListManager implements Serializable {
         myItemArray = myItemArrayList.toArray(myItemArray);
         return myItemArray;
     }
-    public ArrayList<ItemType> getCategoryTypesList() {
-    	ArrayList<ItemType> categoryTypesList = db.getCategoryTypesList();
+    public ArrayList<ItemTypeToDo> getCategoryTypesList() {
+    	ArrayList<ItemTypeToDo> categoryTypesList = db.getCategoryTypesList();
     	return categoryTypesList;
     }
     public ArrayList<Filter> getFilterList() {
@@ -195,8 +199,8 @@ public class ListManager implements Serializable {
     }
 
     // Retrieving Objects
-    public ItemType getCategoryType(int typeID) {
-    	ItemType catType = db.getCategoryType(typeID);
+    public ItemTypeToDo getCategoryType(int typeID) {
+    	ItemTypeToDo catType = db.getCategoryType(typeID);
     	return catType;
     }
     public Category getCategory(int catID) {

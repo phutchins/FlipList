@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,9 +31,12 @@ import android.os.Build;
 public class AddEditCatActivity extends Activity {
 	Category currentCategory;
 	MyCatListCustomAdapter catListDataAdapter;
+	public final static int RESULT_DELETED = 3;
 
 	ListManager myListMan;
 	ArrayList<Category> categoryList;
+	ArrayList<Filter> filterList;
+	SparseIntArray myFilterPositionMap;
 	
 	Spinner typeSpinner;
 	Spinner filterSpinner;
@@ -48,7 +52,9 @@ public class AddEditCatActivity extends Activity {
 		
 		myListMan = new ListManager(this);
         categoryList = myListMan.getCategoryListAll();
-		
+		filterList = myListMan.getFilterList();
+		myFilterPositionMap = new SparseIntArray();
+		myFilterPositionMap = buildFilterIndex(filterList);
 		addItemsOnEditList();
 		
 		// Show the Up button in the action bar.
@@ -67,6 +73,32 @@ public class AddEditCatActivity extends Activity {
     	currentCategory = newCategory;
     	addEditCategory(newCategory);
 	}
+	public SparseIntArray buildIndex(ArrayList<Category> myCatList) {
+		Integer position = 0;
+		SparseIntArray myPositionMap = new SparseIntArray();
+		for (Category myCat : myCatList) {
+			myPositionMap.put(myCat.getID(), position);
+			position++;
+		}
+		return myPositionMap;
+	}
+	public int getPosition(int myListCategoryID, SparseIntArray positionMap) {
+		int myPosition = positionMap.get(myListCategoryID);
+		return myPosition;
+	}
+	public SparseIntArray buildFilterIndex(ArrayList<Filter> myFilterList) {
+		Integer position = 0;
+		SparseIntArray positionMap = new SparseIntArray();
+		for (Filter myFilter : myFilterList) {
+			positionMap.put(myFilter.getID(), position);
+			position++;
+		}
+		return positionMap;
+	}
+	public int getFilterPosition(int myFilterID, SparseIntArray positionMap) {
+		int myPosition = myFilterPositionMap.get(myFilterID);
+		return myPosition;
+	}
 	public void addEditCategory(Category lc) {
 		// TODO: Do I need to pass in the ListCategory? or just use the global currentCategory
 		setContentView(R.layout.activity_add_edit_cat);
@@ -81,6 +113,7 @@ public class AddEditCatActivity extends Activity {
     	} else {
     		isVisible = lc.isVisible();
     	}
+
 		
 		// Get all of the View Objects
 		CheckedTextView pageTitle = (CheckedTextView) findViewById(R.id.catNameOrNewCat);
@@ -97,8 +130,9 @@ public class AddEditCatActivity extends Activity {
 		addTypesToSpinner();
 		typeSpinner.setSelection(lc.getType());
 		addFiltersToSpinner();
-		filterSpinner.setSelection(lc.getFilterID());
-		
+		Log.v("AddEditCatActivity.addEditCategory", "lc.getFilterID(): " + lc.getFilterID());
+		filterSpinner.setSelection(getFilterPosition(lc.getFilterID(), myFilterPositionMap));
+		Log.v("AddEditCatActivity.addEditCategory", "filterPosition: " + getFilterPosition(lc.getFilterID(), myFilterPositionMap));
 		// fill out layout variables using the currentCategory object
 		if (isNew) {
 			pageTitle.setText("New Category");
@@ -114,9 +148,9 @@ public class AddEditCatActivity extends Activity {
 	}
 	
     public void addTypesToSpinner() {
-        ArrayList<ItemType> myTypeList = myListMan.getCategoryTypesList();
+        ArrayList<ItemTypeToDo> myTypeList = myListMan.getCategoryTypesList();
         typeSpinner = (Spinner) findViewById(R.id.cat_type_spinner);
-        ArrayAdapter<ItemType> myTypeAdapter = new MyTypeSpinnerCustomAdapter(this, R.layout.activity_add_edit_cat, myTypeList);
+        ArrayAdapter<ItemTypeToDo> myTypeAdapter = new MyTypeSpinnerCustomAdapter(this, R.layout.activity_add_edit_cat, myTypeList);
         myTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeSpinner.setAdapter(myTypeAdapter);
     }
@@ -128,12 +162,12 @@ public class AddEditCatActivity extends Activity {
         filterSpinner.setAdapter(myFilterAdapter);
     }
     
-    public class MyTypeSpinnerCustomAdapter extends ArrayAdapter<ItemType>{
+    public class MyTypeSpinnerCustomAdapter extends ArrayAdapter<ItemTypeToDo>{
     	private Activity activity;
-    	private ArrayList<ItemType> myTypes;
+    	private ArrayList<ItemTypeToDo> myTypes;
     	LayoutInflater inflater;
     	
-    	public MyTypeSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<ItemType> myTypes) {
+    	public MyTypeSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<ItemTypeToDo> myTypes) {
     		super(activitySpinner, textViewResourceId, myTypes);
     		this.activity = activitySpinner;
     		this.myTypes = myTypes;
@@ -145,7 +179,7 @@ public class AddEditCatActivity extends Activity {
     	public int getCount() {
     		return myTypes.size();
     	}
-    	public ItemType getItem(int position) {
+    	public ItemTypeToDo getItem(int position) {
     		return myTypes.get(position);
     	}
     	public long getItemId(int position) {
@@ -170,7 +204,7 @@ public class AddEditCatActivity extends Activity {
     			holder = (ViewHolder) convertView.getTag();
     		}
     		//TextView label = (TextView) convertView.findViewById(R.id.type_spinner_text);
-    		ItemType type = myTypes.get(position);
+    		ItemTypeToDo type = myTypes.get(position);
     		holder.typeName.setTextColor(Color.BLACK);
     		holder.typeName.setText(myTypes.get(position).getName());
     		holder.typeName.setTag(type);
@@ -346,15 +380,6 @@ public class AddEditCatActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			// This ID represents the Home or Up button. In the case of this
-			// activity, the Up button is shown. Use NavUtils to allow users
-			// to navigate up one level in the application structure. For
-			// more details, see the Navigation pattern on Android Design:
-			//
-			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
-			//
-			// TODO: Fix this - read page above to make this go to fliplist activity
-			//NavUtils.navigateUpFromSameTask(this);
 			finish();
 			return true;
 		}
@@ -376,15 +401,12 @@ public class AddEditCatActivity extends Activity {
 		// TODO: return result saying category deleted and choose a sane default category in FlipList
 		Intent intent = new Intent();
 		intent.putExtra("delCatID", categoryID);
-		setResult(RESULT_CANCELED, intent);
+		setResult(RESULT_DELETED, intent);
 		super.finish();
-		//Intent flipList = new Intent(this, FlipList.class);
-		//this.startActivity(flipList);
 	}
     public void mySaveCatButtonAction(View view) {
-    	ItemType categoryType;
+    	ItemTypeToDo categoryType;
     	
-    	// Make this a hidden field
     	EditText editCategoryIdNumber = (EditText) findViewById(R.id.cat_edit_id);
     	EditText editCategoryNameText = (EditText) findViewById(R.id.cat_edit_name);
     	String categoryName = editCategoryNameText.getText().toString();
@@ -396,41 +418,27 @@ public class AddEditCatActivity extends Activity {
     	Spinner filterSpinner = (Spinner) findViewById(R.id.category_edit_filter_spinner);
     	CheckBox visibleCheckBox = (CheckBox) findViewById(R.id.cat_visible_check_box);
     	
-    	categoryType = (ItemType) typeSpinner.getItemAtPosition(typeSpinner.getSelectedItemPosition());
+    	categoryType = (ItemTypeToDo) typeSpinner.getItemAtPosition(typeSpinner.getSelectedItemPosition());
     	int categoryTypeID = categoryType.getID();
     	boolean isVisible = visibleCheckBox.isChecked();
     	int isVisibleInt = (isVisible) ? 1 : 0;
-
-    	//Log.v("MySaveCatButtonAction", "categoryName: " + categoryName);
-    	//Log.v("MySaveCatButtonAction", "categoryDesc: " + categoryDesc);
-    	//Log.v("MySaveCatButtonAction", "categoryTypeID: " + categoryTypeID);
-    	//Log.v("MySaveCatButtonAction", "categoryVisible: " + isVisible + ", " + isVisibleInt);
     	
     	Category myCat = new Category(categoryName, categoryDesc, categoryTypeID, isVisibleInt);
-    	Log.v("AddEditCatActivity.mySaveCatAction", "filterSpinner.getSelectedItemPosition(): " + filterSpinner.getSelectedItemPosition());
     	myCat.setFilterID(filterSpinner.getSelectedItemPosition());
 
     	if (currentCategory.isNew()) {
-    		//Log.v("AddEditCatActivity", "Adding new category " + currentCategory.getName());
     		int newCatID = myListMan.addCategory(myCat);
     		myCat.setID(newCatID);
     	} else {
     		int categoryID = Integer.parseInt(editCategoryIdNumber.getText().toString());
     		myCat.setID(categoryID);
-        	//Log.v("MySaveCatButtonAction", "categoryID: " + categoryID);
-    		//Log.v("AddEditCatActivity", "Updating category " + currentCategory.getName());
     		myListMan.updateObjCategory(myCat);
     	}
     	
     	Intent intent = new Intent();
     	intent.putExtra("catID", myCat.getID());
-    	Log.v("AddEditCatActivity.mySaveButtonAction", "myNewCat.getID(): " + myCat.getID());
     	setResult(RESULT_OK, intent);
     	super.finish();
-		//Intent flipList = new Intent(this, FlipList.class);
-		//Bundle flipBundle = new Bundle();
-		//flipBundle.putInt("newCatID", myNewCat.getID());
-		//this.startActivity(flipList);
     }
 
 }

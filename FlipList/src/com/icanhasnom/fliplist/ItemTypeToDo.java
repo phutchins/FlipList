@@ -1,13 +1,13 @@
 package com.icanhasnom.fliplist;
 
-public class ItemType {
+public class ItemTypeToDo {
 	int typeID;
 	String typeName;
 	String typeDescription;
-	public ItemType() {
+	public ItemTypeToDo() {
 		
 	}
-	public ItemType(int id, String name, String desc) {
+	public ItemTypeToDo(int id, String name, String desc) {
 		typeID = id;
 		typeName = name;
 		typeDescription = desc;
