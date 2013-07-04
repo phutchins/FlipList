@@ -1,15 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".AddEditItemActivity" >
+    
+    <ScrollView
         android:id="@+id/scrollView1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/cat_visible_check_box"
+
         android:layout_marginTop="12dp" >
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="463dp"
+            android:layout_height="492dp"
             android:orientation="vertical" >
             
             
@@ -60,14 +70,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/checkedTextView3" />
 
-    <Button
-        android:id="@+id/cat_save_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:onClick="mySaveCatButtonAction"
-        android:text="@string/save_button_text" />
+
 
     <CheckedTextView
         android:id="@+id/checkedTextView1"
@@ -117,14 +120,7 @@
         android:layout_below="@+id/cat_type_spinner"
         android:text="@string/cat_visible_check_box_text" />
 
-    <Button
-        android:id="@+id/category_delete_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:onClick="myDeleteCatButtonAction"
-        android:text="@string/cat_delete_button_text" />
+
 
     <Spinner
         android:id="@+id/category_edit_filter_spinner"
@@ -137,12 +133,32 @@
         android:id="@+id/cat_filter_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/category_edit_filter_spinner"
-        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/checkedTextView1"
+        android:layout_alignTop="@+id/category_edit_filter_spinner"
         android:text="@string/cat_filter_text"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
         </RelativeLayout>
+        
+        
     </ScrollView>
-
-
+    
+    <Button
+        android:id="@+id/category_delete_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:onClick="myDeleteCatButtonAction"
+        android:text="@string/cat_delete_button_text" />
+    
+        <Button
+        android:id="@+id/cat_save_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:onClick="mySaveCatButtonAction"
+        android:text="@string/save_button_text" />
+    
+</RelativeLayout>
