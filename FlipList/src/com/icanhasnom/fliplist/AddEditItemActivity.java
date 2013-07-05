@@ -49,7 +49,7 @@ public class AddEditItemActivity extends Activity {
 		final ActionBar bar = getActionBar();
 		bar.setHomeButtonEnabled(true);
 		myListMan = new ListManager(this);
-		categoryList = myListMan.getCategoryList();
+		categoryList = myListMan.getCategories();
 		myPositionMap = new SparseIntArray();
 		myPositionMap = buildIndex(categoryList);
 		

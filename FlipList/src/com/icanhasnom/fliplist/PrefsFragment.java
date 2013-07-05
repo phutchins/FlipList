@@ -45,7 +45,7 @@ public class PrefsFragment extends PreferenceFragment implements TabListener {
 	public void createDefaultCategory() {
 		ListPreference defaultCategory = (ListPreference)findPreference("default_category");
 		ListManager myListMan = new ListManager(getActivity());
-		ArrayList<Category> categoryList = myListMan.getCategoryList();
+		ArrayList<Category> categoryList = myListMan.getCategories();
 		List<String> catListStrings = new ArrayList<String>();
 		List<String> catListValuesStrings = new ArrayList<String>();
 		

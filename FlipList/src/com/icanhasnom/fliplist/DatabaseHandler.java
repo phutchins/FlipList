@@ -629,10 +629,39 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		// Select All Query
 		//String selectQuery = "SELECT * FROM " + TABLE_CATEGORIES;
 		String isVisible = "1";
+		String noFilter = "0";
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
-				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE, KEY_CAT_FILTER }, KEY_CAT_VISIBLE + "=?",
-				new String[] { isVisible }, null, null, null, null);
+				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE, KEY_CAT_FILTER }, KEY_CAT_VISIBLE + "=?"
+				+ " AND " + KEY_CAT_FILTER + "=?",
+				new String[] { isVisible, noFilter }, null, null, null, null);
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				Category category = new Category();
+				category.setID(Integer.parseInt(cursor.getString(0)));
+				category.setName(cursor.getString(1));
+				category.setDescription(cursor.getString(2));
+				category.setType(Integer.parseInt(cursor.getString(3)));
+				category.setVisible(Integer.parseInt(cursor.getString(4)));
+				category.setFilterID(cursor.getInt(5));
+				// Adding category to list
+				categoryList.add(category);
+			} while (cursor.moveToNext());
+		}
+		return categoryList;
+	}
+	public ArrayList<Category> getLists() {
+		ArrayList<Category> categoryList = new ArrayList<Category>();
+		// Select All Query
+		//String selectQuery = "SELECT * FROM " + TABLE_CATEGORIES;
+		String isVisible = "1";
+		String noFilter = "0";
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
+				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE, KEY_CAT_FILTER }, KEY_CAT_VISIBLE + "=?"
+				+ " AND " + KEY_CAT_FILTER + ">?",
+				new String[] { isVisible, noFilter }, null, null, null, null);
 		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {

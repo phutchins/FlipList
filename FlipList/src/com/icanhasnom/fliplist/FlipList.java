@@ -1,5 +1,7 @@
 package com.icanhasnom.fliplist;
 
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import android.annotation.TargetApi;
@@ -10,6 +12,11 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
@@ -104,7 +111,7 @@ import android.widget.Toast;
 
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class FlipList extends Activity {
+public class FlipList extends FragmentActivity {
 	public final static String EXTRA_MESSAGE = "com.icanhasnom.FlipList.MESSAGE";
 	public static final String TAG = "FlipList";
 	public final static int RESULT_DELETED = 3;
@@ -137,10 +144,22 @@ public class FlipList extends Activity {
     EditText editText;
     DatabaseHandler db;
     
+    MyFragmentPagerAdapter mAdapter;
+    ViewPager mPager;
+    static final Integer ITEMS = 3;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        
+        
+        setContentView(R.layout.fragment_pager);
+        mAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager.setAdapter(mAdapter);
+        
+        
+        //setContentView(R.layout.activity_item_view);
 		myPositionMap = new SparseIntArray();
 		myListMan = new ListManager(this);
 		//Log.v("FlipList.onCreate", "1) this: " + this);
@@ -157,11 +176,35 @@ public class FlipList extends Activity {
     		currentItemList = myListMan.getItemList(defaultCatID);
         }
         
-    	catSpinner = (Spinner) findViewById(R.id.catSpinner);
-    	catSpinner.setOnItemSelectedListener(new SpinnerActivity());
+    	//catSpinner = (Spinner) findViewById(R.id.catSpinner);
+    	//catSpinner.setOnItemSelectedListener(new SpinnerActivity());
 		
-        addItemsOnSpinner();
-        addItemsOnList();
+        //addItemsOnSpinner();
+        //addItemsOnList();
+    }
+    
+    public static class MyFragmentPagerAdapter extends FragmentPagerAdapter {
+		public MyFragmentPagerAdapter(android.support.v4.app.FragmentManager fragmentManager) {
+            super(fragmentManager);
+        }
+ 
+        @Override
+        public int getCount() {
+            return ITEMS;
+        }
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+            case 0:
+                return CategoryViewFragment.init(position);
+            case 1:
+                return ListViewFragment.init(position);
+            case 2:
+            	return FilterViewFragment.init(position);
+            default:
+                return ListViewFragment.init(position);
+            }
+        }
     }
     
     public void restoreState(Bundle savedInstanceState) {
@@ -271,7 +314,7 @@ public class FlipList extends Activity {
        }
     }
     public void addItemsOnSpinner() {
-        catList = myListMan.getCategoryList();
+        catList = myListMan.getCategories();
         buildIndex(catList);
         catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.activity_main_cat_spinner, catList);
         catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

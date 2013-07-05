@@ -153,7 +153,7 @@ public class ListManager implements Serializable {
     }
     
     // Retrieving Lists
-    public ArrayList<Category> getCategoryList() {
+    public ArrayList<Category> getCategories() {
     	// TODO: Add a variable to save the category list
     	//       check if the catlist exists (maybe see if its been updated recently?)
     	//       and populate from the DB if it doesn't exist or has been updated
@@ -162,10 +162,15 @@ public class ListManager implements Serializable {
     	ArrayList<Category> retCatListObjs = db.getCategories();
         return retCatListObjs;
     }
+    public ArrayList<Category> getLists() {
+    	ArrayList<Category> retCatListObjs = db.getLists();
+        return retCatListObjs;
+    }
     public ArrayList<Category> getCategoryListAll() {
     	ArrayList<Category> retCatListObjs = db.getAllCategories();
         return retCatListObjs;
     }
+
     public String[] getCategoryListStrings() {
     	ArrayList<Category> retCatList = db.getAllCategories();
     	String[] catListStrings = new String[retCatList.size()];

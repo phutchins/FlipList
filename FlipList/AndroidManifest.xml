@@ -18,7 +18,6 @@
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -27,7 +26,7 @@
             android:label="@string/title_activity_save_cat" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.my.app.MainActivity" />
+                android:value="com.icanhasnom.fliplist.Fliplist" />
         </activity>
         <activity
             android:name="com.icanhasnom.fliplist.AddEditCatActivity"
