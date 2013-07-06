@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="add_edit_cat_list_title">Edit Categories</string>
+    <string name="category_view_fragment_title">Categories</string>
+    <string name="list_view_fragment_title">Lists</string>
+    <string name="item_view_activity_title">Items</string>
+    <string name="filter_view_fragment_title">Filters</string>
     <string name="add_item_button_description">Add Item</string>
     <string name="app_name">fliplist</string>
     <string name="menu_settings">Settings</string>

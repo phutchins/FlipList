@@ -78,7 +78,9 @@ public class ItemListActivity extends Activity {
 		myListItems = myItemList.getListItems();
     	itemListDataAdapter = new MyCustomAdapter(this, R.layout.activity_item_list_layout, myListItems);
     	ListView listView = (ListView) findViewById(R.id.itemList);
+    	TextView itemListTitle = (TextView) findViewById(R.id.item_view_activity_title);
     	listView.setAdapter(itemListDataAdapter);
+    	itemListTitle.setText(currentCategory.getName());
     	
     	listView.setOnItemClickListener(new OnItemClickListener() {
     		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
