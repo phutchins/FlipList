@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-
     <string name="add_item_button_description">Add Item</string>
     <string name="app_name">fliplist</string>
     <string name="menu_settings">Settings</string>
@@ -61,5 +60,6 @@
     <string name="test_string1">testing</string>
     <string name="test_string2">yeah</string>
     <string name="cat_filter_text">Filter</string>
+    <string name="title_activity_add_edit_cat_list">AddEditCatListActivity</string>
 
 </resources>

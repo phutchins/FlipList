@@ -26,7 +26,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int DATABASE_VERSION = 62;
+	private static final int DATABASE_VERSION = 63;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
@@ -81,7 +81,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	
 	
 	// Types Table
-	private static final String TABLE_CATEGORY_TYPES = "types";
+	private static final String TABLE_ITEM_TYPES = "types";
 	// Types Table Column Names
 	private static final String KEY_TYPE_ID = "id";
 	private static final String KEY_TYPE_NAME = "name";
@@ -122,7 +122,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				+ KEY_ITEM_CREATE_DATE + " TEXT,"
 				+ KEY_ITEM_IS_COMPLETED + " INTEGER,"
 				+ KEY_ITEM_COMPLETED_DATE + " TEXT" + ")";
-		String CREATE_TYPES_TABLE = "CREATE TABLE " + TABLE_CATEGORY_TYPES + "("
+		String CREATE_TYPES_TABLE = "CREATE TABLE " + TABLE_ITEM_TYPES + "("
 				+ KEY_TYPE_ID + " INTEGER PRIMARY KEY," 
 				+ KEY_TYPE_NAME + " TEXT,"
 				+ KEY_TYPE_DESC + " TEXT" + ")";
@@ -152,11 +152,11 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		String CREATE_ALL_CATEGORY = "insert into " + TABLE_CATEGORIES + "(" + KEY_CAT_ID + "," + KEY_CAT_NAME + ","
                 + KEY_CAT_DESC + "," + KEY_CAT_TYPE + "," + KEY_CAT_VISIBLE + "," + KEY_CAT_FILTER + ") values(2, 'All Items', 'List All Items','0', '1', 1)";
 		
-		String CREATE_TYPE_GENERIC = "insert into " + TABLE_CATEGORY_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
+		String CREATE_TYPE_GENERIC = "insert into " + TABLE_ITEM_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
 				+ KEY_TYPE_DESC + ") values(0, 'Generic', 'Generic items')";
-		String CREATE_TYPE_GROCERY = "insert into " + TABLE_CATEGORY_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
+		String CREATE_TYPE_GROCERY = "insert into " + TABLE_ITEM_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
 				+ KEY_TYPE_DESC + ") values(1, 'Grocery List', 'List used for grocery items')";
-		String CREATE_TYPE_TODO = "insert into " + TABLE_CATEGORY_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
+		String CREATE_TYPE_TODO = "insert into " + TABLE_ITEM_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
 				+ KEY_TYPE_DESC + ") values(2, 'ToDo', 'Tasks that you need to complete')";
 		
 		String CREATE_FILTER_NONE = "insert into " + TABLE_FILTERS + "(" 
@@ -250,7 +250,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		// Drop older table if existed
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEMS);
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY_TYPES);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEM_TYPES);
 		//db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTERS);
 			
@@ -590,12 +590,12 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				cursor.getString(1), cursor.getString(2), Integer.parseInt(cursor.getString(3)), Integer.parseInt(cursor.getString(4)));
 		return category;
 	}
-	public ItemTypeToDo getCategoryType(int typeID) {
+	public ItemType getItemType(int typeID) {
 		SQLiteDatabase db = this.getReadableDatabase();
-		Cursor cursor = db.query(TABLE_CATEGORY_TYPES, new String[] { KEY_TYPE_ID, KEY_TYPE_NAME, KEY_TYPE_DESC }, KEY_TYPE_ID
+		Cursor cursor = db.query(TABLE_ITEM_TYPES, new String[] { KEY_TYPE_ID, KEY_TYPE_NAME, KEY_TYPE_DESC }, KEY_TYPE_ID
 				+ "=?", new String[] { String.valueOf(typeID) }, null, null, null, null);
-		ItemTypeToDo myCategoryType = new ItemTypeToDo(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getString(2));
-		return myCategoryType;
+		ItemType myItemType = new ItemType(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getString(2));
+		return myItemType;
 	}
 	public ArrayList<Category> getAllCategories() {
 		ArrayList<Category> categoryList = new ArrayList<Category>();
@@ -770,15 +770,15 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	
 	
 	// Types
-	public ArrayList<ItemTypeToDo> getCategoryTypesList() {
-		ArrayList<ItemTypeToDo> typeList = new ArrayList<ItemTypeToDo>();
-		String selectQuery = "SELECT * FROM " + TABLE_CATEGORY_TYPES;
+	public ArrayList<ItemType> getItemTypeList() {
+		ArrayList<ItemType> typeList = new ArrayList<ItemType>();
+		String selectQuery = "SELECT * FROM " + TABLE_ITEM_TYPES;
 		
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()) {
 			do {
-				ItemTypeToDo type = new ItemTypeToDo();
+				ItemType type = new ItemType();
 				type.setID(Integer.parseInt(cursor.getString(0)));
 				type.setName(cursor.getString(1));
 				type.setDescription(cursor.getString(2));
@@ -788,14 +788,14 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		db.close();
 		return typeList;
 	}
-	public String getCategoryTypeName(int typeID) {
+	public String getItemTypeName(int typeID) {
 		SQLiteDatabase db = this.getReadableDatabase();
-		Cursor cursor = db.query(TABLE_CATEGORY_TYPES, new String[] { KEY_TYPE_ID, KEY_TYPE_NAME, KEY_TYPE_DESC }, KEY_TYPE_ID
+		Cursor cursor = db.query(TABLE_ITEM_TYPES, new String[] { KEY_TYPE_ID, KEY_TYPE_NAME, KEY_TYPE_DESC }, KEY_TYPE_ID
 				+ "=?", new String[] { String.valueOf(typeID) }, null, null, null, null);
 		if (cursor != null)
 			cursor.moveToFirst();
-		String categoryTypeName = cursor.getString(1);
-		return categoryTypeName;
+		String itemTypeName = cursor.getString(1);
+		return itemTypeName;
 	}
 
 	

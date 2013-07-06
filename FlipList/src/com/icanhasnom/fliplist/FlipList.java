@@ -229,17 +229,11 @@ public class FlipList extends FragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
     	case R.id.menu_add_edit_cat:
-    		//Intent addEditCatIntent = new Intent(this, AddEditCatActivity.class);
-    		//startActivityForResult(addEditCatIntent, 1);
-    		
-    		
-    		Intent addEditCatIntent = new Intent(this, AddEditCatActivity.class);
+    		Intent addEditCatIntent = new Intent(this, AddEditCatListActivity.class);
     		Bundle b = new Bundle();
     		b.putSerializable("task", MANAGE_CATEGORIES);
     		addEditCatIntent.putExtras(b);
     		this.startActivityForResult(addEditCatIntent, 6);
-    		
-    		
     		break;
     	case R.id.menu_settings:
     		 Intent intent = new Intent();

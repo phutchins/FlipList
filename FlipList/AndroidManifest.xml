@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.icanhasnom.fliplist"
     android:versionCode="1"
-
     android:versionName="1.0" >
 
     <uses-sdk
@@ -10,14 +9,15 @@
         android:targetSdkVersion="15" />
 
     <application
-        android:icon="@drawable/ic_launcher"
         android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.icanhasnom.fliplist.FlipList"
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -55,6 +55,10 @@
         <activity
             android:name="com.icanhasnom.fliplist.AddEditItemActivity"
             android:label="@string/title_activity_add_edit_item" >
+        </activity>
+        <activity
+            android:name="com.icanhasnom.fliplist.AddEditCatListActivity"
+            android:label="@string/title_activity_add_edit_cat_list" >
         </activity>
     </application>
 

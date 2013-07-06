@@ -110,7 +110,7 @@ public class ListManager implements Serializable {
         buildItemListMap();
         return myItem;
     }
-    public void addCategoryType(ItemTypeToDo newCatType) {
+    public void addCategoryType(ItemType newCatType) {
     	// Check if type exists
     	// Add type to db if doesn't exist
     	// Add type to typeList
@@ -194,8 +194,8 @@ public class ListManager implements Serializable {
         myItemArray = myItemArrayList.toArray(myItemArray);
         return myItemArray;
     }
-    public ArrayList<ItemTypeToDo> getCategoryTypesList() {
-    	ArrayList<ItemTypeToDo> categoryTypesList = db.getCategoryTypesList();
+    public ArrayList<ItemType> getItemTypeList() {
+    	ArrayList<ItemType> categoryTypesList = db.getItemTypeList();
     	return categoryTypesList;
     }
     public ArrayList<Filter> getFilterList() {
@@ -204,8 +204,8 @@ public class ListManager implements Serializable {
     }
 
     // Retrieving Objects
-    public ItemTypeToDo getCategoryType(int typeID) {
-    	ItemTypeToDo catType = db.getCategoryType(typeID);
+    public ItemType getItemType(int typeID) {
+    	ItemType catType = db.getItemType(typeID);
     	return catType;
     }
     public Category getCategory(int catID) {
@@ -213,8 +213,8 @@ public class ListManager implements Serializable {
     	return listCat;
     }
     
-    public String getCategoryTypeName(int typeID) {
-    	String typeName = db.getCategoryTypeName(typeID);
+    public String getItemTypeName(int typeID) {
+    	String typeName = db.getItemTypeName(typeID);
     	return typeName;
     }
     public String getCategoryName(int catID) {

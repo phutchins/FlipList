@@ -34,13 +34,14 @@ public class AddEditCatActivity extends Activity {
 	Integer currentCategoryID;
 	Category currentCategory;
 	Integer currentTask;
-	MyCatListCustomAdapter catListDataAdapter;
 	public final static int RESULT_DELETED = 3;
 
 	ListManager myListMan;
 	ArrayList<Category> categoryList;
 	ArrayList<Filter> filterList;
+	ArrayList<ItemType> typeList;
 	SparseIntArray myFilterPositionMap;
+	SparseIntArray myTypePositionMap;
 	ActionBar actionBar;
 	
 	Spinner typeSpinner;
@@ -56,59 +57,62 @@ public class AddEditCatActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		setContentView(R.layout.activity_add_edit_cat);
 		actionBar = getActionBar();
 		actionBar.setHomeButtonEnabled(true);
-		//catList = getIntent().getExtras().getStringArray("catList");
 		
 		myListMan = new ListManager(this);
         categoryList = myListMan.getCategoryListAll();
 		filterList = myListMan.getFilterList();
+		typeList = myListMan.getItemTypeList();
 		myFilterPositionMap = new SparseIntArray();
 		myFilterPositionMap = buildFilterIndex(filterList);
+		myTypePositionMap = new SparseIntArray();
+		myTypePositionMap = buildTypeIndex(typeList);
 		setupActionBar();
 
 		Bundle b = this.getIntent().getExtras();
 		if(b != null) {
 			currentCategoryID = (Integer) b.getSerializable("catID");
 			currentTask = (Integer) b.getSerializable("task");
-			if (currentTask == MANAGE_CATEGORIES) {
-				manageCategories();
-				Log.v("AddEditCatActivity.onCreate", "MANAGE_CATEGORIES");
-			}
 			if (currentTask == ADD_CATEGORY) {
 				addNewCategory();
-				Log.v("AddEditCatActivity.onCreate", "ADD_CATEGORY");
 			}
 			if (currentTask == EDIT_CATEGORY) {
 				currentCategory = myListMan.getCategory(currentCategoryID);
-				addEditCategory(currentCategory);
-				Log.v("AddEditCatActivity.onCreate", "EDIT_CATEGORY");
+				editCategory(currentCategory);
 			}
 		}
 	}
-	public void manageCategories() {
-		setContentView(R.layout.activity_add_edit_cat_list);
-		addItemsOnEditList();
-	}
+	//public void manageCategories() {
+	//	setContentView(R.layout.activity_add_edit_cat_list);
+	//	addItemsOnEditList();
+	//}
+	//public void addNewCategory() {
+    //	Category newCategory = new Category();
+    //	newCategory.setIsNew();
+    //	newCategory.setType(myListMan.defaultTypeID);
+    //	currentCategory = newCategory;
+    //	addEditCategory(newCategory);
+	//}
 	public void addNewCategory() {
     	Category newCategory = new Category();
     	newCategory.setIsNew();
     	newCategory.setType(myListMan.defaultTypeID);
     	currentCategory = newCategory;
-    	addEditCategory(newCategory);
+    	editCategory(newCategory);
 	}
-	public SparseIntArray buildIndex(ArrayList<Category> myCatList) {
+	public SparseIntArray buildTypeIndex(ArrayList<ItemType> myTypeList) {
 		Integer position = 0;
 		SparseIntArray myPositionMap = new SparseIntArray();
-		for (Category myCat : myCatList) {
+		for (ItemType myCat : myTypeList) {
 			myPositionMap.put(myCat.getID(), position);
 			position++;
 		}
 		return myPositionMap;
 	}
-	public int getPosition(int myListCategoryID, SparseIntArray positionMap) {
-		int myPosition = positionMap.get(myListCategoryID);
+	public int getTypePosition(int myTypeID, SparseIntArray positionMap) {
+		int myPosition = positionMap.get(myTypeID);
 		return myPosition;
 	}
 	public SparseIntArray buildFilterIndex(ArrayList<Filter> myFilterList) {
@@ -124,22 +128,21 @@ public class AddEditCatActivity extends Activity {
 		int myPosition = myFilterPositionMap.get(myFilterID);
 		return myPosition;
 	}
-	public void addEditCategory(Category lc) {
+	public void editCategory(Category category) {
 		// TODO: Below menu breaks? Is it needed?
 
 		// TODO: Do I need to pass in the ListCategory? or just use the global currentCategory
-		setContentView(R.layout.activity_add_edit_cat);
-		boolean isNew = lc.isNew();
+
+		boolean isNew = category.isNew();
 		boolean isVisible;
 		Log.v("addEditCategory", "isNew: " + isNew);
     	
     	if (isNew) {
     		isVisible = true;
     	} else {
-    		isVisible = lc.isVisible();
+    		isVisible = category.isVisible();
     	}
 
-		
 		// Get all of the View Objects
 		EditText catName = (EditText) findViewById(R.id.cat_edit_name);
 		EditText catDesc = (EditText) findViewById(R.id.cat_edit_desc);
@@ -152,27 +155,22 @@ public class AddEditCatActivity extends Activity {
 		
 		// Populate type spinner and select the categories type (will be default if new)
 		addTypesToSpinner();
-		typeSpinner.setSelection(lc.getType());
+		typeSpinner.setSelection(category.getType());
 		addFiltersToSpinner();
-		Log.v("AddEditCatActivity.addEditCategory", "lc.getFilterID(): " + lc.getFilterID());
-		filterSpinner.setSelection(getFilterPosition(lc.getFilterID(), myFilterPositionMap));
-		Log.v("AddEditCatActivity.addEditCategory", "filterPosition: " + getFilterPosition(lc.getFilterID(), myFilterPositionMap));
-		// fill out layout variables using the currentCategory object
+		filterSpinner.setSelection(getFilterPosition(category.getFilterID(), myFilterPositionMap));
 		if (isNew) {
 		} else {
-			catName.setText(lc.getName());
-			catDesc.setText(lc.getDescription());
-			//Log.v("addEditCategory", "lc.getID(): " + lc.getID());
-			//Log.v("addEditCategory", "currentCategory.getID(): " + currentCategory.getID());
-			catID.setText(String.valueOf(lc.getID()));
+			catName.setText(category.getName());
+			catDesc.setText(category.getDescription());
+			catID.setText(String.valueOf(category.getID()));
 		}
-		currentCategory = lc;
+		currentCategory = category;
 	}
 	
     public void addTypesToSpinner() {
-        ArrayList<ItemTypeToDo> myTypeList = myListMan.getCategoryTypesList();
+        ArrayList<ItemType> myTypeList = myListMan.getItemTypeList();
         typeSpinner = (Spinner) findViewById(R.id.cat_type_spinner);
-        ArrayAdapter<ItemTypeToDo> myTypeAdapter = new MyTypeSpinnerCustomAdapter(this, R.layout.activity_add_edit_cat, myTypeList);
+        ArrayAdapter<ItemType> myTypeAdapter = new MyTypeSpinnerCustomAdapter(this, R.layout.activity_add_edit_cat, myTypeList);
         myTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeSpinner.setAdapter(myTypeAdapter);
     }
@@ -184,12 +182,12 @@ public class AddEditCatActivity extends Activity {
         filterSpinner.setAdapter(myFilterAdapter);
     }
     
-    public class MyTypeSpinnerCustomAdapter extends ArrayAdapter<ItemTypeToDo>{
+    public class MyTypeSpinnerCustomAdapter extends ArrayAdapter<ItemType>{
     	private Activity activity;
-    	private ArrayList<ItemTypeToDo> myTypes;
+    	private ArrayList<ItemType> myTypes;
     	LayoutInflater inflater;
     	
-    	public MyTypeSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<ItemTypeToDo> myTypes) {
+    	public MyTypeSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<ItemType> myTypes) {
     		super(activitySpinner, textViewResourceId, myTypes);
     		this.activity = activitySpinner;
     		this.myTypes = myTypes;
@@ -201,7 +199,7 @@ public class AddEditCatActivity extends Activity {
     	public int getCount() {
     		return myTypes.size();
     	}
-    	public ItemTypeToDo getItem(int position) {
+    	public ItemType getItem(int position) {
     		return myTypes.get(position);
     	}
     	public long getItemId(int position) {
@@ -226,7 +224,7 @@ public class AddEditCatActivity extends Activity {
     			holder = (ViewHolder) convertView.getTag();
     		}
     		//TextView label = (TextView) convertView.findViewById(R.id.type_spinner_text);
-    		ItemTypeToDo type = myTypes.get(position);
+    		ItemType type = myTypes.get(position);
     		holder.typeName.setTextColor(Color.BLACK);
     		holder.typeName.setText(myTypes.get(position).getName());
     		holder.typeName.setTag(type);
@@ -286,26 +284,26 @@ public class AddEditCatActivity extends Activity {
     	}
     }
 	
-    public void addItemsOnEditList() {
-    	// Populate the Category List
-    	catListDataAdapter = new MyCatListCustomAdapter(this, R.layout.activity_add_edit_cat_list, categoryList);
-    	ListView listView = (ListView) findViewById(R.id.itemAddEditList);
-    	listView.setAdapter(catListDataAdapter);
-    	
-    	// Set up the onClick event for each of the list items
-    	listView.setOnItemClickListener(new OnItemClickListener() {
-    		public void onItemClick(AdapterView<?> parent, View view,
-    		int position, long id) {
-    			// When clicked, show a toast with the TextView text
-    			Category category = (Category) parent.getItemAtPosition(position);
-    			Toast.makeText(getApplicationContext(),
-    					"Clicked on Row: " + category.getDescription(), 
-    					Toast.LENGTH_LONG).show();
-    			addEditCategory(category);
-    		}
-    	});
-    }
-    
+    //public void addItemsOnEditList() {
+    //	// Populate the Category List
+    //	catListDataAdapter = new MyCatListCustomAdapter(this, R.layout.activity_add_edit_cat_list, categoryList);
+    //	ListView listView = (ListView) findViewById(R.id.itemAddEditList);
+    //	listView.setAdapter(catListDataAdapter);
+    //	
+    //	// Set up the onClick event for each of the list items
+    //	listView.setOnItemClickListener(new OnItemClickListener() {
+    //		public void onItemClick(AdapterView<?> parent, View view,
+    //		int position, long id) {
+    //			// When clicked, show a toast with the TextView text
+    //			Category category = (Category) parent.getItemAtPosition(position);
+    //			Toast.makeText(getApplicationContext(),
+    //					"Clicked on Row: " + category.getDescription(), 
+    //					Toast.LENGTH_LONG).show();
+    //			addEditCategory(category);
+    //		}
+    //	});
+    //}
+    /*
     private class MyCatListCustomAdapter extends ArrayAdapter<Category> {
    	 
     	private ArrayList<Category> categoryList;
@@ -380,6 +378,7 @@ public class AddEditCatActivity extends Activity {
     	}
     	 
 	}
+	*/
 
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.
@@ -437,7 +436,7 @@ public class AddEditCatActivity extends Activity {
 		super.finish();
 	}
     public void mySaveCatButtonAction(View view) {
-    	ItemTypeToDo categoryType;
+    	ItemType categoryType;
     	
     	EditText editCategoryIdNumber = (EditText) findViewById(R.id.cat_edit_id);
     	EditText editCategoryNameText = (EditText) findViewById(R.id.cat_edit_name);
@@ -450,7 +449,7 @@ public class AddEditCatActivity extends Activity {
     	Spinner filterSpinner = (Spinner) findViewById(R.id.category_edit_filter_spinner);
     	CheckBox visibleCheckBox = (CheckBox) findViewById(R.id.cat_visible_check_box);
     	
-    	categoryType = (ItemTypeToDo) typeSpinner.getItemAtPosition(typeSpinner.getSelectedItemPosition());
+    	categoryType = (ItemType) typeSpinner.getItemAtPosition(typeSpinner.getSelectedItemPosition());
     	int categoryTypeID = categoryType.getID();
     	boolean isVisible = visibleCheckBox.isChecked();
     	int isVisibleInt = (isVisible) ? 1 : 0;

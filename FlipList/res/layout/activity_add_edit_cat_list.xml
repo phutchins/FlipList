@@ -10,7 +10,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:onClick="myAddNewCategoryAction"
         android:text="@string/new_category_button_text" />
 
     <ListView
