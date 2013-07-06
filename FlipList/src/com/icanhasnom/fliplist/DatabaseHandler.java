@@ -99,7 +99,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	public DatabaseHandler(Context c) {
 		super(c, DATABASE_NAME, null, DATABASE_VERSION);
 		context = c;
-		Log.v("DatabaseHandler.constructor", "5) context: " + context);
+		//Log.v("DatabaseHandler.constructor", "5) context: " + context);
 	}
 	
 	// Creating Tables
@@ -262,7 +262,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
 		//myPrefs.GetPreferences(R.string.remove_completed_key, R.integer.remove_completed_default);  
 		//mySharedPreferences = (PreferenceManager) context.getSharedPreferences();
-		Log.v("DatabaseHandler.getPreferences()", "4) context: " + context);
+
     	mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         prefRemoveCompletedItems = mySharedPreferences.getString(context.getString(R.string.remove_completed_key), context.getResources().getString(R.integer.remove_completed_default));
         prefRemoveCompletedItemsDelay = mySharedPreferences.getString(context.getString(R.string.remove_completed_delay_key), context.getResources().getString(R.integer.remove_completed_delay_default));
@@ -273,8 +273,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
 		//String compareDate = null;
     	//Calendar compareDateCal = Calendar.getInstance();
-		Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "prefRemoveCompletedItems: " + prefRemoveCompletedItems);
-		Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "prefRemoveCompletedItemsDelay: " + prefRemoveCompletedItemsDelay);
+		//Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "prefRemoveCompletedItems: " + prefRemoveCompletedItems);
+		//Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "prefRemoveCompletedItemsDelay: " + prefRemoveCompletedItemsDelay);
 		// Only show Non-Completed items
 		if (prefRemoveCompletedItems.equals("0")) {
 			prefQueryStringValues = KEY_ITEM_IS_COMPLETED + "=?";
@@ -420,7 +420,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		
 		Category myCat = getCategory(catID);
 		int filterID = myCat.getFilterID();
-		Log.v("DatabaseHandler.getItemList", "filterID: " + filterID);
+		//Log.v("DatabaseHandler.getItemList", "filterID: " + filterID);
 		// Filter ID 0 means use preferences as there is no filter applied
 		if (filterID == 0) {
 			if (!prefQueryStringValues.isEmpty()) {
@@ -430,7 +430,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				dbValues = "cat=?";
 				dbValueArgs = String.valueOf(catID);
 			}
-			Log.v("DatabaseHandler.getItemList", "USING DEFAULTS - dbValues: " + dbValues + " dbValueArgs: " + dbValueArgs);
+			//Log.v("DatabaseHandler.getItemList", "USING DEFAULTS - dbValues: " + dbValues + " dbValueArgs: " + dbValueArgs);
 		} else {
 			// Get the selected filter and do not use defaults or preferences
 			// TODO: use something like myFilter.getQuery(catID) to build and return the full query
@@ -456,8 +456,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 			}
 		}
 		
-		Log.v("DatabaseHandler.getItemList", "Category: " + myCat.getName() + " Values: " + dbValues);
-		Log.v("DatabaseHandler.getItemList", "dbValueArgs: " + dbValueArgs);
+		//Log.v("DatabaseHandler.getItemList", "Category: " + myCat.getName() + " Values: " + dbValues);
+		//Log.v("DatabaseHandler.getItemList", "dbValueArgs: " + dbValueArgs);
 		if (dbValueArgs != null) dbValueArgsArray = dbValueArgs.split(";");
 		//Log.v("DatabaseHandler.getItemList", "DEFAULTS - dbValueArgs: " + dbValueArgs);
 		
@@ -485,7 +485,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				item.setCompleted(cursor.getInt(10));
 				item.setCompletedDate(cursor.getString(11));
 				itemList.addListItem(item);
-				Log.v("DatabaseHandler.getItemList", "Got Item: " + cursor.getString(1) + " from Category: " + myCat.getName() + " - createDate: " + cursor.getString(9) + " dueDateTime: " + cursor.getString(8) + " isCompleted: " + cursor.getString(10) + " completedDate: " + cursor.getString(11));
+				//Log.v("DatabaseHandler.getItemList", "Got Item: " + cursor.getString(1) + " from Category: " + myCat.getName() + " - createDate: " + cursor.getString(9) + " dueDateTime: " + cursor.getString(8) + " isCompleted: " + cursor.getString(10) + " completedDate: " + cursor.getString(11));
 			} while (cursor.moveToNext());
 		}
 		// return contact list

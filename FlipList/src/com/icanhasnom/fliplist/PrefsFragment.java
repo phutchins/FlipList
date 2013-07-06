@@ -25,7 +25,7 @@ public class PrefsFragment extends PreferenceFragment implements TabListener {
 		// Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
         
-        //PreferenceManager.setDefaultValues(this, @, false);
+        //PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         
         //final ActionBar actionBar = getActionBar();
         //actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);

@@ -37,6 +37,14 @@
                 android:value="com.icanhasnom.fliplist.FlipList" />
         </activity>
         <activity
+            android:name="com.icanhasnom.fliplist.ItemListActivity"
+            android:label="@string/title_activity_item_list"
+            android:parentActivityName="com.icanhasnom.fliplist.FlipList" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.icanhasnom.fliplist.FlipList" />
+        </activity>
+        <activity
             android:name="com.icanhasnom.fliplist.Preferences"
             android:label="@string/title_activity_preferences" >
         </activity>

@@ -3,6 +3,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,6 +68,25 @@ public class CategoryViewFragment extends Fragment {
         //setListAdapter(new ArrayAdapter<String>(getActivity(),
          //       android.R.layout.simple_list_item_1, arr));
     }
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	if (requestCode == 5 && resultCode == -1) {
+    		refreshList();
+    	}
+    	Log.v("CategoryViewFragment.onActivityResult", "requestCode: " + requestCode + " resultCode: " + resultCode);
+    	super.onActivityResult(requestCode, resultCode, data);
+    }
+    public void refreshList() {
+		myListMan = new ListManager(activity);
+        categoryList = myListMan.getCategories();
+    	addCategoriesOnList();
+    }
+    public void showList(Integer catID) {
+		Intent itemListActivity = new Intent(activity, ItemListActivity.class);
+		Bundle b = new Bundle();
+		b.putSerializable("catID", catID);
+		itemListActivity.putExtras(b);
+		this.startActivity(itemListActivity);
+    }
     public void addCategoriesOnList() {
     	// Populate the Category List
     	catListDataAdapter = new MyCatListCustomAdapter(activity, R.layout.fragment_category_list_layout, categoryList);
@@ -78,13 +99,24 @@ public class CategoryViewFragment extends Fragment {
     		int position, long id) {
     			// When clicked, show a toast with the TextView text
     			Category category = (Category) parent.getItemAtPosition(position);
-    			Toast.makeText(activity,
-    					"Clicked on Row: " + category.getDescription(), 
-    					Toast.LENGTH_LONG).show();
-    			// TODO: Have FlipList launch activity to view items in category
-    			//addEditCategory(category);
+				showList(category.getID());
     		}
     	});
+    	Button addCategoryButton = (Button) layoutView.findViewById(R.id.category_list_add_button);
+    	addCategoryButton.setOnClickListener(new View.OnClickListener() {
+
+    		public void onClick(View v) {
+    			addCategoryButtonListener(v);
+    		}
+    	});
+    }
+    public void addCategoryButtonListener(View view) {
+		Intent addEditCatActivity = new Intent(view.getContext(), AddEditCatActivity.class);
+		Bundle b = new Bundle();
+		Integer catID = null;
+		b.putSerializable("catID", catID);
+		addEditCatActivity.putExtras(b);
+		this.startActivityForResult(addEditCatActivity, 5);
     }
     private class MyCatListCustomAdapter extends ArrayAdapter<Category> {
       	 
@@ -122,13 +154,9 @@ public class CategoryViewFragment extends Fragment {
     			View.OnClickListener categoryClickListener;
     			categoryClickListener = new View.OnClickListener() {  
     				public void onClick(View v) {  
-    					// Use this onClick to send the user to the edit screen for the clicked category
     					TextView tv = (TextView) v;
-    					Category lc = (Category) tv.getTag();
-    					Log.v("AddEditCatActivity", "categoryClickListener - made it here");
-    					// TODO: Probably only need one of these
-    					//currentCategory = lc;
-    					//addEditCategory(lc);
+    					Category category = (Category) tv.getTag();
+    					showList(category.getID());
     				}  
     			};
     			holder.category_list_text_view.setOnClickListener( categoryClickListener );  

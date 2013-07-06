@@ -108,6 +108,7 @@ import android.widget.Toast;
 // TODO: Add ability to add items to multiple categories. It will default to default. Must always be in one category. (default undeletable)
 // TODO: Turn Due Date RED if its past current date
 // TODO: Make each field on edit screen show up only if assigned & create + button to add each one
+// TODO: Break preferences out to its own class (PreferencesHelper?)
 
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -152,22 +153,24 @@ public class FlipList extends FragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
+        db = new DatabaseHandler(this);
+		myPositionMap = new SparseIntArray();
+		myListMan = new ListManager(this);
+		
+		init(savedInstanceState);
         
         setContentView(R.layout.fragment_pager);
+        
         mAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
         
-        
-        //setContentView(R.layout.activity_item_view);
-		myPositionMap = new SparseIntArray();
-		myListMan = new ListManager(this);
-		//Log.v("FlipList.onCreate", "1) this: " + this);
-		loadPref();
+		//loadPref();
         Log.v("FlipList.onCreate", "defaultCatID: " + defaultCatID);
-        db = new DatabaseHandler(this);
-		//Log.v("FlipList.onCreate", "2) this: " + this);
-        
+
+		Log.v("FlipList.onCreate", "2) this: " + this);
+    }
+    public void init(Bundle savedInstanceState) {
         if(savedInstanceState != null) {
         	restoreState(savedInstanceState);
         	Log.v("FlipList.onCreate", "Restoring saved instance state");
@@ -175,14 +178,8 @@ public class FlipList extends FragmentActivity {
         	loadPref();
     		currentItemList = myListMan.getItemList(defaultCatID);
         }
-        
-    	//catSpinner = (Spinner) findViewById(R.id.catSpinner);
-    	//catSpinner.setOnItemSelectedListener(new SpinnerActivity());
-		
-        //addItemsOnSpinner();
-        //addItemsOnList();
     }
-    
+
     public static class MyFragmentPagerAdapter extends FragmentPagerAdapter {
 		public MyFragmentPagerAdapter(android.support.v4.app.FragmentManager fragmentManager) {
             super(fragmentManager);
@@ -257,15 +254,22 @@ public class FlipList extends FragmentActivity {
     	} else if (requestCode == 1 && resultCode == RESULT_CANCELED) {
     		// Do nothing
     	}
-    	addItemsOnSpinner();
+    	if (requestCode == 5) {
+    		// Refresh content in CategoryViewFragment
+    		//CategoryViewFragment catViewFragment = (CategoryViewFragment) mAdapter.getItem(0);
+    		//catViewFragment.refreshList();
+    	}
+    	//addItemsOnSpinner();
     	// TODO: Do i need this?
     	//addItemsOnList();
+    	super.onActivityResult(requestCode, resultCode, data);
     }
        
     private void loadPref(){
-    	mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+    	mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         defaultCatID = Integer.parseInt(mySharedPreferences.getString(getString(R.string.default_category_key), getString(R.integer.default_category_default)));
-        Log.v("FlipList.loadPref", "defaultCatID: " + defaultCatID);
+        Log.v("FlipList.loadPref", "this:  " + this);
+        Log.v("FlipList.loadPref", "Loaded Pref from mySharedPreferences, defaultCatID: " + defaultCatID);
 
         prefShowItemDescriptionGlobal = mySharedPreferences.getBoolean(getString(R.string.show_description_global_key), getResources().getBoolean(R.bool.show_description_global_default));
         prefShowDueDateGlobal = mySharedPreferences.getBoolean(getString(R.string.show_due_date_global_key), getResources().getBoolean(R.bool.show_due_date_global_default));
@@ -273,7 +277,6 @@ public class FlipList extends FragmentActivity {
         // TODO: Create sanity check to ensure that default category exists
         //defaultCatID = mySharedPreferences.getInt("current_category_id", 0);
         if (currentCategoryID == null) currentCategoryID = defaultCatID;
-        Log.v("FlipList.loadPref", "currentCategoryID: " + currentCategoryID);
         currentCategory = myListMan.getCategory(currentCategoryID);
         Log.v("FlipList.loadPrefs", "(1) Setting currentCategory to " + currentCategory.getName());
     }
@@ -293,26 +296,7 @@ public class FlipList extends FragmentActivity {
     	}
     }
     
-    public void mySaveButtonAction(View view) {
-       editText = (EditText) findViewById(R.id.editText);
-       String name = editText.getText().toString();
-       if (name.isEmpty()) {
-			Toast.makeText(getApplicationContext(),
-					"Please enter an item name!", Toast.LENGTH_LONG).show();
-       } else {
-	       catSpinner = (Spinner) findViewById(R.id.catSpinner);
-	       int catID = currentCategory.getID();
-	       
-	       // Get the default type of category
-	       //Category myCat = myListMan.getCategory(catID);
-	       // myTypeID = myCat.getType();
-	       //ItemType myType = myListMan.getItemType(myTypeID);
-	       
-	       myListMan.addItem(catID, name);
-	       addItemsOnList();
-	       editText.setText("");
-       }
-    }
+
     public void addItemsOnSpinner() {
         catList = myListMan.getCategories();
         buildIndex(catList);
@@ -342,7 +326,7 @@ public class FlipList extends FragmentActivity {
 		Log.v("FlipList.addItemsOnList", "catID: " + catID );
 		Log.v("FLipList.addItemsonList", "currentItemList: " + currentItemList);
 		currentListItems = currentItemList.getListItems();
-    	itemListDataAdapter = new MyCustomAdapter(this, R.layout.list_layout, currentListItems);
+    	itemListDataAdapter = new MyCustomAdapter(this, R.layout.activity_item_list_view, currentListItems);
     	ListView listView = (ListView) findViewById(R.id.itemList);
     	listView.setAdapter(itemListDataAdapter);
     	
@@ -429,7 +413,7 @@ public class FlipList extends FragmentActivity {
     		ViewHolder holder = null;
     		if (convertView == null) {
     			LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    			convertView = vi.inflate(R.layout.list_layout, null);
+    			convertView = vi.inflate(R.layout.activity_item_list_view, null);
     	 
     			holder = new ViewHolder();
     			holder.itemCheckBox = (CheckBox) convertView.findViewById(R.id.itemCheckBox);

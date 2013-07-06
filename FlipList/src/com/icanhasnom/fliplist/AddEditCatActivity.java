@@ -31,6 +31,7 @@ import android.os.Build;
 
 public class AddEditCatActivity extends Activity {
 	Menu myMenu;
+	Integer currentCategoryID;
 	Category currentCategory;
 	MyCatListCustomAdapter catListDataAdapter;
 	public final static int RESULT_DELETED = 3;
@@ -48,7 +49,7 @@ public class AddEditCatActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_add_edit_cat_list);
+
 		final ActionBar bar = getActionBar();
 		bar.setHomeButtonEnabled(true);
 		//catList = getIntent().getExtras().getStringArray("catList");
@@ -58,21 +59,29 @@ public class AddEditCatActivity extends Activity {
 		filterList = myListMan.getFilterList();
 		myFilterPositionMap = new SparseIntArray();
 		myFilterPositionMap = buildFilterIndex(filterList);
-		addItemsOnEditList();
-		
-		// Show the Up button in the action bar.
 		setupActionBar();
+		//addItemsOnEditList();
+		Bundle b = this.getIntent().getExtras();
+		if(b != null) {
+			currentCategoryID = (Integer) b.getSerializable("catID");
+			if (currentCategoryID != null) {
+				currentCategory = myListMan.getCategory(currentCategoryID);
+				addEditCategory(currentCategory);
+			} else {
+				addNewCategory();
+			}
+		} else {
+			setContentView(R.layout.activity_add_edit_cat_list);
+		}
+
 		
 		// Set up category list and add an add new category item to the top of the list
 		// Create listener that gets category to edit or new category selection
 		// Send that selection to the edit layout and display layout
 	}
-	public void myAddNewCategoryAction(View view) {
-    	// Create blank new category to add to the list so there is an option to add new at the top
+	public void addNewCategory() {
     	Category newCategory = new Category();
     	newCategory.setIsNew();
-    	
-    	//newCategory.setName("+ Add New Category");
     	newCategory.setType(myListMan.defaultTypeID);
     	currentCategory = newCategory;
     	addEditCategory(newCategory);
@@ -104,7 +113,8 @@ public class AddEditCatActivity extends Activity {
 		return myPosition;
 	}
 	public void addEditCategory(Category lc) {
-		getMenuInflater().inflate(R.menu.add_edit_cat, myMenu);
+		// TODO: Below menu breaks? Is it needed?
+
 		// TODO: Do I need to pass in the ListCategory? or just use the global currentCategory
 		setContentView(R.layout.activity_add_edit_cat);
 		boolean isNew = lc.isNew();
@@ -373,7 +383,8 @@ public class AddEditCatActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		myMenu = menu;
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.add_edit_cat_list, menu);
+		getMenuInflater().inflate(R.menu.add_edit_cat, menu);
+		//getMenuInflater().inflate(R.menu.add_edit_cat, myMenu);
 		return true;
 	}
 
@@ -447,7 +458,7 @@ public class AddEditCatActivity extends Activity {
     	Intent intent = new Intent();
     	intent.putExtra("catID", myCat.getID());
     	setResult(RESULT_OK, intent);
-    	super.finish();
+    	finish();
     }
 
 }
