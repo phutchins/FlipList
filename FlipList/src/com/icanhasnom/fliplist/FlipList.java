@@ -149,6 +149,11 @@ public class FlipList extends FragmentActivity {
     ViewPager mPager;
     static final Integer ITEMS = 3;
     
+	// Tasks for ActivityResult
+	static Integer MANAGE_CATEGORIES = 6;
+	static Integer ADD_CATEGORY = 5;
+	static Integer EDIT_CATEGORY = 4;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -224,8 +229,17 @@ public class FlipList extends FragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
     	case R.id.menu_add_edit_cat:
+    		//Intent addEditCatIntent = new Intent(this, AddEditCatActivity.class);
+    		//startActivityForResult(addEditCatIntent, 1);
+    		
+    		
     		Intent addEditCatIntent = new Intent(this, AddEditCatActivity.class);
-    		startActivityForResult(addEditCatIntent, 1);
+    		Bundle b = new Bundle();
+    		b.putSerializable("task", MANAGE_CATEGORIES);
+    		addEditCatIntent.putExtras(b);
+    		this.startActivityForResult(addEditCatIntent, 6);
+    		
+    		
     		break;
     	case R.id.menu_settings:
     		 Intent intent = new Intent();

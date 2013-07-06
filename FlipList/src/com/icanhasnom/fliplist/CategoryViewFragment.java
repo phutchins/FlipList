@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,12 @@ public class CategoryViewFragment extends Fragment {
 	Activity activity;
 	ListManager myListMan;
 	View layoutView;
+	SparseIntArray myPositionMap;
+	
+	// Tasks for ActivityResult
+	static Integer MANAGE_CATEGORIES = 6;
+	static Integer ADD_CATEGORY = 5;
+	static Integer EDIT_CATEGORY = 4;
  
     static CategoryViewFragment init(int val) {
         CategoryViewFragment truitonList = new CategoryViewFragment();
@@ -70,8 +77,9 @@ public class CategoryViewFragment extends Fragment {
     }
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
     	if (requestCode == 5 && resultCode == -1) {
-    		refreshList();
     	}
+    	// Always refresh the list when coming back from child activity
+		refreshList();
     	Log.v("CategoryViewFragment.onActivityResult", "requestCode: " + requestCode + " resultCode: " + resultCode);
     	super.onActivityResult(requestCode, resultCode, data);
     }
@@ -89,6 +97,7 @@ public class CategoryViewFragment extends Fragment {
     }
     public void addCategoriesOnList() {
     	// Populate the Category List
+    	myPositionMap = buildIndex(categoryList);
     	catListDataAdapter = new MyCatListCustomAdapter(activity, R.layout.fragment_category_list_layout, categoryList);
     	ListView listView = (ListView) layoutView.findViewById(R.id.category_list_list_view);
     	listView.setAdapter(catListDataAdapter);
@@ -102,6 +111,17 @@ public class CategoryViewFragment extends Fragment {
 				showList(category.getID());
     		}
     	});
+    	listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+    		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+    			Log.v("Long clicked", "pos" + " " + position);
+    			
+    			Category category = (Category) parent.getItemAtPosition(position);
+    			editCategory(view, category.getID());
+    			
+    			
+    			return true;
+    		}
+    	});
     	Button addCategoryButton = (Button) layoutView.findViewById(R.id.category_list_add_button);
     	addCategoryButton.setOnClickListener(new View.OnClickListener() {
 
@@ -110,11 +130,32 @@ public class CategoryViewFragment extends Fragment {
     		}
     	});
     }
+
+	public SparseIntArray buildIndex(ArrayList<Category> myCatList) {
+		SparseIntArray myPositionMap = new SparseIntArray();
+		Integer position = 0;
+		for (Category myCat : myCatList) {
+			myPositionMap.put(myCat.getID(), position);
+			position++;
+		}
+		return myPositionMap;
+	}
+	public int getPosition(int myListCategoryID, SparseIntArray myPositionMap) {
+		int myPosition = myPositionMap.get(myListCategoryID);
+		return myPosition;
+	}
+    public void editCategory(View view, Integer catID) {
+		Intent addEditCatActivity = new Intent(view.getContext(), AddEditCatActivity.class);
+		Bundle b = new Bundle();
+		b.putSerializable("catID", catID);
+		b.putSerializable("task", EDIT_CATEGORY);
+		addEditCatActivity.putExtras(b);
+		this.startActivityForResult(addEditCatActivity, 5);
+    }
     public void addCategoryButtonListener(View view) {
 		Intent addEditCatActivity = new Intent(view.getContext(), AddEditCatActivity.class);
 		Bundle b = new Bundle();
-		Integer catID = null;
-		b.putSerializable("catID", catID);
+		b.putSerializable("task", ADD_CATEGORY);
 		addEditCatActivity.putExtras(b);
 		this.startActivityForResult(addEditCatActivity, 5);
     }

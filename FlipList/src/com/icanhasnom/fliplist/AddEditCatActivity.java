@@ -33,6 +33,7 @@ public class AddEditCatActivity extends Activity {
 	Menu myMenu;
 	Integer currentCategoryID;
 	Category currentCategory;
+	Integer currentTask;
 	MyCatListCustomAdapter catListDataAdapter;
 	public final static int RESULT_DELETED = 3;
 
@@ -40,18 +41,24 @@ public class AddEditCatActivity extends Activity {
 	ArrayList<Category> categoryList;
 	ArrayList<Filter> filterList;
 	SparseIntArray myFilterPositionMap;
+	ActionBar actionBar;
 	
 	Spinner typeSpinner;
 	Spinner filterSpinner;
 	MyTypeSpinnerCustomAdapter adapter;
+	
+	// Tasks for ActivityResult
+	static Integer MANAGE_CATEGORIES = 6;
+	static Integer ADD_CATEGORY = 5;
+	static Integer EDIT_CATEGORY = 4;
 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		final ActionBar bar = getActionBar();
-		bar.setHomeButtonEnabled(true);
+		actionBar = getActionBar();
+		actionBar.setHomeButtonEnabled(true);
 		//catList = getIntent().getExtras().getStringArray("catList");
 		
 		myListMan = new ListManager(this);
@@ -60,24 +67,29 @@ public class AddEditCatActivity extends Activity {
 		myFilterPositionMap = new SparseIntArray();
 		myFilterPositionMap = buildFilterIndex(filterList);
 		setupActionBar();
-		//addItemsOnEditList();
+
 		Bundle b = this.getIntent().getExtras();
 		if(b != null) {
 			currentCategoryID = (Integer) b.getSerializable("catID");
-			if (currentCategoryID != null) {
+			currentTask = (Integer) b.getSerializable("task");
+			if (currentTask == MANAGE_CATEGORIES) {
+				manageCategories();
+				Log.v("AddEditCatActivity.onCreate", "MANAGE_CATEGORIES");
+			}
+			if (currentTask == ADD_CATEGORY) {
+				addNewCategory();
+				Log.v("AddEditCatActivity.onCreate", "ADD_CATEGORY");
+			}
+			if (currentTask == EDIT_CATEGORY) {
 				currentCategory = myListMan.getCategory(currentCategoryID);
 				addEditCategory(currentCategory);
-			} else {
-				addNewCategory();
+				Log.v("AddEditCatActivity.onCreate", "EDIT_CATEGORY");
 			}
-		} else {
-			setContentView(R.layout.activity_add_edit_cat_list);
 		}
-
-		
-		// Set up category list and add an add new category item to the top of the list
-		// Create listener that gets category to edit or new category selection
-		// Send that selection to the edit layout and display layout
+	}
+	public void manageCategories() {
+		setContentView(R.layout.activity_add_edit_cat_list);
+		addItemsOnEditList();
 	}
 	public void addNewCategory() {
     	Category newCategory = new Category();
