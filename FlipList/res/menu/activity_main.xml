@@ -1,4 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menuSpinnerMain"
+        android:showAsAction="always"
+        android:actionViewClass="android.widget.Spinner"
+        android:layout_gravity="left"
+        android:actionLayout="@layout/action_main_menu_spinner" />
     <item android:id="@+id/menu_settings"
         android:title="@string/menu_settings"
         android:orderInCategory="100"
