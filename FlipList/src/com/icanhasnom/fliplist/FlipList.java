@@ -172,7 +172,6 @@ public class FlipList extends FragmentActivity {
         
 		//loadPref();
         Log.v("FlipList.onCreate", "defaultCatID: " + defaultCatID);
-
 		Log.v("FlipList.onCreate", "2) this: " + this);
     }
     public void init(Bundle savedInstanceState) {
@@ -200,7 +199,7 @@ public class FlipList extends FragmentActivity {
             case 0:
                 return CategoryViewFragment.init(position);
             case 1:
-                return ListViewFragment.init(position);
+                return ItemViewFragment.init(position);
             case 2:
             	return FilterViewFragment.init(position);
             default:

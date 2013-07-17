@@ -34,7 +34,8 @@ public class ListPreferenceManager {
         ShowDueDateGlobal = mySharedPreferences.getBoolean(context.getString(R.string.show_due_date_global_key), context.getResources().getBoolean(R.bool.show_due_date_global_default));
 
         // TODO: Create sanity check to ensure that default category exists
-        defaultCatID = mySharedPreferences.getInt("current_category_id", 0);
+        defaultCatID = mySharedPreferences.getInt("default_category_id", 0);
+        currentCategoryID = mySharedPreferences.getInt("current_category_id", 0);
         //if (currentCategoryID == null) currentCategoryID = defaultCatID;
     }
 }

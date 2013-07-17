@@ -55,7 +55,7 @@ public class CategoryViewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		myListMan = new ListManager(activity);
-        categoryList = myListMan.getCategories();
+        categoryList = myListMan.getCategoriesAndFilters();
     }
  
     /**
@@ -104,8 +104,7 @@ public class CategoryViewFragment extends Fragment {
     	
     	// Set up the onClick event for each of the list items
     	listView.setOnItemClickListener(new OnItemClickListener() {
-    		public void onItemClick(AdapterView<?> parent, View view,
-    		int position, long id) {
+    		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
     			// When clicked, show a toast with the TextView text
     			Category category = (Category) parent.getItemAtPosition(position);
 				showList(category.getID());
@@ -114,11 +113,8 @@ public class CategoryViewFragment extends Fragment {
     	listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
     		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
     			Log.v("Long clicked", "pos" + " " + position);
-    			
     			Category category = (Category) parent.getItemAtPosition(position);
     			editCategory(view, category.getID());
-    			
-    			
     			return true;
     		}
     	});
@@ -211,13 +207,17 @@ public class CategoryViewFragment extends Fragment {
     		int categoryTypeID = category.getType();
     		//String categoryDescription = category.getDescription();
     		String categoryName = category.getName();
+			String categoryType = "(F)";
+    		if (category.getFilterID() == 0) {
+    			categoryType = "(C)";
+    		}
     		String categoryTypeName = myListMan.getItemTypeName(categoryTypeID);
     		
     		Log.v("MyCatListCustomAdapter", "categoryTypeID:" + categoryTypeID);
     		Log.v("MyCatListCustomAdapter", "category.getDescription(): " + category.getDescription());
     		Log.v("MyCatListCustomAdapter", "myListMan.getCategoryTypeName(): " + myListMan.getItemTypeName(categoryTypeID));
     		
-    		holder.category_list_text_view.setText(categoryName);
+    		holder.category_list_text_view.setText(categoryType + " " + categoryName);
     		holder.category_list_text_view_type.setText("(" + categoryTypeName + ")");
     		holder.category_list_text_view.setTag(category);
     		// TODO: Link this to type type editing activity later

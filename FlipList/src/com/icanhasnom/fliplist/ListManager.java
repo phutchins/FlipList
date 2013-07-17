@@ -170,7 +170,10 @@ public class ListManager implements Serializable {
     	ArrayList<Category> retCatListObjs = db.getAllCategories();
         return retCatListObjs;
     }
-
+    public ArrayList<Category> getCategoriesAndFilters() {
+    	ArrayList<Category> retCatListObjs = db.getAllCategories();
+        return retCatListObjs;
+    }
     public String[] getCategoryListStrings() {
     	ArrayList<Category> retCatList = db.getAllCategories();
     	String[] catListStrings = new String[retCatList.size()];
