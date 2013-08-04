@@ -55,7 +55,8 @@ public class CategoryViewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		myListMan = new ListManager(activity);
-        categoryList = myListMan.getCategoriesAndFilters();
+        //categoryList = myListMan.getCategoriesAndFilters();
+		initVars();
     }
  
     /**
@@ -83,9 +84,12 @@ public class CategoryViewFragment extends Fragment {
     	Log.v("CategoryViewFragment.onActivityResult", "requestCode: " + requestCode + " resultCode: " + resultCode);
     	super.onActivityResult(requestCode, resultCode, data);
     }
-    public void refreshList() {
+    public void initVars() {
 		myListMan = new ListManager(activity);
-        categoryList = myListMan.getCategories();
+		categoryList = myListMan.getCategoriesAndFilters();
+    }
+    public void refreshList() {
+    	initVars();
     	addCategoriesOnList();
     }
     public void showList(Integer catID) {

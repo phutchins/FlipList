@@ -126,21 +126,21 @@ public class FlipList extends FragmentActivity {
     Integer prefRemoveCompletedItemsDelay;
     
     HashMap<String, Item> checkListItems = new HashMap<String, Item>();
-    ItemList currentItemList;
+
     Category currentCategory;
     Integer currentCategoryID;
     Item currentItem;
     ArrayList<Category> catList;
-    ArrayList<Item> currentListItems;
+
 
 	SparseIntArray myPositionMap;
     
-    MyCustomAdapter itemListDataAdapter;
-    MyCatSpinnerCustomAdapter catSpinnerDataAdapter;
+    //MyCustomAdapter itemListDataAdapter;
+    //MyCatSpinnerCustomAdapter catSpinnerDataAdapter;
     SharedPreferences mySharedPreferences;
     
-    Spinner catSpinner;
-    Spinner itemCatSpinner;
+    //Spinner catSpinner;
+    //Spinner itemCatSpinner;
     
     EditText editText;
     DatabaseHandler db;
@@ -180,7 +180,7 @@ public class FlipList extends FragmentActivity {
         	Log.v("FlipList.onCreate", "Restoring saved instance state");
         } else {
         	loadPref();
-    		currentItemList = myListMan.getItemList(defaultCatID);
+;
         }
     }
 
@@ -287,7 +287,7 @@ public class FlipList extends FragmentActivity {
         currentCategory = myListMan.getCategory(currentCategoryID);
         Log.v("FlipList.loadPrefs", "(1) Setting currentCategory to " + currentCategory.getName());
     }
-    
+    /**
     public class SpinnerActivity extends Activity implements OnItemSelectedListener {
     	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
     		Category catSelected = (Category) parent.getItemAtPosition(pos);
@@ -303,30 +303,10 @@ public class FlipList extends FragmentActivity {
     	}
     }
     
+*/
 
-    public void addItemsOnSpinner() {
-        catList = myListMan.getCategories();
-        buildIndex(catList);
-        catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.activity_main_cat_spinner, catList);
-        catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        
-        catSpinner.setAdapter(catSpinnerDataAdapter);
-        catSpinner.setOnItemSelectedListener(new SpinnerActivity());
-        catSpinner.setSelection(getPosition(currentCategory.getID()));
-        catSpinnerDataAdapter.notifyDataSetChanged();
-    }
-	public void buildIndex(ArrayList<Category> myCatList) {
-		Integer position = 0;
-		for (Category myCat : myCatList) {
-			myPositionMap.put(myCat.getID(), position);
-			position++;
-		}
-	}
-	public int getPosition(int myListCategoryID) {
-		int myPosition = myPositionMap.get(myListCategoryID);
-		return myPosition;
-	}
-    
+
+    /**
     public void addItemsOnList()  {
     	int catID = currentCategory.getID();
 		currentItemList = myListMan.getItemList(catID);
@@ -354,54 +334,14 @@ public class FlipList extends FragmentActivity {
 		addEditItem.putExtras(b);
 		this.startActivityForResult(addEditItem, 1);
     }
+    */
 
-    private class MyCatSpinnerCustomAdapter extends ArrayAdapter<Category> {
-      	 
-    	private ArrayList<Category> categoryList;
-    	private Activity activity;
-    	LayoutInflater inflater;
-    	SparseIntArray myPositionMap;
-    	 
-    	public MyCatSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<Category> objects) {
-    		super(activitySpinner, textViewResourceId, objects);
-    		this.categoryList = (ArrayList<Category>) objects;
-    		this.activity = activitySpinner;
-    		inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    		myPositionMap = new SparseIntArray();
-    	}
-		private class ViewHolder {
-    		TextView catName;
-    	}
-    	public View getDropDownView(int position, View convertView, ViewGroup parent) {
-    		return getCustomView(position, convertView, parent);
-    	}
-    	public View getView(int position, View convertView, ViewGroup parent) {
-    		return getCustomView(position, convertView, parent);
-    	}
-    	public View getCustomView(int position, View convertView, ViewGroup parent) {
-    		ViewHolder holder;
-    		if (convertView == null) {
-    			convertView = inflater.inflate(R.layout.activity_main_cat_spinner, null);
-    			holder = new ViewHolder();
-    			holder.catName = (TextView) convertView.findViewById(R.id.cat_spinner_text);
-    			convertView.setTag(holder);
-    		} else {
-    			holder = (ViewHolder) convertView.getTag();
-    		}
-    		Category category = categoryList.get(position);
-    		
-			myPositionMap.put(category.getID(), position);
-    		holder.catName.setText(category.getName());
-    		holder.catName.setTag(category);
-    		return convertView;
-    	}
-    	 
-	}
+/**
     
     private class MyCustomAdapter extends ArrayAdapter<Item> {
     	 
     	private ArrayList<Item> itemList;
-		Category catSelectedObj = (Category) catSpinner.getSelectedItem();
+		//Category catSelectedObj = (Category) catSpinner.getSelectedItem();
     	 
     	public MyCustomAdapter(Context context, int textViewResourceId, ArrayList<Item> itemList) {
     		super(context, textViewResourceId, itemList);
@@ -477,7 +417,7 @@ public class FlipList extends FragmentActivity {
     		return convertView;
     	} 
 	}
-    
+    */
 
     public void onBackPressed() {
     	  //Your code here
