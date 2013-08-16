@@ -27,6 +27,8 @@ public class CategoryViewFragment extends Fragment {
 	ListManager myListMan;
 	View layoutView;
 	SparseIntArray myPositionMap;
+    OnCategoryChangedListener mCallback;
+    OnCategorySelectedListener sCallback;
 	
 	// Tasks for ActivityResult
 	static Integer MANAGE_CATEGORIES = 6;
@@ -43,9 +45,17 @@ public class CategoryViewFragment extends Fragment {
  
         return truitonList;
     }
+    @Override
     public void onAttach(Activity a) {
     	super.onAttach(activity);
     	activity = a;
+        try {
+            mCallback = (OnCategoryChangedListener) activity;
+            sCallback = (OnCategorySelectedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnCategoryChangedListener");
+        }
     }
  
     /**
@@ -83,7 +93,18 @@ public class CategoryViewFragment extends Fragment {
 		refreshList();
     	Log.v("CategoryViewFragment.onActivityResult", "requestCode: " + requestCode + " resultCode: " + resultCode);
     	super.onActivityResult(requestCode, resultCode, data);
+    	mCallback.onCategoryChanged(1);
     }
+
+
+    // Container Activity must implement this interface
+    public interface OnCategoryChangedListener {
+        public void onCategoryChanged(int catID);
+    }
+    public interface OnCategorySelectedListener {
+    	public void onCategorySelected(int catID);
+    }
+
     public void initVars() {
 		myListMan = new ListManager(activity);
 		categoryList = myListMan.getCategoriesAndFilters();
@@ -111,7 +132,8 @@ public class CategoryViewFragment extends Fragment {
     		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
     			// When clicked, show a toast with the TextView text
     			Category category = (Category) parent.getItemAtPosition(position);
-				showList(category.getID());
+    			sCallback.onCategorySelected(category.getID());
+				//showList(category.getID());
     		}
     	});
     	listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -197,7 +219,9 @@ public class CategoryViewFragment extends Fragment {
     				public void onClick(View v) {  
     					TextView tv = (TextView) v;
     					Category category = (Category) tv.getTag();
-    					showList(category.getID());
+    					//showList(category.getID());
+    					Log.v("CategoryViewFragment.MyCatListCustomAdapter", "category.getID(): " + category.getID());
+    					sCallback.onCategorySelected(category.getID());
     				}  
     			};
     			holder.category_list_text_view.setOnClickListener( categoryClickListener );  

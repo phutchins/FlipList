@@ -35,6 +35,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+// Currently Working On
+//   Getting onclick for category view fragment to switch fragment to item view fragment
+//   Enabling item view fragment update when fragemnt becomes active (as in after clicking on category, or selecting a drop down item)
+//   Enabling item view fragment spinner updating
+//   Setting up an init and refresh method for erach fragment and action
+
 // ToDo Next
 // Ability to assign multiple categories to tasks
 // TODO: Format list item list display to show tiny date below description to leave more room for actual description
@@ -112,7 +118,7 @@ import android.widget.Toast;
 
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class FlipList extends FragmentActivity {
+public class FlipList extends FragmentActivity implements CategoryViewFragment.OnCategoryChangedListener, CategoryViewFragment.OnCategorySelectedListener {
 	public final static String EXTRA_MESSAGE = "com.icanhasnom.FlipList.MESSAGE";
 	public static final String TAG = "FlipList";
 	public final static int RESULT_DELETED = 3;
@@ -147,19 +153,25 @@ public class FlipList extends FragmentActivity {
     
     MyFragmentPagerAdapter mAdapter;
     ViewPager mPager;
+    
+    CategoryViewFragment categoryFragment;
+    ItemViewFragment itemFragment;
+    
     static final Integer ITEMS = 3;
     
 	// Tasks for ActivityResult
 	static Integer MANAGE_CATEGORIES = 6;
 	static Integer ADD_CATEGORY = 5;
 	static Integer EDIT_CATEGORY = 4;
-    
+	
+	static Integer CATEGORY_VIEW_FRAGMENT = 0;
+	static Integer ITEM_VIEW_FRAGMENT = 1;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
         db = new DatabaseHandler(this);
-		myPositionMap = new SparseIntArray();
 		myListMan = new ListManager(this);
 		
 		init(savedInstanceState);
@@ -180,7 +192,6 @@ public class FlipList extends FragmentActivity {
         	Log.v("FlipList.onCreate", "Restoring saved instance state");
         } else {
         	loadPref();
-;
         }
     }
 
@@ -207,7 +218,9 @@ public class FlipList extends FragmentActivity {
             }
         }
     }
-    
+    public void setCurrentPagerItem(int item) {
+    	mPager.setCurrentItem(item);
+    }
     public void restoreState(Bundle savedInstanceState) {
     	myListMan = (ListManager) savedInstanceState.getSerializable("ListManager");
     	Log.v("FlipList.restoreState", "Restored ListManager!");
@@ -271,7 +284,48 @@ public class FlipList extends FragmentActivity {
     	//addItemsOnList();
     	super.onActivityResult(requestCode, resultCode, data);
     }
-       
+    public void onCategorySelected(int selectedCat) {
+    	// Set the category spinner on ItemViewFragment here
+    	//itemFragment = (ItemViewFragment) getSupportFragmentManager().findFragmentById(R.id.);
+    	
+    	Log.v("FlipList.onCategorySelected", "selectedCat: " + selectedCat);
+
+    	setCurrentPagerItem(ITEM_VIEW_FRAGMENT);
+    	itemFragment = (ItemViewFragment) mAdapter.getItem(ITEM_VIEW_FRAGMENT);
+    	itemFragment.initCat(this, selectedCat);
+    }
+    public void onCategoryChanged(int position) {
+        // The user selected the headline of an article from the HeadlinesFragment
+        // Do something here to display that article
+/*
+        ItemViewFragment articleFrag = (ItemViewFragment) getSupportFragmentManager().findFragmentById(R.id.item_view_fragment);
+
+        if (articleFrag != null) {
+            // If article frag is available, we're in two-pane layout...
+
+            // Call a method in the ArticleFragment to update its content
+            articleFrag.updateArticleView(position);
+        } else {
+            // Otherwise, we're in the one-pane layout and must swap frags...
+
+            // Create fragment and give it an argument for the selected article
+            ArticleFragment newFragment = new ArticleFragment();
+            Bundle args = new Bundle();
+            args.putInt(ArticleFragment.ARG_POSITION, position);
+            newFragment.setArguments(args);
+        
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            // Replace whatever is in the fragment_container view with this fragment,
+            // and add the transaction to the back stack so the user can navigate back
+            transaction.replace(R.id.fragment_container, newFragment);
+            transaction.addToBackStack(null);
+
+            // Commit the transaction
+            transaction.commit();
+        }
+        **/
+    }
     private void loadPref(){
     	mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         defaultCatID = Integer.parseInt(mySharedPreferences.getString(getString(R.string.default_category_key), getString(R.integer.default_category_default)));
@@ -423,4 +477,5 @@ public class FlipList extends FragmentActivity {
     	  //Your code here
     	  super.onBackPressed();
     }
+
 }
