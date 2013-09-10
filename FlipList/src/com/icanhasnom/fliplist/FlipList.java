@@ -179,12 +179,30 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
         setContentView(R.layout.fragment_pager);
         
         mAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
+        Fragment testFrag = mAdapter.getItem(ITEM_VIEW_FRAGMENT);
+        Log.v("FlipList.onCreate", "testFrag: " + testFrag);
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
         
 		//loadPref();
         Log.v("FlipList.onCreate", "defaultCatID: " + defaultCatID);
 		Log.v("FlipList.onCreate", "2) this: " + this);
+		
+        // Watch for button clicks.
+		/*
+        Button button = (Button)findViewById(R.id.goto_first);
+        button.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                mPager.setCurrentItem(0);
+            }
+        });
+        button = (Button)findViewById(R.id.goto_last);
+        button.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                mPager.setCurrentItem(NUM_ITEMS-1);
+            }
+        });
+        */
     }
     public void init(Bundle savedInstanceState) {
         if(savedInstanceState != null) {
@@ -214,7 +232,7 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
             case 2:
             	return FilterViewFragment.init(position);
             default:
-                return ListViewFragment.init(position);
+                return CategoryViewFragment.init(position);
             }
         }
     }
@@ -292,7 +310,11 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
 
     	setCurrentPagerItem(ITEM_VIEW_FRAGMENT);
     	itemFragment = (ItemViewFragment) mAdapter.getItem(ITEM_VIEW_FRAGMENT);
-    	itemFragment.initCat(this, selectedCat);
+    	Log.v("FlipList.onCategorySelected", "itemFragment: " + itemFragment);
+    	//mAdapter.getItem(ITEM_VIEW_FRAGMENT).
+    	mAdapter.notifyDataSetChanged();
+    	// TODO: Should I be initing the item list from here or can i have it update each time it comes into view?
+    	itemFragment.initCat(FlipList.this, selectedCat);
     }
     public void onCategoryChanged(int position) {
         // The user selected the headline of an article from the HeadlinesFragment

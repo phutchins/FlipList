@@ -26,7 +26,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int DATABASE_VERSION = 64;
+	private static final int DATABASE_VERSION = 65;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
