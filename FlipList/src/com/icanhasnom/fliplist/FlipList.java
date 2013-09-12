@@ -309,6 +309,9 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
     	Log.v("FlipList.onCategorySelected", "selectedCat: " + selectedCat);
 
     	setCurrentPagerItem(ITEM_VIEW_FRAGMENT);
+    	// The assignment below creates a new fragment instance
+    	//   how do I grab the current instance instead?
+    	// TODO: Fix this!
     	itemFragment = (ItemViewFragment) mAdapter.getItem(ITEM_VIEW_FRAGMENT);
     	Log.v("FlipList.onCategorySelected", "itemFragment: " + itemFragment);
     	//mAdapter.getItem(ITEM_VIEW_FRAGMENT).

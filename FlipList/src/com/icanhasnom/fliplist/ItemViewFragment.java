@@ -150,6 +150,7 @@ public class ItemViewFragment extends Fragment {
         catList = myListMan.getCategoriesAndFilters();
         Log.v("ItemViewFragment.addItemsOnSpinner", "layoutView: " + layoutView);
         //View layoutView = getView().findViewById(R.layout.fragment_item_list_layout);
+        Log.v("ItemViewFragment.addItemsOnSpinner", "THIS: " + this);
         catSpinner = (Spinner) layoutView.findViewById(R.id.list_spinner);
 
         buildIndex(catList);
