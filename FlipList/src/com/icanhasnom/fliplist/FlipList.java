@@ -187,6 +187,7 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
 		//loadPref();
         Log.v("FlipList.onCreate", "defaultCatID: " + defaultCatID);
 		Log.v("FlipList.onCreate", "2) this: " + this);
+		Log.v("FlipList.onCreate", "Fragment Tag (2): " + getFragmentTag(2));
 		
         // Watch for button clicks.
 		/*
@@ -212,6 +213,10 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
         	loadPref();
         }
     }
+    
+    private String getFragmentTag(int pos){
+        return "android:switcher:"+R.id.pager+":"+pos;
+    }
 
     public static class MyFragmentPagerAdapter extends FragmentPagerAdapter {
 		public MyFragmentPagerAdapter(android.support.v4.app.FragmentManager fragmentManager) {
@@ -229,6 +234,7 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
                 return CategoryViewFragment.init(position);
             case 1:
                 return ItemViewFragment.init(position);
+                //Log.v("FlipList.getItem", "ItemViewFragment: " + viewId);
             case 2:
             	return FilterViewFragment.init(position);
             default:
@@ -312,12 +318,12 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
     	// The assignment below creates a new fragment instance
     	//   how do I grab the current instance instead?
     	// TODO: Fix this!
-    	itemFragment = (ItemViewFragment) mAdapter.getItem(ITEM_VIEW_FRAGMENT);
+    	//itemFragment = (ItemViewFragment) mAdapter.getItem(ITEM_VIEW_FRAGMENT);
     	Log.v("FlipList.onCategorySelected", "itemFragment: " + itemFragment);
     	//mAdapter.getItem(ITEM_VIEW_FRAGMENT).
     	mAdapter.notifyDataSetChanged();
     	// TODO: Should I be initing the item list from here or can i have it update each time it comes into view?
-    	itemFragment.initCat(FlipList.this, selectedCat);
+    	//itemFragment.initCat(FlipList.this, selectedCat);
     }
     public void onCategoryChanged(int position) {
         // The user selected the headline of an article from the HeadlinesFragment

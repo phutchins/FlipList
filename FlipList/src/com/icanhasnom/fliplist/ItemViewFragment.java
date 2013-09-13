@@ -67,6 +67,7 @@ public class ItemViewFragment extends Fragment {
     public void onAttach(Activity a) {
     	super.onAttach(activity);
     	activity = a;
+    	//initFrag(activity);
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,8 +82,6 @@ public class ItemViewFragment extends Fragment {
         //otherView = layoutView.findViewById(R.id.)
         //catSpinner = (Spinner) layoutView.findViewById(R.id.list_spinner);
 
-
-		
 		initFrag(activity);
 		
 		Log.v("ItemListFragment.onCreateView", "currentCatID: " + currentCatID);
@@ -149,14 +148,19 @@ public class ItemViewFragment extends Fragment {
     public void addItemsOnSpinner(Activity myActivity) {
         catList = myListMan.getCategoriesAndFilters();
         Log.v("ItemViewFragment.addItemsOnSpinner", "layoutView: " + layoutView);
-        //View layoutView = getView().findViewById(R.layout.fragment_item_list_layout);
+        Log.v("ItemViewFragment.addItemsOnSpinner", "myActivity: " + myActivity);
+        //View myItemView = this.findViewById(R.layout.fragment_item_list_layout);
+        //Log.v("ItemViewFragment.addItemsOnSpinner", "myItemView: " + myItemView);
         Log.v("ItemViewFragment.addItemsOnSpinner", "THIS: " + this);
+        Log.v("ItemViewFragment.addItemsOnSpinner", "R.id.viewpager: " + R.id.pager);
         catSpinner = (Spinner) layoutView.findViewById(R.id.list_spinner);
+        //catSpinner = (Spinner) myActivity.findViewById(R.id.list_spinner);
+
 
         buildIndex(catList);
         
         Log.v("ItemViewFragment.addItemsOnSpinner", "myActivity: " + myActivity);
-        Log.v("ItemViewFragment.addItemsOnSpinner", "R.layout.fragment_item_list_layout" + R.layout.fragment_item_list_layout);
+        Log.v("ItemViewFragment.addItemsOnSpinner", "R.layout.fragment_item_list_layout: " + R.layout.fragment_item_list_layout);
         Log.v("ItemViewFragment.addItemsOnSpinner", "catList: " + catList);
         
         catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(myActivity, R.layout.fragment_item_list_layout, catList);
