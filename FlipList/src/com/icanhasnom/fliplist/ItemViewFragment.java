@@ -113,6 +113,10 @@ public class ItemViewFragment extends Fragment {
     	addItemsOnSpinner(myActivity);
     	addItemsOnList(myItemList);
     }
+    public void refreshPage(Activity myActivity) {
+    	addItemsOnSpinner(myActivity);
+    	addItemsOnList(myItemList);
+    }
     public void initCat(Activity myActivity, int cat) {
     	//TODO: myActivity is nill when passed from another fragment. Get the activity from something else.
     	//initObjs(myActivity);

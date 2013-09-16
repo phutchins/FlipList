@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -322,6 +323,7 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
     	Log.v("FlipList.onCategorySelected", "itemFragment: " + itemFragment);
     	//mAdapter.getItem(ITEM_VIEW_FRAGMENT).
     	mAdapter.notifyDataSetChanged();
+    	Fragment itemViewFrag = FragmentManager.findFragmentByTag(getFragmentTag(ITEM_VIEW_FRAGMENT));
     	// TODO: Should I be initing the item list from here or can i have it update each time it comes into view?
     	//itemFragment.initCat(FlipList.this, selectedCat);
     }
