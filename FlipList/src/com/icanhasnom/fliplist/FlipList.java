@@ -4,6 +4,8 @@ import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -16,6 +18,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -219,7 +222,8 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
         return "android:switcher:"+R.id.pager+":"+pos;
     }
 
-    public static class MyFragmentPagerAdapter extends FragmentPagerAdapter {
+    public static class MyFragmentPagerAdapter extends FragmentStatePagerAdapter {
+    	private Map<Integer, Fragment> mPageReferenceMap = new HashMap<Integer, Fragment>();
 		public MyFragmentPagerAdapter(android.support.v4.app.FragmentManager fragmentManager) {
             super(fragmentManager);
         }
@@ -232,15 +236,33 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
         public Fragment getItem(int position) {
             switch (position) {
             case 0:
-                return CategoryViewFragment.init(position);
+            	Fragment categoryViewFragment = CategoryViewFragment.init(position);
+            	mPageReferenceMap.put(Integer.valueOf(position), categoryViewFragment);
+                return categoryViewFragment;
             case 1:
-                return ItemViewFragment.init(position);
+            	Fragment itemViewFragment = ItemViewFragment.init(position);
+            	mPageReferenceMap.put(Integer.valueOf(position), itemViewFragment);
+                return itemViewFragment;
                 //Log.v("FlipList.getItem", "ItemViewFragment: " + viewId);
             case 2:
-            	return FilterViewFragment.init(position);
+            	Fragment filterViewFragment = FilterViewFragment.init(position);
+            	mPageReferenceMap.put(Integer.valueOf(position),  filterViewFragment);
+            	return filterViewFragment;
             default:
-                return CategoryViewFragment.init(position);
+            	CategoryViewFragment defCategoryViewFragment = CategoryViewFragment.init(position);
+            	mPageReferenceMap.put(Integer.valueOf(position), defCategoryViewFragment);
+                return defCategoryViewFragment;
             }
+        }
+        @SuppressWarnings("deprecation")
+		@Override
+        public void destroyItem(View container, int position, Object object) {
+        	super.destroyItem(container,  position,  object);
+        	mPageReferenceMap.remove(Integer.valueOf(position));
+        	
+        }
+        public Fragment getFragment(int key) {
+        	return mPageReferenceMap.get(key);
         }
     }
     public void setCurrentPagerItem(int item) {
@@ -323,9 +345,11 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
     	Log.v("FlipList.onCategorySelected", "itemFragment: " + itemFragment);
     	//mAdapter.getItem(ITEM_VIEW_FRAGMENT).
     	mAdapter.notifyDataSetChanged();
-    	Fragment itemViewFrag = FragmentManager.findFragmentByTag(getFragmentTag(ITEM_VIEW_FRAGMENT));
+    	//MyFragmentPagerAdapter adapter = (MyFragmentPagerAdapter) mPager.getAdapter();
+    	ItemViewFragment ivf = (ItemViewFragment) ((MyFragmentPagerAdapter)mPager.getAdapter()).getFragment(ITEM_VIEW_FRAGMENT);
+    	//Fragment itemViewFrag = getSupportFragmentManager().findFragmentByTag(getFragmentTag(ITEM_VIEW_FRAGMENT));
     	// TODO: Should I be initing the item list from here or can i have it update each time it comes into view?
-    	//itemFragment.initCat(FlipList.this, selectedCat);
+    	ivf.initCat(FlipList.this, selectedCat);
     }
     public void onCategoryChanged(int position) {
         // The user selected the headline of an article from the HeadlinesFragment

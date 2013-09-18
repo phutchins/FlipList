@@ -122,8 +122,9 @@ public class ItemViewFragment extends Fragment {
     	//initObjs(myActivity);
     	initObjs(myActivity);
     	//TODO: FIX THIS
-    	addItemsOnSpinner(myActivity);
+    	currentCategory = myListMan.getCategory(cat);
     	myItemList = getItemList(cat);
+    	addItemsOnSpinner(myActivity);
     	addItemsOnList(myItemList);
     }
     @Override
