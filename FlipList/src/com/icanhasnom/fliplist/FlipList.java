@@ -119,6 +119,7 @@ import android.widget.Toast;
 // TODO: Turn Due Date RED if its past current date
 // TODO: Make each field on edit screen show up only if assigned & create + button to add each one
 // TODO: Break preferences out to its own class (PreferencesHelper?)
+// TODO: Move database clear on upgrade to a function and only do this once we have a DB upgrade function set up also
 
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -325,6 +326,7 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
     		// Refresh content in CategoryViewFragment
     		//CategoryViewFragment catViewFragment = (CategoryViewFragment) mAdapter.getItem(0);
     		//catViewFragment.refreshList();
+    		mAdapter.notifyDataSetChanged();
     	}
     	//addItemsOnSpinner();
     	// TODO: Do i need this?
@@ -332,23 +334,11 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
     	super.onActivityResult(requestCode, resultCode, data);
     }
     public void onCategorySelected(int selectedCat) {
-    	// Set the category spinner on ItemViewFragment here
-    	//itemFragment = (ItemViewFragment) getSupportFragmentManager().findFragmentById(R.id.);
-    	
     	Log.v("FlipList.onCategorySelected", "selectedCat: " + selectedCat);
-
     	setCurrentPagerItem(ITEM_VIEW_FRAGMENT);
-    	// The assignment below creates a new fragment instance
-    	//   how do I grab the current instance instead?
-    	// TODO: Fix this!
-    	//itemFragment = (ItemViewFragment) mAdapter.getItem(ITEM_VIEW_FRAGMENT);
     	Log.v("FlipList.onCategorySelected", "itemFragment: " + itemFragment);
-    	//mAdapter.getItem(ITEM_VIEW_FRAGMENT).
     	mAdapter.notifyDataSetChanged();
-    	//MyFragmentPagerAdapter adapter = (MyFragmentPagerAdapter) mPager.getAdapter();
     	ItemViewFragment ivf = (ItemViewFragment) ((MyFragmentPagerAdapter)mPager.getAdapter()).getFragment(ITEM_VIEW_FRAGMENT);
-    	//Fragment itemViewFrag = getSupportFragmentManager().findFragmentByTag(getFragmentTag(ITEM_VIEW_FRAGMENT));
-    	// TODO: Should I be initing the item list from here or can i have it update each time it comes into view?
     	ivf.initCat(FlipList.this, selectedCat);
     }
     public void onCategoryChanged(int position) {

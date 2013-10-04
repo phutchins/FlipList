@@ -247,16 +247,16 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	// Upgrading database
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		//dropTables(db);
+		onCreate(db);
+	}
+	public void dropTables(SQLiteDatabase db) {
 		// Drop older table if existed
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEMS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEM_TYPES);
-		//db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTERS);
-			
-		onCreate(db);
 	}
-	
 	public void getPreferences() {
 		//PreferencesHelper myPrefs= new PreferencesHelper(getApplicationContext());  
 

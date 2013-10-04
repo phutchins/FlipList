@@ -118,13 +118,10 @@ public class ItemViewFragment extends Fragment {
     	addItemsOnList(myItemList);
     }
     public void initCat(Activity myActivity, int cat) {
-    	//TODO: myActivity is nill when passed from another fragment. Get the activity from something else.
-    	//initObjs(myActivity);
     	initObjs(myActivity);
-    	//TODO: FIX THIS
     	currentCategory = myListMan.getCategory(cat);
     	myItemList = getItemList(cat);
-    	addItemsOnSpinner(myActivity);
+    	addItemsOnSpinner(myActivity); 
     	addItemsOnList(myItemList);
     }
     @Override
