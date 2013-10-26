@@ -220,17 +220,17 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		//String CREATE_SETTING_PROTECTED_CATS = "insert into " + TABLE_SETTINGS + "(" + KEY_SETTING_ID + "," + KEY_SETTING_NAME + ","
 		//		+ KEY_SETTING_VAL1 + "," + KEY_SETTING_VAL2 + ") values(3, 'protectedCats', '0,1', 'unused')";
 		
-		db.execSQL(CREATE_CATEGORIES_TABLE);
-		db.execSQL(CREATE_ITEMS_TABLE);
-		db.execSQL(CREATE_TYPES_TABLE);
-		db.execSQL(CREATE_FILTERS_TABLE);
+		//db.execSQL(CREATE_CATEGORIES_TABLE);
+		//db.execSQL(CREATE_ITEMS_TABLE);
+		//db.execSQL(CREATE_TYPES_TABLE);
+		//db.execSQL(CREATE_FILTERS_TABLE);
 		//db.execSQL(CREATE_SETTINGS_TABLE);
-		db.execSQL(CREATE_UNCATEGORIZED_CATEGORY);
-		db.execSQL(CREATE_ARCHIVE_CATEGORY);
-		db.execSQL(CREATE_ALL_CATEGORY);
-		db.execSQL(CREATE_TYPE_GENERIC);
-		db.execSQL(CREATE_TYPE_GROCERY);
-		db.execSQL(CREATE_TYPE_TODO);
+		//db.execSQL(CREATE_UNCATEGORIZED_CATEGORY);
+		//db.execSQL(CREATE_ARCHIVE_CATEGORY);
+		//db.execSQL(CREATE_ALL_CATEGORY);
+		//db.execSQL(CREATE_TYPE_GENERIC);
+		//db.execSQL(CREATE_TYPE_GROCERY);
+		//db.execSQL(CREATE_TYPE_TODO);
 		db.execSQL(CREATE_FILTER_NONE);
 		db.execSQL(CREATE_FILTER_ALL);
 		db.execSQL(CREATE_FILTER_ACTIVE);
@@ -247,14 +247,14 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	// Upgrading database
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		//dropTables(db);
+		dropTables(db);
 		onCreate(db);
 	}
 	public void dropTables(SQLiteDatabase db) {
 		// Drop older table if existed
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEMS);
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEM_TYPES);
+		//db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
+		//db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEMS);
+		//db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEM_TYPES);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTERS);
 	}
 	public void getPreferences() {
@@ -284,7 +284,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		if (prefRemoveCompletedItems.equals("1")) {
 			Integer delayInt = Integer.valueOf(prefRemoveCompletedItemsDelay);
 			//SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-			//Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "prefRemoveCompletedItemsDelay: " + prefRemoveCompletedItemsDelay);
+			Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "prefRemoveCompletedItemsDelay: " + prefRemoveCompletedItemsDelay);
+			Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "delayInt: " + delayInt);
 	    	// TODO: make this use the result from prefRemoveCompletedItemsDelay preference as a negative number
 	    	//compareDateCal.add(Calendar.MINUTE, -delayInt);
 			//compareDate = sdfDateTime.format(compareDateCal.getTime());
@@ -294,7 +295,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		}
 		// Show all items always
 		if (prefRemoveCompletedItems.equals("2")) {
-			// Do nothing
+			prefQueryStringValues = "";
 		}
 	}
 	public static int hoursAgo(String datetime) {
@@ -422,15 +423,20 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		int filterID = myCat.getFilterID();
 		//Log.v("DatabaseHandler.getItemList", "filterID: " + filterID);
 		// Filter ID 0 means use preferences as there is no filter applied
+		//filterID = 1;
+		Log.v("DatabaseHandler.getItemList", "prefQueryStringValues: " + prefQueryStringValues);
+		Log.v("DatabaseHandler.getItemList", "prefQueryStringValueArgs: " + prefQueryStringValueArgs);
 		if (filterID == 0) {
 			if (!prefQueryStringValues.isEmpty()) {
+				// No filter so show all completed items in the selected category
 				dbValues = prefQueryStringValues + " AND cat=?";
 				dbValueArgs = prefQueryStringValueArgs + ";" + catID;
 			} else {
+				// Add filter from preferences
 				dbValues = "cat=?";
 				dbValueArgs = String.valueOf(catID);
 			}
-			//Log.v("DatabaseHandler.getItemList", "USING DEFAULTS - dbValues: " + dbValues + " dbValueArgs: " + dbValueArgs);
+			Log.v("DatabaseHandler.getItemList", "USING DEFAULTS - dbValues: " + dbValues + " dbValueArgs: " + dbValueArgs);
 		} else {
 			// Get the selected filter and do not use defaults or preferences
 			// TODO: use something like myFilter.getQuery(catID) to build and return the full query

@@ -300,6 +300,10 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
     		 intent.setClass(FlipList.this, SetPreferenceActivity.class);
     	     startActivityForResult(intent, 0);
     		break;
+    	case R.id.export_import_db:
+    		Intent exportImportIntent = new Intent();
+    		exportImportIntent.setClass(FlipList.this, ExportImportDBActivity.class);
+    		startActivityForResult(exportImportIntent, 9);
     	default:
     		return super.onOptionsItemSelected(item);
     	}

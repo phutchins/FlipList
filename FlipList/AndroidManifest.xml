@@ -7,6 +7,9 @@
     <uses-sdk
         android:minSdkVersion="14"
         android:targetSdkVersion="15" />
+    
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+   	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -59,6 +62,10 @@
         <activity
             android:name="com.icanhasnom.fliplist.AddEditCatListActivity"
             android:label="@string/title_activity_add_edit_cat_list" >
+        </activity>
+        <activity
+            android:name="com.icanhasnom.fliplist.ExportImportDBActivity"
+            android:label="@string/title_activity_export_import_db" >
         </activity>
     </application>
 

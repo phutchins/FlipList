@@ -9,5 +9,9 @@
         android:title="@string/menu_add_edit_cat"
         android:orderInCategory="200"
         android:showAsAction="never" />
+    <item android:id="@+id/export_import_db"
+        android:title="@string/menu_export_import_db"
+        android:orderInCategory="300"
+        android:showAsAction="never" />
     
 </menu>
