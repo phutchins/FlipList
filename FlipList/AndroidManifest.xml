@@ -32,7 +32,7 @@
                 android:value="com.icanhasnom.fliplist.Fliplist" />
         </activity>
         <activity
-            android:name="com.icanhasnom.fliplist.AddEditCatActivity"
+            android:name="com.icanhasnom.fliplist.AddEditListActivity"
             android:label="@string/title_activity_add_edit_cat"
             android:parentActivityName="com.icanhasnom.fliplist.FlipList" >
             <meta-data
@@ -60,7 +60,7 @@
             android:label="@string/title_activity_add_edit_item" >
         </activity>
         <activity
-            android:name="com.icanhasnom.fliplist.AddEditCatListActivity"
+            android:name="com.icanhasnom.fliplist.AddEditFlistListActivity"
             android:label="@string/title_activity_add_edit_cat_list" >
         </activity>
         <activity

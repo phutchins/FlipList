@@ -78,7 +78,7 @@ public class FilterViewFragment extends Fragment {
     		public void onItemClick(AdapterView<?> parent, View view,
     		int position, long id) {
     			// When clicked, show a toast with the TextView text
-    			Category category = (Category) parent.getItemAtPosition(position);
+    			Flist category = (Flist) parent.getItemAtPosition(position);
     			Toast.makeText(activity,
     					"Clicked on Row: " + category.getDescription(), 
     					Toast.LENGTH_LONG).show();

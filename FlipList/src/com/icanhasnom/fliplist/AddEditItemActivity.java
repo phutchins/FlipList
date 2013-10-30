@@ -39,7 +39,7 @@ public class AddEditItemActivity extends Activity {
     MyCatSpinnerCustomAdapter catSpinnerDataAdapter;
     SparseIntArray myPositionMap;
 
-	ArrayList<Category> categoryList;
+	ArrayList<Flist> categoryList;
 
 
 	@Override
@@ -49,7 +49,7 @@ public class AddEditItemActivity extends Activity {
 		final ActionBar bar = getActionBar();
 		bar.setHomeButtonEnabled(true);
 		myListMan = new ListManager(this);
-		categoryList = myListMan.getCategories();
+		categoryList = myListMan.getFlists();
 		myPositionMap = new SparseIntArray();
 		myPositionMap = buildIndex(categoryList);
 		
@@ -89,10 +89,10 @@ public class AddEditItemActivity extends Activity {
     	itemCatSpinner = (Spinner) findViewById(R.id.item_edit_category_spinner);
         itemCatSpinner.setAdapter(catSpinnerDataAdapter);
 	}
-	public SparseIntArray buildIndex(ArrayList<Category> myCatList) {
+	public SparseIntArray buildIndex(ArrayList<Flist> myCatList) {
 		Integer position = 0;
 		SparseIntArray myPositionMap = new SparseIntArray();
-		for (Category myCat : myCatList) {
+		for (Flist myCat : myCatList) {
 			myPositionMap.put(myCat.getID(), position);
 			position++;
 		}
@@ -137,7 +137,7 @@ public class AddEditItemActivity extends Activity {
         
         addCategoriesToSpinner();
         
-        int spinnerPosition = getPosition(currentItem.getPrimaryCat(), myPositionMap);
+        int spinnerPosition = getPosition(currentItem.getFlist(), myPositionMap);
         itemCatSpinner.setSelection(spinnerPosition);
         
 		Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "myPosition(0): " + myPositionMap.get(0) + " myPosition(1): " + myPositionMap.get(1) + " myPosition.get(2): " + myPositionMap.get(2));
@@ -145,7 +145,7 @@ public class AddEditItemActivity extends Activity {
 
     	// TODO: Make this into a generic addItemsToSpinner method that I can use with the first spinner also
         //Log.v("AddEditItemActivity.editListItem", "catSpinnerDataAdapter: " + catSpinnerDataAdapter);
-        Log.v("AddEditItemActivity.editListItem", "Item Name: " + currentItem.getName() + " Primary Cat: " + currentItem.getPrimaryCat());
+        Log.v("AddEditItemActivity.editListItem", "Item Name: " + currentItem.getName() + " Primary Cat: " + currentItem.getFlist());
         
 
     }
@@ -154,7 +154,8 @@ public class AddEditItemActivity extends Activity {
     	EditText itemNameTv = (EditText) findViewById(R.id.item_edit_name_edittext);
     	CheckBox itemCompleted = (CheckBox) findViewById(R.id.item_completed_checkbox);
     	EditText itemDescTv = (EditText) findViewById(R.id.item_edit_description_edittext);
-    	Spinner itemCatSpinner = (Spinner) findViewById(R.id.item_edit_category_spinner);
+    	// TODO: Where does this spinner come from? Is this to set the category or getting the category (list) that it was created from
+    	Spinner itemCategorySpinner = (Spinner) findViewById(R.id.item_edit_category_spinner);
     	EditText itemNotesTv = (EditText) findViewById(R.id.item_edit_notes_edittext);
     	Button itemDueTimeBtn = (Button) findViewById(R.id.time_edit_button);
     	Button itemDueDateBtn = (Button) findViewById(R.id.date_edit_button);
@@ -162,8 +163,8 @@ public class AddEditItemActivity extends Activity {
     	int itemID = Integer.parseInt(itemIDTv.getText().toString());
     	String itemName = itemNameTv.getText().toString();
     	String itemDesc = itemDescTv.getText().toString();
-    	Category itemCategory = (Category) itemCatSpinner.getItemAtPosition(itemCatSpinner.getSelectedItemPosition());
-    	int itemCategoryID = itemCategory.getID();
+    	Flist itemFlist = (Flist) itemCategorySpinner.getItemAtPosition(itemCategorySpinner.getSelectedItemPosition());
+    	int itemFlistID = itemFlist.getID();
     	String itemNotes = itemNotesTv.getText().toString();
     	String itemDueTime = (String) itemDueTimeBtn.getTag();
     	String itemDueDate = (String) itemDueDateBtn.getTag();
@@ -172,7 +173,7 @@ public class AddEditItemActivity extends Activity {
     	myItem.setID(itemID);
     	myItem.setName(itemName);
     	myItem.setDescription(itemDesc);
-    	myItem.setPrimaryCat(itemCategoryID);
+    	myItem.setFlist(itemFlistID);
     	myItem.setNotes(itemNotes);
     	myItem.setDueTime(itemDueTime);
     	myItem.setCompleted(itemCompleted.isChecked());
@@ -193,7 +194,7 @@ public class AddEditItemActivity extends Activity {
     	myListMan.updateItem(myItem);
     	
     	Intent intent = new Intent();
-    	intent.putExtra("catID", itemCategoryID);
+    	intent.putExtra("flistID", itemFlistID);
     	setResult(RESULT_OK, intent);
     	super.finish();
     	
@@ -319,17 +320,17 @@ public class AddEditItemActivity extends Activity {
         newFragment.show(getFragmentManager(), "datePicker");
     }
     
-    private class MyCatSpinnerCustomAdapter extends ArrayAdapter<Category> {
+    private class MyCatSpinnerCustomAdapter extends ArrayAdapter<Flist> {
      	 
-    	private ArrayList<Category> categoryList;
+    	private ArrayList<Flist> categoryList;
     	private Activity activity;
     	LayoutInflater inflater;
     	//Map<Integer, Integer> myPositionMap = new HashMap<Integer, Integer>();
 
     	 
-    	public MyCatSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<Category> objects) {
+    	public MyCatSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<Flist> objects) {
     		super(activitySpinner, textViewResourceId, objects);
-    		this.categoryList = (ArrayList<Category>) objects;
+    		this.categoryList = (ArrayList<Flist>) objects;
     		this.activity = activitySpinner;
     		inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     		//Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "Initializing myPositionMap");
@@ -355,7 +356,7 @@ public class AddEditItemActivity extends Activity {
     		} else {
     			holder = (ViewHolder) convertView.getTag();
     		}
-    		Category category = categoryList.get(position);
+    		Flist category = categoryList.get(position);
     		
 
 			Log.v("AddEditItemActivity.catSpinnerCustomAdapter", "Adding CatID: " + category.getID() + " with position " + position);

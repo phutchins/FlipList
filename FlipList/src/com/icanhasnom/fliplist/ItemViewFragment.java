@@ -2,7 +2,7 @@ package com.icanhasnom.fliplist;
  
 import java.util.ArrayList;
 
-import com.icanhasnom.fliplist.AddEditCatActivity.MyFilterSpinnerCustomAdapter;
+import com.icanhasnom.fliplist.AddEditListActivity.MyFilterSpinnerCustomAdapter;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -36,23 +36,23 @@ public class ItemViewFragment extends Fragment {
 	
 	SparseIntArray myPositionMap;
 	ListManager myListMan;
-	int defaultCatID;
-	int currentCatID;
-	Category currentCategory;
+	int defaultFlistID;
+	int currentFlistID;
+	Flist currentFlist;
 	ListPreferenceManager prefMan;
 	ItemList myItemList;
-    ArrayList<Category> catList;
+    ArrayList<Flist> flistList;
     ArrayList<Item> myListItems;
     MyCustomAdapter itemListDataAdapter;
     SharedPreferences mySharedPreferences;
     
-    MyCatSpinnerCustomAdapter catSpinnerDataAdapter;
-    Spinner catSpinner;
+    MyCatSpinnerCustomAdapter flistSpinnerDataAdapter;
+    Spinner flistSpinner;
     
     ItemList currentItemList;
     ArrayList<Item> currentListItems;
     
-	ArrayList<Category> listList;
+	ArrayList<Flist> listList;
 	ViewGroup container;
 	Activity activity;
 	View layoutView;
@@ -84,13 +84,13 @@ public class ItemViewFragment extends Fragment {
 
 		initFrag(activity);
 		
-		Log.v("ItemListFragment.onCreateView", "currentCatID: " + currentCatID);
+		Log.v("ItemListFragment.onCreateView", "currentFlistID: " + currentFlistID);
 
         //catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(activity, R.layout.fragment_item_list_layout, catList);
         //catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		Log.v("ItemListActivity.onCreate", "Current category is: " + currentCategory.getName());
+		Log.v("ItemListActivity.onCreate", "Current category is: " + currentFlist.getName());
 
-		currentItemList = myListMan.getItemList(defaultCatID);
+		currentItemList = myListMan.getItemList(defaultFlistID);
 		//myPositionMap = new SparseIntArray();
 
 		//addItemsOnSpinner();
@@ -104,23 +104,28 @@ public class ItemViewFragment extends Fragment {
     public void initFrag(Activity myActivity) {
     	initObjs(myActivity);
     	
-    	myItemList = getItemList(currentCatID);
-		currentCatID = prefMan.currentCategoryID;
-		defaultCatID = prefMan.defaultCatID;
-		Log.v("ItemViewFragment.initFrag", "currentCatID: " + currentCatID);
-		currentCategory = getCategoryObj(currentCatID);
+    	myItemList = getItemList(currentFlistID);
+		currentFlistID = prefMan.currentFlistID;
+		defaultFlistID = prefMan.defaultFlistID;
+		Log.v("ItemViewFragment.initFrag", "currentFlistID: " + currentFlistID);
+		currentFlist = getFlistObj(currentFlistID);
 		
     	addItemsOnSpinner(myActivity);
-    	addItemsOnList(myItemList);
+    	try {
+        	addItemsOnList(myItemList);
+    	} catch (Exception e) {
+    		Log.v("initFrag", "Exception: " + e.getMessage());
+    	}
+
     }
     public void refreshPage(Activity myActivity) {
     	addItemsOnSpinner(myActivity);
     	addItemsOnList(myItemList);
     }
-    public void initCat(Activity myActivity, int cat) {
+    public void initCat(Activity myActivity, int fl) {
     	initObjs(myActivity);
-    	currentCategory = myListMan.getCategory(cat);
-    	myItemList = getItemList(cat);
+    	currentFlist = myListMan.getFlist(fl);
+    	myItemList = getItemList(fl);
     	addItemsOnSpinner(myActivity); 
     	addItemsOnList(myItemList);
     }
@@ -134,12 +139,12 @@ public class ItemViewFragment extends Fragment {
     	if (requestCode == 0) {
     	}
     	if (requestCode == 1 && resultCode == RESULT_OK) {
-            //currentCategoryID = data.getIntExtra("catID", currentCategoryID);
+            //currentFlistID = data.getIntExtra("catID", currentFlistID);
     	}
     	updateList(activity);
     }
-	public Category getCategoryObj(int catID) {
-		Category myCat = myListMan.getCategory(catID);
+	public Flist getFlistObj(int catID) {
+		Flist myCat = myListMan.getFlist(catID);
 		return myCat;
 	}
 	public ItemList getItemList(int catID) {
@@ -147,36 +152,38 @@ public class ItemViewFragment extends Fragment {
 		Log.v("ItemListActivity.onCreate", "Got item List for catID: " + catID);
 		return itemList;
 	}
+	// TODO: Add other functions to add filters and categories to the spinner
+	// and add another spinner or tab on the fragment to switch between the three
     public void addItemsOnSpinner(Activity myActivity) {
-        catList = myListMan.getCategoriesAndFilters();
+        flistList = myListMan.getFlists();
         Log.v("ItemViewFragment.addItemsOnSpinner", "layoutView: " + layoutView);
         Log.v("ItemViewFragment.addItemsOnSpinner", "myActivity: " + myActivity);
         //View myItemView = this.findViewById(R.layout.fragment_item_list_layout);
         //Log.v("ItemViewFragment.addItemsOnSpinner", "myItemView: " + myItemView);
         Log.v("ItemViewFragment.addItemsOnSpinner", "THIS: " + this);
         Log.v("ItemViewFragment.addItemsOnSpinner", "R.id.viewpager: " + R.id.pager);
-        catSpinner = (Spinner) layoutView.findViewById(R.id.list_spinner);
+        flistSpinner = (Spinner) layoutView.findViewById(R.id.list_spinner);
         //catSpinner = (Spinner) myActivity.findViewById(R.id.list_spinner);
 
 
-        buildIndex(catList);
+        buildIndex(flistList);
         
         Log.v("ItemViewFragment.addItemsOnSpinner", "myActivity: " + myActivity);
         Log.v("ItemViewFragment.addItemsOnSpinner", "R.layout.fragment_item_list_layout: " + R.layout.fragment_item_list_layout);
-        Log.v("ItemViewFragment.addItemsOnSpinner", "catList: " + catList);
+        Log.v("ItemViewFragment.addItemsOnSpinner", "catList: " + flistList);
         
-        catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(myActivity, R.layout.fragment_item_list_layout, catList);
-        catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        flistSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(myActivity, R.layout.fragment_item_list_layout, flistList);
+        flistSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         
-        Log.v("ItemViewFragment.addItemsOnSpinner", "catSpinner: " + catSpinner);
-        Log.v("ItemViewFragment.addItemsOnSpinner", "catSpinnerDataAdapter: " + catSpinnerDataAdapter);
+        Log.v("ItemViewFragment.addItemsOnSpinner", "catSpinner: " + flistSpinner);
+        Log.v("ItemViewFragment.addItemsOnSpinner", "catSpinnerDataAdapter: " + flistSpinnerDataAdapter);
         
-        catSpinner.setAdapter(catSpinnerDataAdapter);
+        flistSpinner.setAdapter(flistSpinnerDataAdapter);
         
-        Log.v("ItemViewFragment.addItemsOnSpinner", "currentCategory.getID(): " + currentCategory.getID());
-        catSpinner.setOnItemSelectedListener(new SpinnerActivity());
-        catSpinner.setSelection(getPosition(currentCategory.getID()));
-        catSpinnerDataAdapter.notifyDataSetChanged();
+        Log.v("ItemViewFragment.addItemsOnSpinner", "currentFlist.getID(): " + currentFlist.getID());
+        flistSpinner.setOnItemSelectedListener(new SpinnerActivity());
+        flistSpinner.setSelection(getPosition(currentFlist.getID()));
+        flistSpinnerDataAdapter.notifyDataSetChanged();
         
         //ArrayList<Filter> myFilterList = myListMan.getFilterList();
         //filterSpinner = (Spinner) findViewById(R.id.category_edit_filter_spinner);
@@ -185,14 +192,19 @@ public class ItemViewFragment extends Fragment {
         //filterSpinner.setAdapter(myFilterAdapter);
     }
     public void addItemsOnList(ItemList myItemList)  {
-		Log.v("FlipList.addItemsOnList", "catID: " + currentCatID );
+		Log.v("FlipList.addItemsOnList", "catID: " + currentFlistID );
 		Log.v("FLipList.addItemsonList", "currentItemList: " + myItemList);
-		myListItems = myItemList.getListItems();
+		try {
+			myListItems = myItemList.getListItems();
+		} catch (Exception e) {
+			Toast.makeText(activity, "Add a task to get started", Toast.LENGTH_LONG).show();
+		}
+
     	itemListDataAdapter = new MyCustomAdapter(activity, R.layout.fragment_item_list_layout, myListItems);
     	ListView listView = (ListView) layoutView.findViewById(R.id.itemList);
     	//TextView itemListTitle = (TextView) layoutView.findViewById(R.id.item_view_activity_title);
     	listView.setAdapter(itemListDataAdapter);
-    	//itemListTitle.setText(currentCategory.getName());
+    	//itemListTitle.setText(currentFlist.getName());
     	
     	listView.setOnItemClickListener(new OnItemClickListener() {
     		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -224,10 +236,10 @@ public class ItemViewFragment extends Fragment {
  			Toast.makeText(activity,
  					"Please enter an item name!", Toast.LENGTH_LONG).show();
         } else {
- 	       int catID = currentCategory.getID();
+ 	       int catID = currentFlist.getID();
  	       
  	       // Get the default type of category
- 	       //Category myCat = myListMan.getCategory(catID);
+ 	       //Category myCat = myListMan.getFlist(catID);
  	       // myTypeID = myCat.getType();
  	       //ItemType myType = myListMan.getItemType(myTypeID);
  	       
@@ -238,7 +250,7 @@ public class ItemViewFragment extends Fragment {
         updateList(activity);
      }
     public void updateList(Activity myActivity) {
-    	myItemList = getItemList(currentCatID);
+    	myItemList = getItemList(currentFlistID);
     	addItemsOnSpinner(myActivity);
         addItemsOnList(myItemList);
     }
@@ -294,9 +306,9 @@ public class ItemViewFragment extends Fragment {
     		holder.itemName.setText(item.getName());
     		String infoString = "";
     		Boolean showInfo = false;
-    		Log.v("ItemListActivity.MyCustomAdapter", "currentCategory.showDueDate(): " + currentCategory.showDueDate());
+    		Log.v("ItemListActivity.MyCustomAdapter", "currentFlist.showDueDate(): " + currentFlist.showDueDate());
     		Log.v("ItemListActivity.MyCustomAdapter", "prefMan.showDueDateGlobal: " + prefMan.ShowDueDateGlobal);
-    		if (currentCategory.showDueDate() && prefMan.ShowDueDateGlobal) {
+    		if (currentFlist.showDueDate() && prefMan.ShowDueDateGlobal) {
     			if (item.hasDueTime() == true) {
     				infoString = "Due: " + item.getDueDatePretty() + " @ " + item.getDueTimePretty();
     				showInfo = true;
@@ -305,7 +317,7 @@ public class ItemViewFragment extends Fragment {
     				showInfo = true;
     			}
     		}
-	    	if (currentCategory.showDescription() && prefMan.ShowItemDescriptionGlobal) {
+	    	if (currentFlist.showDescription() && prefMan.ShowItemDescriptionGlobal) {
 	    		if (!item.getDescription().isEmpty()) {
 	    			infoString = infoString + " (" + item.getDescription() + ")";
 	    			showInfo = true;
@@ -326,11 +338,11 @@ public class ItemViewFragment extends Fragment {
 
     public class SpinnerActivity extends Activity implements OnItemSelectedListener {
     	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-    		Category catSelected = (Category) parent.getItemAtPosition(pos);
-    		currentCategory = catSelected;
+    		Flist catSelected = (Flist) parent.getItemAtPosition(pos);
+    		currentFlist = catSelected;
         	mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
     		SharedPreferences.Editor prefEditor = mySharedPreferences.edit();
-    		prefEditor.putInt("current_category_id", currentCategory.getID());
+    		prefEditor.putInt("current_category_id", currentFlist.getID());
     		prefEditor.commit();
     		addItemsOnList();
     	}
@@ -339,7 +351,7 @@ public class ItemViewFragment extends Fragment {
     	}
     }
     public void addItemsOnList()  {
-    	int catID = currentCategory.getID();
+    	int catID = currentFlist.getID();
 		currentItemList = myListMan.getItemList(catID);
 		Log.v("ItemViewFragment.addItemsOnList", "catID: " + catID );
 		Log.v("ItemViewFragment.addItemsonList", "currentItemList: " + currentItemList);
@@ -367,11 +379,11 @@ public class ItemViewFragment extends Fragment {
 		this.startActivityForResult(addEditItem, 1);
     }
     **/
-	public void buildIndex(ArrayList<Category> myCatList) {
+	public void buildIndex(ArrayList<Flist> myCatList) {
 		Integer position = 0;
 		myPositionMap = new SparseIntArray();
 		Log.v("ItemViewFragment.buildIndex", "myCatList.size()" + myCatList.size());
-		for (Category myCat : myCatList) {
+		for (Flist myCat : myCatList) {
 			Log.v("ItemViewFragment.buildIndex", "position: " + position);
 			Log.v("ItemViewFragment.buildIndex", "myCat.getName(): " + myCat.getName());
 			Log.v("ItemViewFragment.buildIndex", "myCat.getID(): " + myCat.getID());
@@ -383,16 +395,16 @@ public class ItemViewFragment extends Fragment {
 		int myPosition = myPositionMap.get(myListCategoryID);
 		return myPosition;
 	}
-    private class MyCatSpinnerCustomAdapter extends ArrayAdapter<Category> {
+    private class MyCatSpinnerCustomAdapter extends ArrayAdapter<Flist> {
      	 
-    	private ArrayList<Category> categoryList;
+    	private ArrayList<Flist> categoryList;
     	private Activity activity;
     	LayoutInflater inflater;
     	SparseIntArray myPositionMap;
     	 
-    	public MyCatSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<Category> objects) {    		
+    	public MyCatSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<Flist> objects) {    		
     		super(activitySpinner, textViewResourceId, objects);
-    		this.categoryList = (ArrayList<Category>) objects;
+    		this.categoryList = (ArrayList<Flist>) objects;
     		this.activity = activitySpinner;
     		inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     		myPositionMap = new SparseIntArray();
@@ -416,7 +428,7 @@ public class ItemViewFragment extends Fragment {
     		} else {
     			holder = (ViewHolder) convertView.getTag();
     		}
-    		Category category = categoryList.get(position);
+    		Flist category = categoryList.get(position);
     		
 			myPositionMap.put(category.getID(), position);
     		holder.catName.setText(category.getName());

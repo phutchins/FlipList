@@ -20,10 +20,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class AddEditCatListActivity extends Activity {
+public class AddEditFlistListActivity extends Activity {
 	MyCatListCustomAdapter catListDataAdapter;
-	Category currentCategory;
-	ArrayList<Category> categoryList;
+	Flist currentCategory;
+	ArrayList<Flist> categoryList;
 	ListManager myListMan;
 	ActionBar actionBar;
 	
@@ -35,16 +35,16 @@ public class AddEditCatListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		actionBar = getActionBar();
 		actionBar.setHomeButtonEnabled(true);
-		setContentView(R.layout.activity_add_edit_cat_list);
+		setContentView(R.layout.activity_add_edit_flist_list);
 		myListMan = new ListManager(this);
-	    categoryList = myListMan.getCategoryListAll();
+	    categoryList = myListMan.getFlists();
 		addCategoriesOnList();
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.add_edit_cat_list, menu);
+		getMenuInflater().inflate(R.menu.add_edit_flist_list, menu);
 		return true;
 	}
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -57,12 +57,12 @@ public class AddEditCatListActivity extends Activity {
     }
     public void refreshList() {
 		myListMan = new ListManager(this);
-        categoryList = myListMan.getCategories();
+        categoryList = myListMan.getFlists();
     	addCategoriesOnList();
     }
     public void addCategoriesOnList() {
     	// Populate the Category List
-    	catListDataAdapter = new MyCatListCustomAdapter(this, R.layout.activity_add_edit_cat_list, categoryList);
+    	catListDataAdapter = new MyCatListCustomAdapter(this, R.layout.activity_add_edit_flist_list, categoryList);
     	ListView listView = (ListView) findViewById(R.id.itemAddEditList);
     	listView.setAdapter(catListDataAdapter);
     	
@@ -71,7 +71,7 @@ public class AddEditCatListActivity extends Activity {
     		public void onItemClick(AdapterView<?> parent, View view,
     		int position, long id) {
     			// When clicked, show a toast with the TextView text
-    			Category category = (Category) parent.getItemAtPosition(position);
+    			Flist category = (Flist) parent.getItemAtPosition(position);
     			Toast.makeText(getApplicationContext(),
     					"Clicked on Row: " + category.getDescription(), 
     					Toast.LENGTH_LONG).show();
@@ -79,9 +79,9 @@ public class AddEditCatListActivity extends Activity {
     		}
     	});
     }
-    public void editCategory(Category category) {
+    public void editCategory(Flist category) {
     	Integer catID = category.getID();
-		Intent addEditCatActivity = new Intent(this, AddEditCatActivity.class);
+		Intent addEditCatActivity = new Intent(this, AddEditListActivity.class);
 		Bundle b = new Bundle();
 		b.putSerializable("catID", catID);
 		b.putSerializable("task", EDIT_CATEGORY);
@@ -89,19 +89,19 @@ public class AddEditCatListActivity extends Activity {
 		this.startActivityForResult(addEditCatActivity, 5);
     }
 	public void addNewCategory() {
-  		Intent addEditCatActivity = new Intent(this, AddEditCatActivity.class);
+  		Intent addEditCatActivity = new Intent(this, AddEditListActivity.class);
 		Bundle b = new Bundle();
 		b.putSerializable("task", ADD_CATEGORY);
 		addEditCatActivity.putExtras(b);
 		this.startActivityForResult(addEditCatActivity, 5);
 	}
-    private class MyCatListCustomAdapter extends ArrayAdapter<Category> {
+    private class MyCatListCustomAdapter extends ArrayAdapter<Flist> {
       	 
-    	private ArrayList<Category> categoryList;
+    	private ArrayList<Flist> categoryList;
     	 
-    	public MyCatListCustomAdapter(Context context, int textViewResourceId, ArrayList<Category> categoryList) {
+    	public MyCatListCustomAdapter(Context context, int textViewResourceId, ArrayList<Flist> categoryList) {
     		super(context, textViewResourceId, categoryList);
-    		this.categoryList = new ArrayList<Category>();
+    		this.categoryList = new ArrayList<Flist>();
     		this.categoryList.addAll(categoryList);
     	}
     	
@@ -132,7 +132,7 @@ public class AddEditCatListActivity extends Activity {
     			categoryClickListener = new View.OnClickListener() {  
     				public void onClick(View v) {
     					TextView tv = (TextView) v;
-    					Category category = (Category) tv.getTag();
+    					Flist category = (Flist) tv.getTag();
     					currentCategory = category;
     					editCategory(category);
     				}  
@@ -143,7 +143,7 @@ public class AddEditCatListActivity extends Activity {
     	   else {
     	    holder = (ViewHolder) convertView.getTag();
     		}
-    		Category category = categoryList.get(position);
+    		Flist category = categoryList.get(position);
     		// TODO: Make a function in ListManager to get and hold the category type names in memory
     		int categoryTypeID = category.getType();
     		//String categoryDescription = category.getDescription();
@@ -158,10 +158,10 @@ public class AddEditCatListActivity extends Activity {
     		return convertView;
     	}
 	}
-	public SparseIntArray buildIndex(ArrayList<Category> myCatList) {
+	public SparseIntArray buildIndex(ArrayList<Flist> myCatList) {
 		Integer position = 0;
 		SparseIntArray myPositionMap = new SparseIntArray();
-		for (Category myCat : myCatList) {
+		for (Flist myCat : myCatList) {
 			myPositionMap.put(myCat.getID(), position);
 			position++;
 		}

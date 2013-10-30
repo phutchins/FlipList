@@ -4,19 +4,10 @@
     android:layout_height="match_parent"
     android:windowActionBar="false" >
 
-    <Button
-        android:id="@+id/category_list_add_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/category_list_add_button_text" />
-
     <ListView
         android:id="@+id/category_list_list_view"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/category_list_add_button"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true" >
 

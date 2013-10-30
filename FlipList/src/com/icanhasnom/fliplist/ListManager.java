@@ -19,7 +19,7 @@ import android.util.Log;
  */
 public class ListManager implements Serializable {
 	private static final long serialVersionUID = 1L;
-	ArrayList<Category> categoryList = new ArrayList<Category>();
+	ArrayList<Flist> flistList = new ArrayList<Flist>();
     ItemList itemList = null;
     Map<Integer, ItemList> itemListMap = new HashMap<Integer, ItemList>();
     //Map<String,ListCategory> categoryListMap = new HashMap<String,ListCategory>();
@@ -32,7 +32,7 @@ public class ListManager implements Serializable {
     public String defaultType = "Generic";
     //public int completedCatID = 1;
     public int archiveCategory = 1;
-    public Category currentCategory;
+    public Flist currentCategory;
     
     public transient DatabaseHandler db;
     public ListManager(Context context) {
@@ -42,7 +42,7 @@ public class ListManager implements Serializable {
     }
     public void updateListManagerState() {
     	// TODO: Use this to replace the below calls everywhere in here
-    	populateCategoryList();
+    	populateFlistList();
     	buildItemListMap();
     }
     public void updateItem(Item item) {
@@ -51,19 +51,19 @@ public class ListManager implements Serializable {
     public void deleteItem(Item item) {
     	db.deleteItem(item);
     }
-    public void populateCategoryList() {
-    	categoryList = db.getAllCategories();
+    public void populateFlistList() {
+    	flistList = db.getFlists();
     }
     public void buildItemListMap() {
 		itemListMap.clear();
     	ItemList myItemList = null;
-    	for(int i = 0; i < categoryList.size(); i++) {
-    		Category curCat = (Category) categoryList.get(i);
-    		int curCatID = curCat.getID();
-			myItemList = db.getItemList(curCatID);
-			myItemList.setName(curCat.getName());
-			myItemList.setID(curCat.getID());
-    		itemListMap.put(curCatID, myItemList);
+    	for(int i = 0; i < flistList.size(); i++) {
+    		Flist curFlist = (Flist) flistList.get(i);
+    		int curFlistID = curFlist.getID();
+			myItemList = db.getItemList(curFlistID);
+			myItemList.setName(curFlist.getName());
+			myItemList.setID(curFlist.getID());
+    		itemListMap.put(curFlistID, myItemList);
     	}	
     }
     public void populateItemList(int catID) {
@@ -88,14 +88,14 @@ public class ListManager implements Serializable {
     	
     //    return myNewListCategory;
     //}
-    public int addCategory(Category listCategory) {
+    public int addFlist(Flist flist) {
     	// TODO: Merge updateObjCategory into this? Maybe make addUpdateObjCategory() which does 
     	//       a check to see if it exists and updates it if it already exists and adds it if
     	//       it doesn't.
-    	Integer newCatID = db.addCategory(listCategory);
+    	Integer newFlistID = db.addFlist(flist);
     	buildItemListMap();
-    	populateCategoryList();
-    	return newCatID;
+    	populateFlistList();
+    	return newFlistID;
     }
 	public Item addItem(int catID, String name) {
 		Item myItem = new Item(catID, name);
@@ -118,11 +118,11 @@ public class ListManager implements Serializable {
 
     
     // Updating Objects
-    public void updateObjCategory(Category catToUpdate) {
+    public void updateObjFlist(Flist flistToUpdate) {
     	// update category in DB here & update category list (or pull from DB and refresh)
     	//int catID = catToUpdate.getID();
     	//String catName = catToUpdate.getName();
-    	db.updateCategory(catToUpdate);
+    	db.updateFlist(flistToUpdate);
     	//itemListMap.put(catID, new ItemList(catName));
     }
     public void moveItem(Item myItem, String fromList, String toList) {
@@ -143,47 +143,61 @@ public class ListManager implements Serializable {
     }
     
     // Removing Objects
-    public boolean rmCategory(int catID) {
+    public boolean rmFlist(int catID) {
     	// TODO: Make this remove all items in category or move them to some other list
     	//       or warn user that all items on the list will be deleted, or give the option
     	//       to delete them all or move them to a different list
     	boolean success;
-    	success = db.deleteCategory(catID);
+    	success = db.deleteFlist(catID);
     	return success;
     }
     
     // Retrieving Lists
-    public ArrayList<Category> getCategories() {
+    //public ArrayList<Flist> getCategories() {
     	// TODO: Add a variable to save the category list
     	//       check if the catlist exists (maybe see if its been updated recently?)
     	//       and populate from the DB if it doesn't exist or has been updated
     	//       Create Variable to set in in the ListManager that is true if a certain datatype
     	//       has been updated, then update the list and set the variable to false
-    	ArrayList<Category> retCatListObjs = db.getCategories();
+    //	ArrayList<Flist> retCatListObjs = db.getCategories();
+    //    return retCatListObjs;
+    //}
+    /*
+    public ArrayList<Flist> getLists() {
+    	ArrayList<Flist> retCatListObjs = db.getLists();
         return retCatListObjs;
     }
-    public ArrayList<Category> getLists() {
-    	ArrayList<Category> retCatListObjs = db.getLists();
+    */
+    /*
+    public ArrayList<Flist> getCategoryListAll() {
+    	ArrayList<Flist> retCatListObjs = db.getCategories();
         return retCatListObjs;
     }
-    public ArrayList<Category> getCategoryListAll() {
-    	ArrayList<Category> retCatListObjs = db.getAllCategories();
-        return retCatListObjs;
+    */
+    public ArrayList<Flist> getFlists() {
+    	ArrayList<Flist> retFlistListObjs = db.getFlists();
+        return retFlistListObjs;
     }
-    public ArrayList<Category> getCategoriesAndFilters() {
-    	ArrayList<Category> retCatListObjs = db.getAllCategories();
-        return retCatListObjs;
+    public ArrayList<Category> getCategories() {
+    	ArrayList<Category> retCategoryListObjs = db.getCategories();
+        return retCategoryListObjs;
     }
+    public ArrayList<Filter> getFilters() {
+    	ArrayList<Filter> retFilterListObjs = db.getFilters();
+        return retFilterListObjs;
+    }
+    /*
     public String[] getCategoryListStrings() {
-    	ArrayList<Category> retCatList = db.getAllCategories();
+    	ArrayList<Flist> retCatList = db.getCategories();
     	String[] catListStrings = new String[retCatList.size()];
     	int index = 0;
-    	for (Category value : retCatList) {
+    	for (Flist value : retCatList) {
     		catListStrings[index] = (String) value.getName();
     		index++;
     	}
     	return catListStrings;
     }
+    */
     public ItemList getItemList(int catID) {
     	ItemList myItemList;
     	updateListManagerState();
@@ -202,7 +216,7 @@ public class ListManager implements Serializable {
     	return categoryTypesList;
     }
     public ArrayList<Filter> getFilterList() {
-    	ArrayList<Filter> filterList = db.getFilterList();
+    	ArrayList<Filter> filterList = db.getFilters();
     	return filterList;
     }
 
@@ -211,8 +225,8 @@ public class ListManager implements Serializable {
     	ItemType catType = db.getItemType(typeID);
     	return catType;
     }
-    public Category getCategory(int catID) {
-    	Category listCat = db.getCategory(catID);
+    public Flist getFlist(int flistID) {
+    	Flist listCat = db.getFlist(flistID);
     	return listCat;
     }
     
@@ -220,9 +234,9 @@ public class ListManager implements Serializable {
     	String typeName = db.getItemTypeName(typeID);
     	return typeName;
     }
-    public String getCategoryName(int catID) {
-    	Category listCat = db.getCategory(catID);
-    	return listCat.getName();
+    public String getFlistName(int flistID) {
+    	Flist flist = db.getFlist(flistID);
+    	return flist.getName();
     }
     
 

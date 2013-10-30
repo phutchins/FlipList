@@ -5,8 +5,8 @@
             android:title="Category Settings">
 
         <ListPreference
-                android:key="@string/default_category_key"
-				android:defaultValue="@integer/default_category_default"
+                android:key="@string/default_flist_key"
+				android:defaultValue="@integer/default_flist_default"
                 android:title="Default Category"
                 android:summary="Select the default category to display when launching the app"
                 android:dialogTitle="Default Category" />

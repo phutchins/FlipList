@@ -10,12 +10,12 @@ import java.io.*;
  *
  * @author flip
  */
-public class Category implements Serializable {
+public class Flist implements Serializable {
     /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	int catID;
+	int flistID;
 	String name;
     String description;
     int type;
@@ -24,29 +24,38 @@ public class Category implements Serializable {
     boolean showDescription = true;
     int filterID = 0;
     int isVisible = 1;
-    public Category() {
+    public Flist() {
     }
-    public Category(int ID, String catName, String catDesc, int catType, int v) {
-    	catID = ID;
-        name = catName;
-        description = catDesc;
-        type = catType;
+    public Flist(int ID, String flistName, String flistDesc, int flistType, int v) {
+    	flistID = ID;
+        name = flistName;
+        description = flistDesc;
+        type = flistType;
         isVisible = v;
     }
-    public Category(String catName, String catDesc, int catType, int v) {
-    	name = catName;
-    	description = catDesc;
-    	type = catType;
+    public Flist(String flistName, String flistDesc, int flistType, int v) {
+    	name = flistName;
+    	description = flistDesc;
+    	type = flistType;
     	isVisible = v;
+    }
+    public boolean showDueDate() {
+    	return showDueDate;
     }
     public boolean showDescription() {
     	return showDescription;
     }
+    public void setShowDueDate(boolean sdd) {
+    	showDueDate = sdd;
+    }
+    public void setShowDescription(boolean sd) {
+    	showDescription = sd;
+    }
     public void setID(int id) {
-    	catID = id;
+    	flistID = id;
     }
     public int getID() {
-    	return catID;
+    	return flistID;
     }
     public void setName(String catName) {
     	name = catName;
@@ -54,11 +63,17 @@ public class Category implements Serializable {
     public void setDescription(String catDesc) {
     	description = catDesc;
     }
+    public void setType(int catType) {
+    	type = catType;
+    }
     public String getName() {
     	return name;
     }
     public String getDescription() {
     	return description;
+    }
+    public int getType() {
+    	return type;
     }
     public boolean isNew() {
     	return isNew;
@@ -80,5 +95,12 @@ public class Category implements Serializable {
 	}
 	public void setVisible(int v) {
 		isVisible = v;
+	}
+	public int getFilterID() {
+		// TODO Auto-generated method stub
+		return filterID;
+	}
+	public void setFilterID(int fid) {
+		filterID = fid;
 	}
 }

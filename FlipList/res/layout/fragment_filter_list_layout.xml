@@ -4,31 +4,11 @@
     android:layout_height="match_parent"
     android:windowActionBar="false" >
 
-    <Button
-        android:id="@+id/filter_list_add_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="myAddNewCategoryAction"
-        android:text="@string/filter_list_add_button_text" />
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/filter_view_fragment_title"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
     <ListView
         android:id="@+id/filter_list_list_view"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/filter_list_add_button"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/textView1" >
+        android:layout_alignParentLeft="true" >
 
     </ListView>
 

@@ -1,6 +1,11 @@
 package com.icanhasnom.fliplist;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.channels.FileChannel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,16 +14,23 @@ import java.util.Date;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.text.format.Time;
 import android.util.Log;
+import android.widget.Toast;
 
 public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	/**
@@ -26,10 +38,27 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int DATABASE_VERSION = 65;
+	private static final int DATABASE_VERSION = 69;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
+	
+	
+    String currentDBPath = "/data/"+ "com.icanhasnom.fliplist" +"/databases/" + DATABASE_NAME;
+    String backupDBPath = "/FlipList/" + DATABASE_NAME;
+    
+    String importDatabaseFileName;
+    Handler handler;
+	
+	// Flists Table
+	private static final String TABLE_FLISTS = "flists";
+	// Flists Table Column Names
+	private static final String KEY_FLIST_ID = "id";
+	private static final String KEY_FLIST_NAME = "name";
+	private static final String KEY_FLIST_DESC = "desc";
+	private static final String KEY_FLIST_TYPE = "type";
+	private static final String KEY_FLIST_VISIBLE = "visible";
+	private static final String KEY_FLIST_FILTER = "filter";
 	
 	// Categories Table
 	private static final String TABLE_CATEGORIES = "categories";
@@ -39,23 +68,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	private static final String KEY_CAT_DESC = "desc";
 	private static final String KEY_CAT_TYPE = "type";
 	private static final String KEY_CAT_VISIBLE = "visible";
-	private static final String KEY_CAT_FILTER = "filter";
-	
-	// Items Table
-	private static final String TABLE_ITEMS = "items";
-	// Items Table Column Names
-	private static final String KEY_ITEM_ID = "id";
-	private static final String KEY_ITEM_NAME = "name";
-	private static final String KEY_ITEM_DESC = "desc";
-	private static final String KEY_ITEM_NOTES = "notes";
-	private static final String KEY_ITEM_PRIMARY_CAT = "cat";
-	private static final String KEY_ITEM_SECONDARY_CATS = "cats";
-	private static final String KEY_ITEM_HAS_DUE_DATE = "has_due_date";
-	private static final String KEY_ITEM_HAS_DUE_TIME = "has_due_time";
-	private static final String KEY_ITEM_DUE_DATETIME = "due_datetime";
-	private static final String KEY_ITEM_CREATE_DATE = "create_date";
-	private static final String KEY_ITEM_IS_COMPLETED = "is_completed";
-	private static final String KEY_ITEM_COMPLETED_DATE = "completed_date";
 	
 	// Filters Table
 	private static final String TABLE_FILTERS = "filters";
@@ -71,14 +83,21 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	private static final String KEY_FILTER_HIDDEN = "hidden";
 	private static final String KEY_FILTER_BY_CATEGORY = "filter_by_cat";
 	
-	// Settings Table
-	private static final String TABLE_SETTINGS = "settings";
-	// Settings Table Column Names
-	private static final String KEY_SETTING_ID = "id";
-	private static final String KEY_SETTING_NAME = "name";
-	private static final String KEY_SETTING_VAL1 = "val1";
-	private static final String KEY_SETTING_VAL2 = "val2";
-	
+	// Items Table
+	private static final String TABLE_ITEMS = "items";
+	// Items Table Column Names
+	private static final String KEY_ITEM_ID = "id";
+	private static final String KEY_ITEM_NAME = "name";
+	private static final String KEY_ITEM_DESC = "desc";
+	private static final String KEY_ITEM_NOTES = "notes";
+	private static final String KEY_ITEM_FLIST = "flist";
+	private static final String KEY_ITEM_CATEGORIES = "cats";
+	private static final String KEY_ITEM_HAS_DUE_DATE = "has_due_date";
+	private static final String KEY_ITEM_HAS_DUE_TIME = "has_due_time";
+	private static final String KEY_ITEM_DUE_DATETIME = "due_datetime";
+	private static final String KEY_ITEM_CREATE_DATE = "create_date";
+	private static final String KEY_ITEM_IS_COMPLETED = "is_completed";
+	private static final String KEY_ITEM_COMPLETED_DATE = "completed_date";
 	
 	// Types Table
 	private static final String TABLE_ITEM_TYPES = "types";
@@ -105,17 +124,21 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	// Creating Tables
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		String CREATE_FLISTS_TABLE = "CREATE TABLE " + TABLE_FLISTS + "(" 
+				+ KEY_FLIST_ID + " INTEGER PRIMARY KEY," + KEY_FLIST_NAME + " TEXT," 
+				+ KEY_FLIST_DESC + " TEXT," + KEY_FLIST_TYPE + " TEXT," + KEY_FLIST_VISIBLE
+				+ " INTEGER," + KEY_FLIST_FILTER + " INTEGER" + ")";
 		String CREATE_CATEGORIES_TABLE = "CREATE TABLE " + TABLE_CATEGORIES + "(" 
 				+ KEY_CAT_ID + " INTEGER PRIMARY KEY," + KEY_CAT_NAME + " TEXT," 
-				+ KEY_CAT_DESC + " TEXT," + KEY_CAT_TYPE + " TEXT," + KEY_CAT_VISIBLE
-				+ " INTEGER," + KEY_CAT_FILTER + " INTEGER" + ")";
+				+ KEY_CAT_DESC + " TEXT," + KEY_CAT_VISIBLE
+				+ " INTEGER" + ")";
 		String CREATE_ITEMS_TABLE = "CREATE TABLE " + TABLE_ITEMS + "("
 				+ KEY_ITEM_ID + " INTEGER PRIMARY KEY," 
 				+ KEY_ITEM_NAME + " TEXT,"
 				+ KEY_ITEM_DESC + " TEXT," 
 				+ KEY_ITEM_NOTES + " TEXT,"
-				+ KEY_ITEM_PRIMARY_CAT + " TEXT," 
-				+ KEY_ITEM_SECONDARY_CATS + " TEXT," 
+				+ KEY_ITEM_FLIST + " TEXT," 
+				+ KEY_ITEM_CATEGORIES + " TEXT," 
 				+ KEY_ITEM_HAS_DUE_DATE + " TEXT,"
 				+ KEY_ITEM_HAS_DUE_TIME + " TEXT,"
 				+ KEY_ITEM_DUE_DATETIME + " TEXT," 
@@ -146,11 +169,11 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		//       Undeletable setting mande, make delete method check undeletable before deleting category
 		//        and notify user in a tost if category cannot be deleted.
 		String CREATE_UNCATEGORIZED_CATEGORY = "insert into " + TABLE_CATEGORIES + "(" + KEY_CAT_ID + "," + KEY_CAT_NAME + ","
-                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + "," + KEY_CAT_VISIBLE + "," + KEY_CAT_FILTER + ") values(0, 'Uncategorized', 'Uncategorized','0', '1', 0)";
+                + KEY_CAT_DESC + "," + KEY_CAT_VISIBLE + ") values(0, 'Uncategorized', 'Uncategorized', '1')";
 		String CREATE_ARCHIVE_CATEGORY = "insert into " + TABLE_CATEGORIES + "(" + KEY_CAT_ID + "," + KEY_CAT_NAME + ","
-                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + "," + KEY_CAT_VISIBLE + "," + KEY_CAT_FILTER + ") values(1, 'Archive', 'Archive Category','0', '0', 0)";
-		String CREATE_ALL_CATEGORY = "insert into " + TABLE_CATEGORIES + "(" + KEY_CAT_ID + "," + KEY_CAT_NAME + ","
-                + KEY_CAT_DESC + "," + KEY_CAT_TYPE + "," + KEY_CAT_VISIBLE + "," + KEY_CAT_FILTER + ") values(2, 'All Items', 'List All Items','0', '1', 1)";
+                + KEY_CAT_DESC + "," + KEY_CAT_VISIBLE + ") values(1, 'Archive', 'Archive Category', '0')";
+		String CREATE_ALL_FLIST = "insert into " + TABLE_FLISTS + "(" + KEY_FLIST_ID + "," + KEY_FLIST_NAME + ","
+                + KEY_FLIST_DESC + "," + KEY_FLIST_TYPE + "," + KEY_FLIST_VISIBLE + "," + KEY_FLIST_FILTER + ") values(0, 'Default List', 'List All Items','0', '1', 1)";
 		
 		String CREATE_TYPE_GENERIC = "insert into " + TABLE_ITEM_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
 				+ KEY_TYPE_DESC + ") values(0, 'Generic', 'Generic items')";
@@ -210,38 +233,23 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				+ ") values(4, 'All by Cat', 'Show All items', \"" + FILTER_ALL_BY_CAT_QUERY + "\", null, null, null, null, 0, 1)";
 
 		//CREATE_FILTER_ACTIVE = DatabaseUtils.sqlEscapeString(CREATE_FILTER_ACTIVE);
-
-		//String CREATE_SETTING_DEFCAT = "insert into " + TABLE_SETTINGS + "(" + KEY_SETTING_ID + "," + KEY_SETTING_NAME + ","
-		//		+ KEY_SETTING_VAL1 + "," + KEY_SETTING_VAL2 + ") values(0, 'defaultCategory', '0', 'unused')";
-		//String CREATE_SETTING_DEFTYPE = "insert into " + TABLE_SETTINGS + "(" + KEY_SETTING_ID + "," + KEY_SETTING_NAME + ","
-		//		+ KEY_SETTING_VAL1 + "," + KEY_SETTING_VAL2 + ") values(1, 'defaultType', '0', 'unused')";
-		//String CREATE_SETTING_COMPLETED = "insert into " + TABLE_SETTINGS + "(" + KEY_SETTING_ID + "," + KEY_SETTING_NAME + ","
-		//		+ KEY_SETTING_VAL1 + "," + KEY_SETTING_VAL2 + ") values(2, 'defaultCompleted', '1', 'unused')";
-		//String CREATE_SETTING_PROTECTED_CATS = "insert into " + TABLE_SETTINGS + "(" + KEY_SETTING_ID + "," + KEY_SETTING_NAME + ","
-		//		+ KEY_SETTING_VAL1 + "," + KEY_SETTING_VAL2 + ") values(3, 'protectedCats', '0,1', 'unused')";
 		
-		//db.execSQL(CREATE_CATEGORIES_TABLE);
-		//db.execSQL(CREATE_ITEMS_TABLE);
-		//db.execSQL(CREATE_TYPES_TABLE);
-		//db.execSQL(CREATE_FILTERS_TABLE);
-		//db.execSQL(CREATE_SETTINGS_TABLE);
-		//db.execSQL(CREATE_UNCATEGORIZED_CATEGORY);
-		//db.execSQL(CREATE_ARCHIVE_CATEGORY);
-		//db.execSQL(CREATE_ALL_CATEGORY);
-		//db.execSQL(CREATE_TYPE_GENERIC);
-		//db.execSQL(CREATE_TYPE_GROCERY);
-		//db.execSQL(CREATE_TYPE_TODO);
+		db.execSQL(CREATE_FLISTS_TABLE);
+		db.execSQL(CREATE_CATEGORIES_TABLE);
+		db.execSQL(CREATE_ITEMS_TABLE);
+		db.execSQL(CREATE_TYPES_TABLE);
+		db.execSQL(CREATE_FILTERS_TABLE);
+		db.execSQL(CREATE_UNCATEGORIZED_CATEGORY);
+		db.execSQL(CREATE_ARCHIVE_CATEGORY);
+		db.execSQL(CREATE_ALL_FLIST);
+		db.execSQL(CREATE_TYPE_GENERIC);
+		db.execSQL(CREATE_TYPE_GROCERY);
+		db.execSQL(CREATE_TYPE_TODO);
 		db.execSQL(CREATE_FILTER_NONE);
 		db.execSQL(CREATE_FILTER_ALL);
 		db.execSQL(CREATE_FILTER_ACTIVE);
 		db.execSQL(CREATE_FILTER_NEXTSEVEN);
 		db.execSQL(CREATE_FILTER_ALL_BY_CAT);
-		//db.execSQL(CREATE_SETTING_DEFCAT);
-		//db.execSQL(CREATE_SETTING_DEFTYPE);
-		//db.execSQL(CREATE_SETTING_COMPLETED);
-		//db.execSQL(CREATE_SETTING_PROTECTED_CATS);
-		
-
 	}
 		
 	// Upgrading database
@@ -252,9 +260,10 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	}
 	public void dropTables(SQLiteDatabase db) {
 		// Drop older table if existed
-		//db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
-		//db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEMS);
-		//db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEM_TYPES);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_FLISTS);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEMS);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEM_TYPES);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTERS);
 	}
 	public void getPreferences() {
@@ -314,7 +323,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	// Items
 	public void addItem(Item item) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		String secondaryCatsString = item.getSecondaryCatsString();
+		String secondaryCatsString = item.getCategoriesString();
 		int hasDueDate = item.hasDueDate()? 1 : 0;
 		int hasDueTime = item.hasDueTime()? 1 : 0;
 		int isCompleted = item.isCompleted()? 1 : 0;
@@ -323,8 +332,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_ITEM_NAME, item.getName());
 		values.put(KEY_ITEM_DESC, item.getDescription());
 		values.put(KEY_ITEM_NOTES, item.getNotes());
-		values.put(KEY_ITEM_PRIMARY_CAT,  item.getPrimaryCat());
-		values.put(KEY_ITEM_SECONDARY_CATS, secondaryCatsString);
+		values.put(KEY_ITEM_FLIST,  item.getFlist());
+		values.put(KEY_ITEM_CATEGORIES, secondaryCatsString);
 		values.put(KEY_ITEM_HAS_DUE_DATE, hasDueDate);
 		values.put(KEY_ITEM_HAS_DUE_TIME, hasDueTime);
 		values.put(KEY_ITEM_DUE_DATETIME, item.getDueDateTime());
@@ -345,7 +354,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		SQLiteDatabase db = this.getReadableDatabase();
 		
 		Cursor cursor = db.query(TABLE_ITEMS, new String[] { KEY_ITEM_ID, KEY_ITEM_NAME,
-				KEY_ITEM_DESC, KEY_ITEM_NOTES, KEY_ITEM_PRIMARY_CAT, KEY_ITEM_SECONDARY_CATS, 
+				KEY_ITEM_DESC, KEY_ITEM_NOTES, KEY_ITEM_FLIST, KEY_ITEM_CATEGORIES, 
 				KEY_ITEM_HAS_DUE_DATE, KEY_ITEM_HAS_DUE_TIME, KEY_ITEM_DUE_DATETIME, 
 				KEY_ITEM_CREATE_DATE, KEY_ITEM_COMPLETED_DATE }, 
 				KEY_ITEM_ID + "?", new String[] { String.valueOf(id) }, null, null, null, null);
@@ -386,8 +395,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				item.setName(cursor.getString(1));
 				item.setDescription(cursor.getString(2));
 				item.setNotes(cursor.getString(3));
-				item.setPrimaryCat(cursor.getInt(4));
-				item.addToCats(cursor.getString(5));
+				item.setFlist(cursor.getInt(4));
+				item.addCategories(cursor.getString(5));
 				item.setHasDueDate(cursor.getInt(6));
 				item.setHasDueTime(cursor.getInt(7));
 				item.setDueDateTime(cursor.getString(8));
@@ -401,8 +410,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		db.close();
 		return itemList;
 	}
-	public ItemList getItemList(int catID) {
-		ItemList itemList = new ItemList(catID);
+	public ItemList getItemList(int flistID) {
+		ItemList itemList = new ItemList(flistID);
 		SQLiteDatabase db = this.getReadableDatabase();
 		
 		getQueryValuesFromPrefs();
@@ -419,8 +428,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		String dbHaving = null;
 		String dbOrderBy = KEY_ITEM_IS_COMPLETED;
 		
-		Category myCat = getCategory(catID);
-		int filterID = myCat.getFilterID();
+		Flist myFlist = getFlist(flistID);
+		int filterID = myFlist.getFilterID();
 		//Log.v("DatabaseHandler.getItemList", "filterID: " + filterID);
 		// Filter ID 0 means use preferences as there is no filter applied
 		//filterID = 1;
@@ -429,12 +438,12 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		if (filterID == 0) {
 			if (!prefQueryStringValues.isEmpty()) {
 				// No filter so show all completed items in the selected category
-				dbValues = prefQueryStringValues + " AND cat=?";
-				dbValueArgs = prefQueryStringValueArgs + ";" + catID;
+				dbValues = prefQueryStringValues + " AND " + KEY_ITEM_FLIST + "=?";
+				dbValueArgs = prefQueryStringValueArgs + ";" + flistID;
 			} else {
 				// Add filter from preferences
-				dbValues = "cat=?";
-				dbValueArgs = String.valueOf(catID);
+				dbValues = KEY_ITEM_FLIST + "=?";
+				dbValueArgs = String.valueOf(flistID);
 			}
 			Log.v("DatabaseHandler.getItemList", "USING DEFAULTS - dbValues: " + dbValues + " dbValueArgs: " + dbValueArgs);
 		} else {
@@ -453,11 +462,11 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 			//Log.v("DatabaseHandler.getItemList", "dbOrderBy: '" + dbOrderBy + "'");
 			if (myFilter.filterByCurrentCategory) {
 				if (dbValues != null) {
-					dbValues = dbValues + " AND cat=?";
-					dbValueArgs = dbValueArgs + ";" + catID;
+					dbValues = dbValues + " AND " + KEY_ITEM_FLIST + "=?";
+					dbValueArgs = dbValueArgs + ";" + flistID;
 				} else {
-					dbValues = "cat=?";
-					dbValueArgs = String.valueOf(catID);
+					dbValues = KEY_ITEM_FLIST + "=?";
+					dbValueArgs = String.valueOf(flistID);
 				}
 			}
 		}
@@ -482,8 +491,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				item.setName(cursor.getString(1));
 				item.setDescription(cursor.getString(2));
 				item.setNotes(cursor.getString(3));
-				item.setPrimaryCat(cursor.getInt(4));
-				item.addToCats(cursor.getString(5));
+				item.setFlist(cursor.getInt(4));
+				item.addCategories(cursor.getString(5));
 				item.setHasDueDate(cursor.getInt(6));
 				item.setHasDueTime(cursor.getInt(7));
 				item.setDueDateTime(cursor.getString(8));
@@ -536,8 +545,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_ITEM_NAME, item.getName());
 		values.put(KEY_ITEM_DESC, item.getDescription());
 		values.put(KEY_ITEM_NOTES, item.getNotes());
-		values.put(KEY_ITEM_PRIMARY_CAT, item.getPrimaryCat());
-		values.put(KEY_ITEM_SECONDARY_CATS, item.getSecondaryCatsString());
+		values.put(KEY_ITEM_FLIST, item.getFlist());
+		values.put(KEY_ITEM_CATEGORIES, item.getCategoriesString());
 		values.put(KEY_ITEM_HAS_DUE_DATE, hasDueDate);
 		values.put(KEY_ITEM_HAS_DUE_TIME, hasDueTime);
 		values.put(KEY_ITEM_DUE_DATETIME, item.getDueDateTime());
@@ -554,14 +563,27 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	}
 	
 	// Categories
+	public int addFlist(Flist flist) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put(KEY_FLIST_NAME, flist.getName());
+		values.put(KEY_FLIST_DESC, flist.getDescription());
+		values.put(KEY_FLIST_TYPE, flist.getType());
+		values.put(KEY_FLIST_VISIBLE, flist.getVisible());
+		db.insert(TABLE_FLISTS, null, values);
+		Cursor cursor = db.rawQuery("SELECT last_insert_rowid() FROM " + TABLE_FLISTS, null);
+		cursor.moveToFirst();
+		int newFlistID = cursor.getInt(0);
+		cursor.close();
+		db.close();
+		return newFlistID;
+	}
 	public int addCategory(Category category) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(KEY_CAT_NAME, category.getName());
 		values.put(KEY_CAT_DESC, category.getDescription());
-		values.put(KEY_CAT_TYPE, category.getType());
 		values.put(KEY_CAT_VISIBLE, category.getVisible());
-		values.put(KEY_CAT_FILTER, category.getFilterID());
 		db.insert(TABLE_CATEGORIES, null, values);
 		Cursor cursor = db.rawQuery("SELECT last_insert_rowid() FROM " + TABLE_CATEGORIES, null);
 		cursor.moveToFirst();
@@ -570,31 +592,30 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		db.close();
 		return newCatID;
 	}
-	public Category getCategory(int id) {
+	public Flist getFlist(int id) {
 		SQLiteDatabase db = this.getReadableDatabase();
-		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
-				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE, KEY_CAT_FILTER }, KEY_CAT_ID + "=?",
+		Cursor cursor = db.query(TABLE_FLISTS,  new String[] { KEY_FLIST_ID,
+				KEY_FLIST_NAME, KEY_FLIST_DESC, KEY_FLIST_VISIBLE, KEY_FLIST_TYPE, KEY_FLIST_FILTER }, KEY_FLIST_ID + "=?",
 				new String[] { String.valueOf(id) }, null, null, null, null);
 		if (cursor != null)
 			cursor.moveToFirst();
-		Category category = new Category(cursor.getInt(0),
+		Flist flist = new Flist(cursor.getInt(0),
 				cursor.getString(1), cursor.getString(2), cursor.getInt(3), cursor.getInt(4));
-		// TOOD: should this be in the constructor? or not?
-		category.setFilterID(cursor.getInt(5));
-		return category;
+		flist.setFilterID(cursor.getInt(5));
+		return flist;
 	}
-	public Category getCategoryByName(String catName) {
+	public Flist getFlistByName(String flistName) {
 		SQLiteDatabase db = this.getReadableDatabase();
 		
-		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
-				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE }, KEY_CAT_NAME + "=?",
-				new String[] { catName }, null, null, null, null);
+		Cursor cursor = db.query(TABLE_FLISTS,  new String[] { KEY_FLIST_ID,
+				KEY_FLIST_NAME, KEY_FLIST_DESC, KEY_FLIST_VISIBLE }, KEY_FLIST_NAME + "=?",
+				new String[] { flistName }, null, null, null, null);
 		if (cursor != null)
 			cursor.moveToFirst();
 		
-		Category category = new Category(Integer.parseInt(cursor.getString(0)),
+		Flist flist = new Flist(Integer.parseInt(cursor.getString(0)),
 				cursor.getString(1), cursor.getString(2), Integer.parseInt(cursor.getString(3)), Integer.parseInt(cursor.getString(4)));
-		return category;
+		return flist;
 	}
 	public ItemType getItemType(int typeID) {
 		SQLiteDatabase db = this.getReadableDatabase();
@@ -603,10 +624,10 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		ItemType myItemType = new ItemType(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getString(2));
 		return myItemType;
 	}
-	public ArrayList<Category> getAllCategories() {
-		ArrayList<Category> categoryList = new ArrayList<Category>();
+	public ArrayList<Flist> getAllFlists() {
+		ArrayList<Flist> flistList = new ArrayList<Flist>();
 		// Select All Query
-		String selectQuery = "SELECT * FROM " + TABLE_CATEGORIES;
+		String selectQuery = "SELECT * FROM " + TABLE_FLISTS;
 		
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -614,24 +635,75 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {
-				Category category = new Category();
-				category.setID(cursor.getInt(0));
-				category.setName(cursor.getString(1));
-				category.setDescription(cursor.getString(2));
-				category.setType(cursor.getInt(3));
-				category.setVisible(cursor.getInt(4));
-				category.setFilterID(cursor.getInt(5));
+				Flist flist = new Flist();
+				flist.setID(cursor.getInt(0));
+				flist.setName(cursor.getString(1));
+				flist.setDescription(cursor.getString(2));
+				flist.setVisible(cursor.getInt(3));
 				// Adding category to list
-				categoryList.add(category);
+				flistList.add(flist);
 			} while (cursor.moveToNext());
 		}
 		db.close();
 		
 		// return contact list
-		return categoryList;
+		return flistList;
+	}
+	public ArrayList<Flist> getFlists() {
+		ArrayList<Flist> flistList = new ArrayList<Flist>();
+		// Select All Query
+		//String selectQuery = "SELECT * FROM " + TABLE_CATEGORIES;
+		String isVisible = "1";
+		String noFilter = "0";
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor cursor = db.query(TABLE_FLISTS,  new String[] { KEY_FLIST_ID,
+				KEY_FLIST_NAME, KEY_FLIST_DESC, KEY_FLIST_TYPE, KEY_FLIST_VISIBLE, KEY_FLIST_FILTER }, KEY_FLIST_VISIBLE + "=?"
+				+ " AND " + KEY_FLIST_FILTER + "=?",
+				new String[] { isVisible, noFilter }, null, null, null, null);
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				Flist flist = new Flist();
+				flist.setID(Integer.parseInt(cursor.getString(0)));
+				flist.setName(cursor.getString(1));
+				flist.setDescription(cursor.getString(2));
+				flist.setType(Integer.parseInt(cursor.getString(3)));
+				flist.setVisible(Integer.parseInt(cursor.getString(4)));
+				flist.setFilterID(cursor.getInt(5));
+				// Adding category to list
+				flistList.add(flist);
+			} while (cursor.moveToNext());
+		}
+		return flistList;
 	}
 	public ArrayList<Category> getCategories() {
 		ArrayList<Category> categoryList = new ArrayList<Category>();
+		// Select All Query
+		//String selectQuery = "SELECT * FROM " + TABLE_CATEGORIES;
+		String isVisible = "1";
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
+				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_VISIBLE }, KEY_CAT_VISIBLE + "=?",
+				new String[] { isVisible }, null, null, null, null);
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				Category category = new Category();
+				category.setID(Integer.parseInt(cursor.getString(0)));
+				category.setName(cursor.getString(1));
+				category.setDescription(cursor.getString(2));
+				//category.setType(Integer.parseInt(cursor.getString(3)));
+				category.setVisible(cursor.getInt(3));
+				//category.setFilterID(cursor.getInt(5));
+				// Adding category to list
+				categoryList.add(category);
+			} while (cursor.moveToNext());
+		}
+		return categoryList;
+	}
+	/*
+	public ArrayList<Filter> getFilters() {
+		ArrayList<Filter> filterList = new ArrayList<Flist>();
 		// Select All Query
 		//String selectQuery = "SELECT * FROM " + TABLE_CATEGORIES;
 		String isVisible = "1";
@@ -644,7 +716,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {
-				Category category = new Category();
+				Flist category = new Flist();
 				category.setID(Integer.parseInt(cursor.getString(0)));
 				category.setName(cursor.getString(1));
 				category.setDescription(cursor.getString(2));
@@ -657,35 +729,38 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		}
 		return categoryList;
 	}
-	public ArrayList<Category> getLists() {
-		ArrayList<Category> categoryList = new ArrayList<Category>();
+	*/
+	/*
+	public ArrayList<Flist> getLists() {
+		ArrayList<Flist> flistList = new ArrayList<Flist>();
 		// Select All Query
 		//String selectQuery = "SELECT * FROM " + TABLE_CATEGORIES;
 		String isVisible = "1";
 		String noFilter = "0";
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
-				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE, KEY_CAT_FILTER }, KEY_CAT_VISIBLE + "=?"
-				+ " AND " + KEY_CAT_FILTER + ">?",
+				KEY_FLIST_NAME, KEY_FLIST_DESC, KEY_FLIST_TYPE, KEY_CAT_VISIBLE, KEY_FLIST_FILTER }, KEY_FLIST_VISIBLE + "=?"
+				+ " AND " + KEY_FLIST_FILTER + ">?",
 				new String[] { isVisible, noFilter }, null, null, null, null);
 		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {
-				Category category = new Category();
-				category.setID(Integer.parseInt(cursor.getString(0)));
-				category.setName(cursor.getString(1));
-				category.setDescription(cursor.getString(2));
-				category.setType(Integer.parseInt(cursor.getString(3)));
-				category.setVisible(Integer.parseInt(cursor.getString(4)));
-				category.setFilterID(cursor.getInt(5));
+				Flist flist = new Flist();
+				flist.setID(Integer.parseInt(cursor.getString(0)));
+				flist.setName(cursor.getString(1));
+				flist.setDescription(cursor.getString(2));
+				flist.setType(Integer.parseInt(cursor.getString(3)));
+				flist.setVisible(Integer.parseInt(cursor.getString(4)));
+				flist.setFilterID(cursor.getInt(5));
 				// Adding category to list
-				categoryList.add(category);
+				flistList.add(flist);
 			} while (cursor.moveToNext());
 		}
-		return categoryList;
+		return flistList;
 	}
-	public int getCategoriesCount() {
-		String countQuery = "SELECT * FROM " + TABLE_CATEGORIES;
+	*/
+	public int getFlistsCount() {
+		String countQuery = "SELECT * FROM " + TABLE_FLISTS;
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.rawQuery(countQuery, null);
 		int count = cursor.getCount();
@@ -694,9 +769,10 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		// return count
 		return count;
 	}
-	public int getCategoryID(String catName) {
+	/*
+	public int getFlistID(String catName) {
 		// Fix this DB query to pull cat id using the name
-		String catIdQuery = "SELECT * FROM " + TABLE_CATEGORIES + " WHERE " + KEY_CAT_NAME + " = 'Default'";
+		String catIdQuery = "SELECT * FROM " + TABLE_FLISTS + " WHERE " + KEY_FLIST_NAME + " = 'Default'";
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.rawQuery(catIdQuery, null);
 		int catID = 0;
@@ -710,42 +786,43 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		}
 		return catID;
 	}
-	public void hideCategory(int catID) {
+	*/
+	public void hideFlist(int flistID) {
 		int isVisible = 0;
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
-		values.put(KEY_CAT_VISIBLE, isVisible);
-		db.update(TABLE_CATEGORIES, values, KEY_CAT_VISIBLE + " = " + isVisible, null);
+		values.put(KEY_FLIST_VISIBLE, isVisible);
+		db.update(TABLE_FLISTS, values, KEY_FLIST_VISIBLE + " = " + isVisible, null);
 	}
-	public void unHideCategory(int catId) {
+	public void unHideFlist(int flistId) {
 		int isVisible = 1;
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
-		values.put(KEY_CAT_VISIBLE, isVisible);
-		db.update(TABLE_CATEGORIES, values, KEY_CAT_VISIBLE + " = " + isVisible, null);
+		values.put(KEY_FLIST_VISIBLE, isVisible);
+		db.update(TABLE_FLISTS, values, KEY_FLIST_VISIBLE + " = " + isVisible, null);
 	}
-	public int updateCategory(Category category) {
+	public int updateFlist(Flist flist) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
-		values.put(KEY_CAT_NAME, category.getName());
-		values.put(KEY_CAT_DESC, category.getDescription().toString());
-		values.put(KEY_CAT_TYPE, category.getType());
-		values.put(KEY_CAT_VISIBLE, category.getVisible());
-		values.put(KEY_CAT_FILTER,  category.getFilterID());
-		String keyID = String.valueOf(category.getID());
+		values.put(KEY_FLIST_NAME, flist.getName());
+		values.put(KEY_FLIST_DESC, flist.getDescription().toString());
+		values.put(KEY_FLIST_TYPE, flist.getType());
+		values.put(KEY_FLIST_VISIBLE, flist.getVisible());
+		values.put(KEY_FLIST_FILTER,  flist.getFilterID());
+		String keyID = String.valueOf(flist.getID());
 		//Log.v("updateCategory", "DatabaseHandler.updateCategory.keyID: " + keyID);
 		// updating row
 		//return db.update(TABLE_CATEGORIES, values, KEY_CAT_ID + " = ?",
 		//		new String[] { String.valueOf(category.getID()) });
-		return db.update(TABLE_CATEGORIES, values, KEY_CAT_ID + " = " + keyID, null);
+		return db.update(TABLE_FLISTS, values, KEY_FLIST_ID + " = " + keyID, null);
 	}
-	public boolean deleteCategory(int catID) {
+	public boolean deleteFlist(int flistID) {
 		int rowsDeleted = 0;
 		boolean success = false;
 		SQLiteDatabase db = this.getWritableDatabase();
-		rowsDeleted = db.delete(TABLE_CATEGORIES, KEY_CAT_ID + " = ?",
-				new String[] { String.valueOf(catID) });
+		rowsDeleted = db.delete(TABLE_FLISTS, KEY_FLIST_ID + " = ?",
+				new String[] { String.valueOf(flistID) });
 		db.close();
 		if (rowsDeleted > 0)
 			success = true;
@@ -753,7 +830,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	}
 	
 	// Filters
-	public ArrayList<Filter> getFilterList() {
+	public ArrayList<Filter> getFilters() {
 		ArrayList<Filter> filterList = new ArrayList<Filter>();
 		String selectQuery = "SELECT * FROM " + TABLE_FILTERS;
 		
@@ -806,7 +883,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
 	
 	// Settings
-	public int getDefaultCatID() {
+	/*
+	public int getDefaultFlistID() {
 		SQLiteDatabase db = this.getReadableDatabase();
 		
 		Cursor cursor = db.query(TABLE_SETTINGS, new String[] { KEY_SETTING_NAME, 
@@ -832,4 +910,117 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_SETTING_VAL1, completedCatID);
 		db.update(TABLE_SETTINGS, values, KEY_SETTING_NAME + " = " + completedSettingName, null);
 	}
+	 */
+	
+	// Backup & Restore
+	public void exportDB(){
+		File sd = Environment.getExternalStorageDirectory();
+	      	File data = Environment.getDataDirectory();
+	       FileChannel source=null;
+	       FileChannel destination=null;
+
+	       // Use one of these to set timestamp on DB Backup File
+	       Time now = new Time();
+	       now.setToNow();
+	       
+	       SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+	       String currentDateandTime = sdf.format(new Date(0));
+	       
+	     //File backupDB = new File(sd, backupDBPath);
+	       File currentDB = new File(data, currentDBPath);
+	       File backupDB = new File(sd, backupDBPath + "-" + "123456");
+	       try {
+	            source = new FileInputStream(currentDB).getChannel();
+	            destination = new FileOutputStream(backupDB).getChannel();
+	            destination.transferFrom(source, 0, source.size());
+	            source.close();
+	            destination.close();
+	            Toast.makeText(context, "DB Exported!", Toast.LENGTH_LONG).show();
+	        } catch(IOException e) {
+	        	e.printStackTrace();
+	            Toast.makeText(context, "Export Failed!", Toast.LENGTH_LONG).show();
+	            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+	        }
+	}
+	
+	private String getAppDir() {
+		return "/FlipList/";
+	}
+
+	public void restoreDBSelectFile() {
+		handler = new Handler();
+		File sd = Environment.getExternalStorageDirectory();
+		String select_file = "Select File";
+		File importFolder = new File(sd, "/FlipList/");
+		final CharSequence[] importFiles = importFolder.list();
+		
+		if (importFiles == null || importFiles.length == 0) {
+			Toast.makeText(context, "Source folder empty", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
+		importDatabaseFileName = (String) importFiles[0];
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle(select_file);
+		builder.setSingleChoiceItems(importFiles, 0, new 
+				android.content.DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				importDatabaseFileName = (String) importFiles[whichButton];
+				handler.post(restoreDatabaseRunable);
+				
+				dialog.dismiss();
+			}
+		});
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	
+	private SQLiteDatabase getDatabase() {
+		SQLiteDatabase db = this.getWritableDatabase();
+		return db;
+	}
+	
+	private Runnable restoreDatabaseRunable = new Runnable() {
+        public void run() {
+            try {
+                // open database in readonly mode
+                SQLiteDatabase db = SQLiteDatabase.openDatabase(
+                        getAppDir() + "/" + importDatabaseFileName,
+                        null, SQLiteDatabase.OPEN_READONLY);
+                // check version compatibility
+                // only same version of the db can be restored
+                if (getDatabase().getVersion() != db.getVersion()) {
+                    Toast.makeText(context, context.getString(R.string.restore_db_version_conflict),
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+                db.close();
+            } catch (SQLiteException e) {
+                Toast.makeText(context, context.getString(R.string.restore_file_error) + ": " + e.getMessage(),
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+            // closing current db
+            getDatabase().close();
+            try {
+                File data = Environment.getDataDirectory();
+                if (Environment.getExternalStorageDirectory() != null) {
+                    String restoreDBPath = getAppDir() + "/" + importDatabaseFileName;
+                    File restoreDB = new File(restoreDBPath);
+                    File currentDB = new File(data, currentDBPath);
+                    FileChannel src = new FileInputStream(restoreDB).getChannel();
+                    FileChannel dst = new FileOutputStream(currentDB).getChannel();
+                    dst.transferFrom(src, 0, src.size());
+                    src.close();
+                    dst.close();
+                    //myApp.setDatabase();
+                }
+            }
+            catch (Exception e) {
+                Log.e("DatabaseHandler.RestoreDatabaseRunable", e.getMessage());
+                //myApp.setDatabase();
+            }
+        }
+    };
 }

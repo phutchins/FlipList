@@ -10,13 +10,13 @@ import android.util.Log;
 public class ListPreferenceManager {
     SharedPreferences mySharedPreferences;
     
-	int defaultCatID;
+	int defaultFlistID;
 	Boolean ShowItemDescriptionGlobal;
 	Boolean ShowDueDateGlobal;
 	Integer RemoveCompletedItems;
     Integer RemoveCompletedItemsDelay;
     // Category currentCategory;
-    Integer currentCategoryID;
+    Integer currentFlistID;
     
     Context context;
 
@@ -27,15 +27,15 @@ public class ListPreferenceManager {
     }
     private void loadPrefs(){
     	mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        defaultCatID = Integer.parseInt(mySharedPreferences.getString(context.getString(R.string.default_category_key), context.getString(R.integer.default_category_default)));
-        Log.v("FlipList.loadPref", "defaultCatID: " + defaultCatID);
+        defaultFlistID = Integer.parseInt(mySharedPreferences.getString(context.getString(R.string.default_flist_key), context.getString(R.integer.default_flist_default)));
+        Log.v("FlipList.loadPref", "defaultFlistID: " + defaultFlistID);
 
         ShowItemDescriptionGlobal = mySharedPreferences.getBoolean(context.getString(R.string.show_description_global_key), context.getResources().getBoolean(R.bool.show_description_global_default));
         ShowDueDateGlobal = mySharedPreferences.getBoolean(context.getString(R.string.show_due_date_global_key), context.getResources().getBoolean(R.bool.show_due_date_global_default));
 
         // TODO: Create sanity check to ensure that default category exists
-        defaultCatID = mySharedPreferences.getInt("default_category_id", 0);
-        currentCategoryID = mySharedPreferences.getInt("current_category_id", 0);
+        defaultFlistID = mySharedPreferences.getInt("default_flist_id", 0);
+        currentFlistID = mySharedPreferences.getInt("current_flist_id", 0);
         //if (currentCategoryID == null) currentCategoryID = defaultCatID;
     }
 }

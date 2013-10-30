@@ -123,7 +123,13 @@ import android.widget.Toast;
 
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class FlipList extends FragmentActivity implements CategoryViewFragment.OnCategoryChangedListener, CategoryViewFragment.OnCategorySelectedListener {
+public class FlipList extends FragmentActivity implements 
+ListViewFragment.OnCategoryChangedListener, 
+ListViewFragment.OnCategorySelectedListener,
+ListViewFragment.OnFlistChangedListener,
+ListViewFragment.OnFlistSelectedListener,
+ListViewFragment.OnFilterChangedListener,
+ListViewFragment.OnFilterSelectedListener {
 	public final static String EXTRA_MESSAGE = "com.icanhasnom.FlipList.MESSAGE";
 	public static final String TAG = "FlipList";
 	public final static int RESULT_DELETED = 3;
@@ -138,10 +144,10 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
     
     HashMap<String, Item> checkListItems = new HashMap<String, Item>();
 
-    Category currentCategory;
-    Integer currentCategoryID;
+    Flist currentFlist;
+    Integer currentFlistID;
     Item currentItem;
-    ArrayList<Category> catList;
+    ArrayList<Flist> catList;
 
 
 	SparseIntArray myPositionMap;
@@ -159,7 +165,7 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
     MyFragmentPagerAdapter mAdapter;
     ViewPager mPager;
     
-    CategoryViewFragment categoryFragment;
+    ListViewFragment categoryFragment;
     ItemViewFragment itemFragment;
     
     static final Integer ITEMS = 3;
@@ -237,7 +243,7 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
         public Fragment getItem(int position) {
             switch (position) {
             case 0:
-            	Fragment categoryViewFragment = CategoryViewFragment.init(position);
+            	Fragment categoryViewFragment = ListViewFragment.init(position);
             	mPageReferenceMap.put(Integer.valueOf(position), categoryViewFragment);
                 return categoryViewFragment;
             case 1:
@@ -250,7 +256,7 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
             	mPageReferenceMap.put(Integer.valueOf(position),  filterViewFragment);
             	return filterViewFragment;
             default:
-            	CategoryViewFragment defCategoryViewFragment = CategoryViewFragment.init(position);
+            	ListViewFragment defCategoryViewFragment = ListViewFragment.init(position);
             	mPageReferenceMap.put(Integer.valueOf(position), defCategoryViewFragment);
                 return defCategoryViewFragment;
             }
@@ -289,7 +295,7 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
     	case R.id.menu_add_edit_cat:
-    		Intent addEditCatIntent = new Intent(this, AddEditCatListActivity.class);
+    		Intent addEditCatIntent = new Intent(this, AddEditFlistListActivity.class);
     		Bundle b = new Bundle();
     		b.putSerializable("task", MANAGE_CATEGORIES);
     		addEditCatIntent.putExtras(b);
@@ -318,9 +324,9 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
         	loadPref();
     	}
     	if (requestCode == 1 && resultCode == RESULT_OK) {
-            currentCategoryID = data.getIntExtra("catID", currentCategoryID);
-            currentCategory = myListMan.getCategory(currentCategoryID);
-            Log.v("FlipList.onActivityResult", "Got Result Code -1, currentCategoryID: " + currentCategoryID + " currentCategory.getName(): " + currentCategory.getName());
+            currentFlistID = data.getIntExtra("flistID", currentFlistID);
+            currentFlist = myListMan.getFlist(currentFlistID);
+            Log.v("FlipList.onActivityResult", "Got Result Code -1, currentCategoryID: " + currentFlistID + " currentCategory.getName(): " + currentFlist.getName());
     	} else if (requestCode == 1 && resultCode == RESULT_DELETED) {
     		loadPref();
     	} else if (requestCode == 1 && resultCode == RESULT_CANCELED) {
@@ -337,13 +343,47 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
     	//addItemsOnList();
     	super.onActivityResult(requestCode, resultCode, data);
     }
+    public void onFlistSelected(int selectedFlist) {
+    	Log.v("FlipList.onFlistSelected", "selectedFlist: " + selectedFlist);
+    	try {
+    		setCurrentPagerItem(ITEM_VIEW_FRAGMENT);
+        	Log.v("FlipList.onCategorySelected", "itemFragment: " + itemFragment);
+        	mAdapter.notifyDataSetChanged();
+        	ItemViewFragment ivf = (ItemViewFragment) ((MyFragmentPagerAdapter)mPager.getAdapter()).getFragment(ITEM_VIEW_FRAGMENT);
+        	ivf.initCat(FlipList.this, selectedFlist);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+    	}
+    }
     public void onCategorySelected(int selectedCat) {
     	Log.v("FlipList.onCategorySelected", "selectedCat: " + selectedCat);
-    	setCurrentPagerItem(ITEM_VIEW_FRAGMENT);
-    	Log.v("FlipList.onCategorySelected", "itemFragment: " + itemFragment);
-    	mAdapter.notifyDataSetChanged();
-    	ItemViewFragment ivf = (ItemViewFragment) ((MyFragmentPagerAdapter)mPager.getAdapter()).getFragment(ITEM_VIEW_FRAGMENT);
-    	ivf.initCat(FlipList.this, selectedCat);
+    	try {
+    		setCurrentPagerItem(ITEM_VIEW_FRAGMENT);
+        	Log.v("FlipList.onCategorySelected", "itemFragment: " + itemFragment);
+        	mAdapter.notifyDataSetChanged();
+        	ItemViewFragment ivf = (ItemViewFragment) ((MyFragmentPagerAdapter)mPager.getAdapter()).getFragment(ITEM_VIEW_FRAGMENT);
+        	ivf.initCat(FlipList.this, selectedCat);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+    	}
+    }
+    public void onFilterSelected(int selectedFilter) {
+    	Log.v("FlipList.onFilterSelected", "selectedFilter: " + selectedFilter);
+    	try {
+    		setCurrentPagerItem(ITEM_VIEW_FRAGMENT);
+        	Log.v("FlipList.onFilterSelected", "itemFragment: " + itemFragment);
+        	mAdapter.notifyDataSetChanged();
+        	ItemViewFragment ivf = (ItemViewFragment) ((MyFragmentPagerAdapter)mPager.getAdapter()).getFragment(ITEM_VIEW_FRAGMENT);
+        	ivf.initCat(FlipList.this, selectedFilter);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+    	}
+    }
+    public void onFlistChanged(int position) {
+    	
     }
     public void onCategoryChanged(int position) {
         // The user selected the headline of an article from the HeadlinesFragment
@@ -377,9 +417,13 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
         }
         **/
     }
+
+    public void onFilterChanged(int position) {
+    	
+    }
     private void loadPref(){
     	mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        defaultCatID = Integer.parseInt(mySharedPreferences.getString(getString(R.string.default_category_key), getString(R.integer.default_category_default)));
+        defaultCatID = Integer.parseInt(mySharedPreferences.getString(getString(R.string.default_flist_key), getString(R.integer.default_flist_default)));
         Log.v("FlipList.loadPref", "this:  " + this);
         Log.v("FlipList.loadPref", "Loaded Pref from mySharedPreferences, defaultCatID: " + defaultCatID);
 
@@ -388,9 +432,9 @@ public class FlipList extends FragmentActivity implements CategoryViewFragment.O
 
         // TODO: Create sanity check to ensure that default category exists
         //defaultCatID = mySharedPreferences.getInt("current_category_id", 0);
-        if (currentCategoryID == null) currentCategoryID = defaultCatID;
-        currentCategory = myListMan.getCategory(currentCategoryID);
-        Log.v("FlipList.loadPrefs", "(1) Setting currentCategory to " + currentCategory.getName());
+        if (currentFlistID == null) currentFlistID = defaultCatID;
+        currentFlist = myListMan.getFlist(currentFlistID);
+        Log.v("FlipList.loadPrefs", "(1) Setting currentCategory to " + currentFlist.getName());
     }
     /**
     public class SpinnerActivity extends Activity implements OnItemSelectedListener {

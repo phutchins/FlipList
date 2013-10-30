@@ -11,7 +11,7 @@
         android:icon="@android:drawable/ic_menu_preferences"
         android:showAsAction="ifRoom" />
     <item android:id="@+id/menu_add_edit_cat"
-        android:title="@string/menu_add_edit_cat"
+        android:title="@string/menu_add_edit_flist"
         android:orderInCategory="200"
         android:showAsAction="never" />
     

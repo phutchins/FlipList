@@ -2,13 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-    
-    <TextView
-        android:id="@+id/filter_list_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/filter_list_text_view"
-        android:textSize="26sp" />
 
     <TextView
         android:id="@+id/filter_list_text_view_type"
@@ -18,5 +11,24 @@
         android:layout_alignParentRight="true"
         android:text="@string/filter_list_text_view_type"
         android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/filter_list_text_view_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="25dp"
+        android:text="@string/filter_list_text_view_header"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/filter_list_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/filter_list_text_view_title"
+        android:text="@string/filter_list_text_view"
+        android:textSize="26sp" />
     
 </RelativeLayout>

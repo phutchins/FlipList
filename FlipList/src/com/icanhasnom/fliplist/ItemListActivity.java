@@ -27,10 +27,10 @@ public class ItemListActivity extends Activity {
 	ListManager myListMan;
 	int defaultCatID;
 	int currentCatID;
-	Category currentCategory;
+	Flist currentCategory;
 	ListPreferenceManager prefMan;
 	ItemList myItemList;
-    ArrayList<Category> catList;
+    ArrayList<Flist> catList;
     ArrayList<Item> myListItems;
     MyCustomAdapter itemListDataAdapter;
     SharedPreferences mySharedPreferences;
@@ -63,8 +63,8 @@ public class ItemListActivity extends Activity {
     	}
     	updateList();
     }
-	public Category getCategoryObj(int catID) {
-		Category myCat = myListMan.getCategory(catID);
+	public Flist getCategoryObj(int catID) {
+		Flist myCat = myListMan.getFlist(catID);
 		return myCat;
 	}
 	public ItemList getItemList(int catID) {

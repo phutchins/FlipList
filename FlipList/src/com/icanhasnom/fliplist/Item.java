@@ -23,8 +23,8 @@ public class Item implements Serializable {
 	Calendar myCal = Calendar.getInstance();
     public String dueDateTime;
     public String createDate;
-    public int primaryCat;
-    public List<String> secondaryCats = new ArrayList<String>();
+    public int flist;
+    public List<String> categories = new ArrayList<String>();
     public boolean hasDueDateBool = false;
     public boolean hasDueTimeBool = false;
     public String notes = "";
@@ -48,7 +48,7 @@ public class Item implements Serializable {
 	    String currentDateTime = sdfDateTime.format(new Date());
 	    return currentDateTime;
     }
-    public Item(int cat, String n, String desc, String crDate, String due) throws ParseException {
+    public Item(int fl, String n, String desc, String crDate, String due) throws ParseException {
     	name = n;
     	description = desc;
         if (due != null) {
@@ -56,14 +56,14 @@ public class Item implements Serializable {
         	hasDueDateBool = true;
         	Log.v("Item Constructor", "dueDateTime: " + due);
         }
-    	primaryCat = cat;
+    	flist = fl;
 	    createDate = getCurrentDateTime();
     	Log.v("Item Constructor", "createDate: " + createDate);
 
     }
-    public Item(int cat, String n, String desc, String due) {
+    public Item(int fl, String n, String desc, String due) {
     	name = n;
-    	primaryCat = cat;
+    	flist = fl;
     	Log.v("ListItem", "1) due: " + due + " hasDueDateBool: " + hasDueDateBool);
 
     	if (desc != null) {
@@ -79,9 +79,9 @@ public class Item implements Serializable {
 	    createDate = getCurrentDateTime();
     	Log.v("ListItem", "2) due: " + due + " hasDueDateBool: " + hasDueDateBool);
     }
-    public Item(int cat, String n, String desc) {
+    public Item(int fl, String n, String desc) {
     	name = n;
-    	primaryCat = cat;
+    	flist = fl;
     	if (desc != null) {
     		description = desc;
     	} else {
@@ -90,16 +90,16 @@ public class Item implements Serializable {
 	    createDate = getCurrentDateTime();
     	dueDateTime = getCurrentDateTime();
     }
-    public Item(int cat, String n) {
+    public Item(int fl, String n) {
     	name = n;
-    	primaryCat = cat;
+    	flist = fl;
 	    createDate = getCurrentDateTime();
     	dueDateTime = getCurrentDateTime();
     }
-    public Item(int id, int priCat, String cats, String n, String desc, String itemNotes, String crDate, String dueDT) throws ParseException {
+    public Item(int id, int fl, String cats, String n, String desc, String itemNotes, String crDate, String dueDT) throws ParseException {
     	itemID = id;
-    	primaryCat = priCat;
-        addToCats(cats);
+    	flist = fl;
+        addCategories(cats);
     	name = n;
         description = desc;
         notes = itemNotes;
@@ -170,6 +170,7 @@ public class Item implements Serializable {
     public void setID(int id) {
     	itemID = id;
     }
+    /*
     public void addToCats(String cats) {
     	String[] catList = cats.split(",");
         int catListSize = catList.length;
@@ -177,11 +178,12 @@ public class Item implements Serializable {
         	secondaryCats.add(catList[i]);
         }
     }
-    public void addSecondaryCat(String cat) {
-    	secondaryCats.add(cat);
+    */
+    public void addCategories(String cat) {
+    	categories.add(cat);
     }
-    public void setPrimaryCat(int cat) {
-    	primaryCat = cat;
+    public void setFlist(int f) {
+    	flist = f;
     }
     public void setNotes(String n) {
     	notes = n;
@@ -250,11 +252,11 @@ public class Item implements Serializable {
     public String getCreateDate() {
         return createDate;
     }
-    public int getPrimaryCat() {
-    	return primaryCat;
+    public int getFlist() {
+    	return flist;
     }
-    public List<String> getSecondaryCats() {
-        return secondaryCats;
+    public List<String> getCategories() {
+        return categories;
     }
     public Boolean isCompleted() {
     	return isCompleted;
@@ -264,9 +266,9 @@ public class Item implements Serializable {
     //	if (isCompleted) isCompletedInt = 1;
     //	return isCompletedInt;
     //}
-    public String getSecondaryCatsString() {
-    	String secondaryCatsString = secondaryCats.toArray().toString();
-    	return secondaryCatsString;
+    public String getCategoriesString() {
+    	String categoriesString = categories.toArray().toString();
+    	return categoriesString;
     }
     public String getDescription() {
         return description;
@@ -381,6 +383,6 @@ public class Item implements Serializable {
 
     // Remove Values
     public void rmCategory(String cat) {
-    	secondaryCats.remove(cat);
+    	categories.remove(cat);
     }
 }

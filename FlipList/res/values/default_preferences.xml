@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="default_category_key">default_category</string>
-    <item type="integer" name="default_category_default">0</item>
+    <string name="default_flist_key">default_category</string>
+    <item type="integer" name="default_flist_default">0</item>
     
     <string name="show_description_global_key">show_description_global</string>
     <item type="bool" name="show_description_global_default">true</item>

@@ -11,17 +11,23 @@ import java.util.Calendar;
 
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.text.format.Time;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 
 public class ExportImportDBActivity extends Activity implements OnClickListener {
 
-	private static final String SAMPLE_DB_NAME = "fliplist";
-	private static final String SAMPLE_TABLE_NAME = "Info";
+
+    DatabaseHandler db;
+    
+    Activity activity;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,6 +36,8 @@ public class ExportImportDBActivity extends Activity implements OnClickListener 
         findViewById(R.id.button1).setOnClickListener(this);
         findViewById(R.id.button2).setOnClickListener(this);
         findViewById(R.id.button3).setOnClickListener(this);
+        activity = this;
+        db = new DatabaseHandler(this);
     }
 	public void onClick(View v) {
 		switch(v.getId()) {
@@ -37,65 +45,63 @@ public class ExportImportDBActivity extends Activity implements OnClickListener 
 			//deleteDB();
 			break;
 		case R.id.button2:
-			exportDB();
+			db.exportDB();
 			break;
 		case R.id.button3:
-			//createDB();
+			db.restoreDBSelectFile();
 			break;
 		}
 	}
-	
+
+	/*
 	private void deleteDB(){
-		boolean result = this.deleteDatabase(SAMPLE_DB_NAME);
+		boolean result = this.deleteDatabase(DB_NAME);
 		if (result==true) {
 			 Toast.makeText(this, "DB Deleted!", Toast.LENGTH_LONG).show();
 		} 
 	}
-
+	*/
+	/*
 	private void createDB() {
-		SQLiteDatabase sampleDB =  this.openOrCreateDatabase(SAMPLE_DB_NAME, MODE_PRIVATE, null);
+		SQLiteDatabase sampleDB =  this.openOrCreateDatabase(DB_NAME, MODE_PRIVATE, null);
 		sampleDB.execSQL("CREATE TABLE IF NOT EXISTS " +
-	                SAMPLE_TABLE_NAME +
+	                TABLE_NAME +
 	                " (LastName VARCHAR, FirstName VARCHAR," +
 	                " Rank VARCHAR);");
 	        sampleDB.execSQL("INSERT INTO " +
-	                SAMPLE_TABLE_NAME +
+	                TABLE_NAME +
 	                " Values ('Kirk','James, T','Captain');");
 	        sampleDB.close();
 	        sampleDB.getPath();
 	        Toast.makeText(this, "DB Created @ "+sampleDB.getPath(), Toast.LENGTH_LONG).show(); 
 	}
+	 */
 
-	private void exportDB(){
+	/*
+	private void restoreDB() {
 		File sd = Environment.getExternalStorageDirectory();
-	      	File data = Environment.getDataDirectory();
-	       FileChannel source=null;
-	       FileChannel destination=null;
-	       String currentDBPath = "/data/"+ "com.icanhasnom.fliplist" +"/databases/"+SAMPLE_DB_NAME;
-	       String backupDBPath = "/FlipList/db_export/" + SAMPLE_DB_NAME;
-	       
-	       Time now = new Time();
-	       now.setToNow();
-	       
-	       SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-	       String currentDateandTime = sdf.format(new Date(0));
-	       
-	     //File backupDB = new File(sd, backupDBPath);
-	       File currentDB = new File(data, currentDBPath);
-	       
-	       File backupDB = new File(sd, backupDBPath + "-" + "123456");
-	       try {
-	            source = new FileInputStream(currentDB).getChannel();
-	            destination = new FileOutputStream(backupDB).getChannel();
-	            destination.transferFrom(source, 0, source.size());
-	            source.close();
-	            destination.close();
-	            Toast.makeText(this, "DB Exported!", Toast.LENGTH_LONG).show();
-	        } catch(IOException e) {
-	        	e.printStackTrace();
-	            Toast.makeText(this, "Export Failed!", Toast.LENGTH_LONG).show();
-	            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-	        }
+		File data = Environment.getDataDirectory();
+		
+		try {
+			File currentDB = new File(data, currentDBPath);
+			File backupDB = new File(sd, backupDBPath);
+			
+			if (currentDB.exists()) {
+				FileChannel src = new FileInputStream(backupDB).getChannel();
+				FileChannel dst = new FileOutputStream(currentDB).getChannel();
+				dst.transferFrom(src, 0, src.size());
+				src.close();
+				dst.close();
+				Toast.makeText(this, "Database Restored Successfully", Toast.LENGTH_SHORT).show();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			Toast.makeText(this, "Export Failed!", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this,  e.toString(),  Toast.LENGTH_LONG).show();
+		}
 	}
+	*/
+	
+
 }
 
