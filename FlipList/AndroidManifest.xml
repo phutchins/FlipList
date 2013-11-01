@@ -32,7 +32,7 @@
                 android:value="com.icanhasnom.fliplist.Fliplist" />
         </activity>
         <activity
-            android:name="com.icanhasnom.fliplist.AddEditListActivity"
+            android:name="com.icanhasnom.fliplist.AddEditFlistActivity"
             android:label="@string/title_activity_add_edit_cat"
             android:parentActivityName="com.icanhasnom.fliplist.FlipList" >
             <meta-data

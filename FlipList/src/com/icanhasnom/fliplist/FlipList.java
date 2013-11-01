@@ -167,6 +167,7 @@ ListViewFragment.OnFilterSelectedListener {
     
     ListViewFragment categoryFragment;
     ItemViewFragment itemFragment;
+    UtilViewFragment utilFragment;
     
     static final Integer ITEMS = 3;
     
@@ -250,11 +251,10 @@ ListViewFragment.OnFilterSelectedListener {
             	Fragment itemViewFragment = ItemViewFragment.init(position);
             	mPageReferenceMap.put(Integer.valueOf(position), itemViewFragment);
                 return itemViewFragment;
-                //Log.v("FlipList.getItem", "ItemViewFragment: " + viewId);
             case 2:
-            	Fragment filterViewFragment = FilterViewFragment.init(position);
-            	mPageReferenceMap.put(Integer.valueOf(position),  filterViewFragment);
-            	return filterViewFragment;
+            	Fragment utilViewFragment = UtilViewFragment.init(position);
+            	mPageReferenceMap.put(Integer.valueOf(position),  utilViewFragment);
+            	return utilViewFragment;
             default:
             	ListViewFragment defCategoryViewFragment = ListViewFragment.init(position);
             	mPageReferenceMap.put(Integer.valueOf(position), defCategoryViewFragment);
@@ -326,6 +326,14 @@ ListViewFragment.OnFilterSelectedListener {
     	if (requestCode == 1 && resultCode == RESULT_OK) {
             currentFlistID = data.getIntExtra("flistID", currentFlistID);
             currentFlist = myListMan.getFlist(currentFlistID);
+            
+    		ListViewFragment listViewFragment = (ListViewFragment) mAdapter.getItem(0);
+    		listViewFragment.refreshList();
+    		mAdapter.notifyDataSetChanged();
+    		
+    		ItemViewFragment itemViewFragment = (ItemViewFragment) mAdapter.getItem(1);
+    		itemViewFragment.refreshPage(this);
+    		
             Log.v("FlipList.onActivityResult", "Got Result Code -1, currentCategoryID: " + currentFlistID + " currentCategory.getName(): " + currentFlist.getName());
     	} else if (requestCode == 1 && resultCode == RESULT_DELETED) {
     		loadPref();
@@ -334,8 +342,12 @@ ListViewFragment.OnFilterSelectedListener {
     	}
     	if (requestCode == 5) {
     		// Refresh content in CategoryViewFragment
-    		//CategoryViewFragment catViewFragment = (CategoryViewFragment) mAdapter.getItem(0);
-    		//catViewFragment.refreshList();
+    		ListViewFragment listViewFragment = (ListViewFragment) mAdapter.getItem(0);
+    		listViewFragment.refreshList();
+    		
+    		ItemViewFragment itemViewFragment = (ItemViewFragment) mAdapter.getItem(1);
+    		itemViewFragment.refreshPage(this);
+    		
     		mAdapter.notifyDataSetChanged();
     	}
     	//addItemsOnSpinner();

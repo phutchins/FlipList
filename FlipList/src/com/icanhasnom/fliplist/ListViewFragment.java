@@ -141,7 +141,9 @@ public class ListViewFragment extends Fragment {
     }
     public void refreshList() {
     	initVars();
+    	addFlistsOnList();
     	addCategoriesOnList();
+    	addFiltersOnList();
     }
     public void showList(Integer catID) {
 		Intent itemListActivity = new Intent(activity, ItemListActivity.class);
@@ -171,18 +173,18 @@ public class ListViewFragment extends Fragment {
     	listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
     		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
     			Log.v("Long clicked", "pos" + " " + position);
-    			Flist category = (Flist) parent.getItemAtPosition(position);
-    			editCategory(view, category.getID());
+    			Flist flist = (Flist) parent.getItemAtPosition(position);
+    			editFlist(view, flist.getID());
     			return true;
     		}
     	});
     	Button addFlistButton = (Button) layoutView.findViewById(R.id.flist_list_add_button);
-    	//addFlistButton.setOnClickListener(new View.OnClickListener() {
+    	addFlistButton.setOnClickListener(new View.OnClickListener() {
 
-    	//	public void onClick(View v) {
-    	//		addListButtonListener(v);
-    	//	}
-    	//});
+    		public void onClick(View v) {
+    			addListButtonListener(v);
+    		}
+    	});
     }
     
     public void addCategoriesOnList() {
@@ -284,10 +286,10 @@ public class ListViewFragment extends Fragment {
 		int myPosition = myPositionMap.get(myListCategoryID);
 		return myPosition;
 	}
-    public void editList(View view, Integer listID) {
-		Intent addEditListActivity = new Intent(view.getContext(), AddEditListActivity.class);
+    public void editFlist(View view, Integer flistID) {
+		Intent addEditListActivity = new Intent(view.getContext(), AddEditFlistActivity.class);
 		Bundle b = new Bundle();
-		b.putSerializable("catID", listID);
+		b.putSerializable("flistID", flistID);
 		b.putSerializable("task", EDIT);
 		addEditListActivity.putExtras(b);
 		this.startActivityForResult(addEditListActivity, 5);
@@ -309,7 +311,7 @@ public class ListViewFragment extends Fragment {
 		this.startActivityForResult(addEditFilterActivity, 5);
     }
     public void addListButtonListener(View view) {
-		Intent addEditListActivity = new Intent(view.getContext(), AddEditListActivity.class);
+		Intent addEditListActivity = new Intent(view.getContext(), AddEditFlistActivity.class);
 		Bundle b = new Bundle();
 		b.putSerializable("task", ADD);
 		addEditListActivity.putExtras(b);
@@ -384,10 +386,10 @@ public class ListViewFragment extends Fragment {
     		int categoryTypeID = category.getType();
     		//String categoryDescription = category.getDescription();
     		String categoryName = category.getName();
-			String categoryType = "(F)";
-    		if (category.getFilterID() == 0) {
-    			categoryType = "(C)";
-    		}
+			String categoryType = "(L)";
+    		//if (category.getFilterID() == 0) {
+    		//	categoryType = "(C)";
+    		//}
     		String categoryTypeName = myListMan.getItemTypeName(categoryTypeID);
     		
     		Log.v("MyCatListCustomAdapter", "categoryTypeID:" + categoryTypeID);

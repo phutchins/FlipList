@@ -13,29 +13,11 @@
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
-        android:id="@+id/category_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="25dp"
-        android:text="@string/category_list_text_view_header" />
-
-    <Button
-        android:id="@+id/category_list_add_button"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:text="@string/category_list_add_button_text" />
-
-    <TextView
         android:id="@+id/category_list_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/category_list_add_button"
+        android:layout_alignParentTop="true"
         android:text="@string/category_list_text_view"
         android:textSize="26sp" />
     

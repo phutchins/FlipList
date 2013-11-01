@@ -38,7 +38,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int DATABASE_VERSION = 69;
+	private static final int DATABASE_VERSION = 70;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
@@ -66,7 +66,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	private static final String KEY_CAT_ID = "id";
 	private static final String KEY_CAT_NAME = "name";
 	private static final String KEY_CAT_DESC = "desc";
-	private static final String KEY_CAT_TYPE = "type";
 	private static final String KEY_CAT_VISIBLE = "visible";
 	
 	// Filters Table
@@ -173,7 +172,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		String CREATE_ARCHIVE_CATEGORY = "insert into " + TABLE_CATEGORIES + "(" + KEY_CAT_ID + "," + KEY_CAT_NAME + ","
                 + KEY_CAT_DESC + "," + KEY_CAT_VISIBLE + ") values(1, 'Archive', 'Archive Category', '0')";
 		String CREATE_ALL_FLIST = "insert into " + TABLE_FLISTS + "(" + KEY_FLIST_ID + "," + KEY_FLIST_NAME + ","
-                + KEY_FLIST_DESC + "," + KEY_FLIST_TYPE + "," + KEY_FLIST_VISIBLE + "," + KEY_FLIST_FILTER + ") values(0, 'Default List', 'List All Items','0', '1', 1)";
+                + KEY_FLIST_DESC + "," + KEY_FLIST_TYPE + "," + KEY_FLIST_VISIBLE + "," + KEY_FLIST_FILTER + ") values(0, 'Default List', 'List All Items','0', '1', 0)";
 		
 		String CREATE_TYPE_GENERIC = "insert into " + TABLE_ITEM_TYPES + "(" + KEY_TYPE_ID + "," + KEY_TYPE_NAME + ","
 				+ KEY_TYPE_DESC + ") values(0, 'Generic', 'Generic items')";
@@ -566,10 +565,12 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	public int addFlist(Flist flist) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
+		Log.v("DatabaseHandler.addFlist", "Adding Flist " + flist.getName() + " Desc: " + flist.getDescription() + " Type: " + flist.getType() + " Visible: " + flist.getVisible() + "Filter: " + flist.getFilterID());
 		values.put(KEY_FLIST_NAME, flist.getName());
 		values.put(KEY_FLIST_DESC, flist.getDescription());
 		values.put(KEY_FLIST_TYPE, flist.getType());
 		values.put(KEY_FLIST_VISIBLE, flist.getVisible());
+		values.put(KEY_FLIST_FILTER, flist.getFilterID());
 		db.insert(TABLE_FLISTS, null, values);
 		Cursor cursor = db.rawQuery("SELECT last_insert_rowid() FROM " + TABLE_FLISTS, null);
 		cursor.moveToFirst();

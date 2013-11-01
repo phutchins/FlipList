@@ -30,12 +30,12 @@
         android:layout_height="fill_parent"
         android:layout_above="@+id/saveItemButton"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/list_spinner" >
+        android:layout_below="@+id/flist_spinner" >
 
     </ListView>
 
     <Spinner
-        android:id="@+id/list_spinner"
+        android:id="@+id/flist_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true" />

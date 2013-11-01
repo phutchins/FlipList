@@ -39,6 +39,13 @@ public class Flist implements Serializable {
     	type = flistType;
     	isVisible = v;
     }
+    //public Flist(String flistName, String flistDesc, int flistType, int v, int f) {
+    //	name = flistName;
+    //	description = flistDesc;
+    //	type = flistType;
+    //	isVisible = v;
+    //	filterID = f;
+    //}
     public boolean showDueDate() {
     	return showDueDate;
     }

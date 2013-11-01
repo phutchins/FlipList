@@ -1,32 +1,90 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/RelativeLayout1"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:windowActionBar="false" >
 
+      <TextView
+        android:id="@+id/flist_list_header_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="Lists"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+      
+    <Button
+        android:id="@+id/flist_list_add_button"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:minHeight="25dp"
+        android:text="@string/flist_list_add_button_text" />
     <ListView
         android:id="@+id/flist_list_list_view"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1" >
-
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/flist_list_header_textview"
+        android:layout_alignParentLeft="true" >
     </ListView>
 
-        <ListView
-            android:id="@+id/flist_category_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" >
+    <TextView
+        android:id="@+id/flist_category_header_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/flist_list_list_view"
+        android:layout_alignParentLeft="true"
+        android:text="Categories"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
+    <Button
+        android:id="@+id/flist_category_add_button"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		android:layout_below="@+id/flist_list_list_view"
+        android:layout_alignParentRight="true"
+        android:minHeight="25dp"
+        android:text="@string/flist_category_add_button_text" />
+    
+    <ListView
+        android:id="@+id/flist_category_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/flist_category_header_textview"
+        android:layout_alignParentLeft="true" >
+    </ListView>
+    <TextView
+        android:id="@+id/flist_filter_header_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/flist_category_list_view"
+        android:layout_alignParentLeft="true"
+        android:text="Filters"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    
+    <Button
+        android:id="@+id/flist_filter_add_button"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		android:layout_below="@+id/flist_category_list_view"
+        android:layout_alignParentRight="true"
+        android:minHeight="25dp"
+        android:text="@string/flist_filter_add_button_text" />
+        
+    <ListView
+        android:id="@+id/flist_filter_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/flist_filter_header_textview"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" >
     </ListView>
 
-        <ListView
-            android:id="@+id/flist_filter_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" >
-
-    </ListView>
-
-</LinearLayout>
+</RelativeLayout>

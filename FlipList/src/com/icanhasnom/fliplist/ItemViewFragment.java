@@ -2,8 +2,6 @@ package com.icanhasnom.fliplist;
  
 import java.util.ArrayList;
 
-import com.icanhasnom.fliplist.AddEditListActivity.MyFilterSpinnerCustomAdapter;
-
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
@@ -162,7 +160,7 @@ public class ItemViewFragment extends Fragment {
         //Log.v("ItemViewFragment.addItemsOnSpinner", "myItemView: " + myItemView);
         Log.v("ItemViewFragment.addItemsOnSpinner", "THIS: " + this);
         Log.v("ItemViewFragment.addItemsOnSpinner", "R.id.viewpager: " + R.id.pager);
-        flistSpinner = (Spinner) layoutView.findViewById(R.id.list_spinner);
+        flistSpinner = (Spinner) layoutView.findViewById(R.id.flist_spinner);
         //catSpinner = (Spinner) myActivity.findViewById(R.id.list_spinner);
 
 

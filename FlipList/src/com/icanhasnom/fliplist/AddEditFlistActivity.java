@@ -454,12 +454,15 @@ public class AddEditFlistActivity extends Activity {
     	boolean isVisible = visibleCheckBox.isChecked();
     	int isVisibleInt = (isVisible) ? 1 : 0;
     	
+    	//int filterID = (Integer) filterSpinner.getItemAtPosition(filterSpinner.getSelectedItemPosition());
+    	
     	Flist myFlist = new Flist(flistName, flistDesc, flistTypeID, isVisibleInt);
     	myFlist.setFilterID(filterSpinner.getSelectedItemPosition());
 
     	if (currentFlist.isNew()) {
     		int newflistID = myListMan.addFlist(myFlist);
     		myFlist.setID(newflistID);
+    		Log.v("AddEditFlistActivity.mySaveFlistButtonAction", "myListMan.addFlist: " + myFlist.getName());
     	} else {
     		int flistID = Integer.parseInt(editFlistIdNumber.getText().toString());
     		myFlist.setID(flistID);
@@ -467,7 +470,7 @@ public class AddEditFlistActivity extends Activity {
     	}
     	
     	Intent intent = new Intent();
-    	intent.putExtra("catID", myFlist.getID());
+    	intent.putExtra("flistID", myFlist.getID());
     	setResult(RESULT_OK, intent);
     	finish();
     }

@@ -81,7 +81,7 @@ public class AddEditFlistListActivity extends Activity {
     }
     public void editCategory(Flist category) {
     	Integer catID = category.getID();
-		Intent addEditCatActivity = new Intent(this, AddEditListActivity.class);
+		Intent addEditCatActivity = new Intent(this, AddEditFlistActivity.class);
 		Bundle b = new Bundle();
 		b.putSerializable("catID", catID);
 		b.putSerializable("task", EDIT_CATEGORY);
@@ -89,7 +89,7 @@ public class AddEditFlistListActivity extends Activity {
 		this.startActivityForResult(addEditCatActivity, 5);
     }
 	public void addNewCategory() {
-  		Intent addEditCatActivity = new Intent(this, AddEditListActivity.class);
+  		Intent addEditCatActivity = new Intent(this, AddEditFlistActivity.class);
 		Bundle b = new Bundle();
 		b.putSerializable("task", ADD_CATEGORY);
 		addEditCatActivity.putExtras(b);

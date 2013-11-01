@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:text="@string/new_category_button_text" />
+        android:text="@string/flist_category_add_button_text" />
 
     <TextView
         android:id="@+id/category_title"

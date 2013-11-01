@@ -92,6 +92,7 @@ public class ListManager implements Serializable {
     	// TODO: Merge updateObjCategory into this? Maybe make addUpdateObjCategory() which does 
     	//       a check to see if it exists and updates it if it already exists and adds it if
     	//       it doesn't.
+    	Log.v("ListManager.addFlist", "Adding Flist: " + flist.getName());
     	Integer newFlistID = db.addFlist(flist);
     	buildItemListMap();
     	populateFlistList();
