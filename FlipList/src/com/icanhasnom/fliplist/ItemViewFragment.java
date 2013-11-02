@@ -234,14 +234,14 @@ public class ItemViewFragment extends Fragment {
  			Toast.makeText(activity,
  					"Please enter an item name!", Toast.LENGTH_LONG).show();
         } else {
- 	       int catID = currentFlist.getID();
+ 	       int flistID = currentFlist.getID();
  	       
  	       // Get the default type of category
  	       //Category myCat = myListMan.getFlist(catID);
  	       // myTypeID = myCat.getType();
  	       //ItemType myType = myListMan.getItemType(myTypeID);
  	       
- 	       myListMan.addItem(catID, name);
+ 	       myListMan.addItem(flistID, name);
  	       addItemsOnList(myItemList);
  	       editText.setText("");
         }

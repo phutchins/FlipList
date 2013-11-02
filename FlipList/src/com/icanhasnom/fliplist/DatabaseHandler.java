@@ -322,7 +322,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	// Items
 	public void addItem(Item item) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		String secondaryCatsString = item.getCategoriesString();
+		String itemCategories = item.getCategoriesString();
 		int hasDueDate = item.hasDueDate()? 1 : 0;
 		int hasDueTime = item.hasDueTime()? 1 : 0;
 		int isCompleted = item.isCompleted()? 1 : 0;
@@ -332,7 +332,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_ITEM_DESC, item.getDescription());
 		values.put(KEY_ITEM_NOTES, item.getNotes());
 		values.put(KEY_ITEM_FLIST,  item.getFlist());
-		values.put(KEY_ITEM_CATEGORIES, secondaryCatsString);
+		values.put(KEY_ITEM_CATEGORIES, itemCategories);
 		values.put(KEY_ITEM_HAS_DUE_DATE, hasDueDate);
 		values.put(KEY_ITEM_HAS_DUE_TIME, hasDueTime);
 		values.put(KEY_ITEM_DUE_DATETIME, item.getDueDateTime());
@@ -340,11 +340,11 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_ITEM_IS_COMPLETED, isCompleted);
 		values.put(KEY_ITEM_COMPLETED_DATE,  item.getCompletedDate());
 		
-		//Log.v("DatabaseHandler.addItem", "Adding Item " + item.getName() + " to the DB");
+		Log.v("DatabaseHandler.addItem", "Adding Item " + item.getName() + " to the DB");
 		//Log.v("DatabaseHandler.addItem", "item.getDueDateTime(): " + item.getDueDateTime());
-		//Log.v("DatabaseHandler.addItem", " *item info: " + item.getName() + "," + item.getDescription() + "," + item.getNotes() + "," 
-		//+ item.getPrimaryCat() + "," + secondaryCatsString + "," + item.getCreateDate() + "," + hasDueDate + "," + hasDueTime
-		//+ item.getDueDateTime());
+		Log.v("DatabaseHandler.addItem", " *item info: " + item.getName() + "," + item.getDescription() + "," + item.getNotes() + "," 
+		+ item.getFlist() + "," + itemCategories + "," + item.getCreateDate() + "," + hasDueDate + "," + hasDueTime
+		+ item.getDueDateTime());
 		
 		db.insert(TABLE_ITEMS, null, values);
 		db.close();

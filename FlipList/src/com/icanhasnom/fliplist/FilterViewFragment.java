@@ -46,7 +46,7 @@ public class FilterViewFragment extends Fragment {
         super.onCreate(savedInstanceState);
         fragVal = getArguments() != null ? getArguments().getInt("val") : 1;
 		myListMan = new ListManager(activity);
-        filterList = myListMan.getFilterList();
+        filterList = myListMan.getFilters();
     }
  
     /**

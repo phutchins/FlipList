@@ -30,6 +30,7 @@ public class ListManager implements Serializable {
     
     public int defaultTypeID = 0;
     public String defaultType = "Generic";
+	public int defaultCategoryID = 0;
     //public int completedCatID = 1;
     public int archiveCategory = 1;
     public Flist currentCategory;
@@ -98,20 +99,20 @@ public class ListManager implements Serializable {
     	populateFlistList();
     	return newFlistID;
     }
-	public Item addItem(int catID, String name) {
-		Item myItem = new Item(catID, name);
+	public Item addItem(int flistID, String name) {
+		Item myItem = new Item(flistID, name);
 		
 		db.addItem(myItem);
 		buildItemListMap();
 		return myItem;
 	}
-    public Item addItem(int curCategory, String name, String description, String dueDate) {
-        Item myItem = new Item(curCategory, name, description, dueDate);
+    public Item addItem(int curFlist, String name, String description, String dueDate) {
+        Item myItem = new Item(curFlist, name, description, dueDate);
         db.addItem(myItem);
         buildItemListMap();
         return myItem;
     }
-    public void addCategoryType(ItemType newCatType) {
+    public void addType(ItemType newCatType) {
     	// Check if type exists
     	// Add type to db if doesn't exist
     	// Add type to typeList
@@ -212,17 +213,17 @@ public class ListManager implements Serializable {
         myItemArray = myItemArrayList.toArray(myItemArray);
         return myItemArray;
     }
-    public ArrayList<ItemType> getItemTypeList() {
+    public ArrayList<ItemType> getTypes() {
     	ArrayList<ItemType> categoryTypesList = db.getItemTypeList();
     	return categoryTypesList;
     }
-    public ArrayList<Filter> getFilterList() {
-    	ArrayList<Filter> filterList = db.getFilters();
-    	return filterList;
-    }
+    //public ArrayList<Filter> getFilters() {
+    //	ArrayList<Filter> filterList = db.getFilters();
+    //	return filterList;
+    //}
 
     // Retrieving Objects
-    public ItemType getItemType(int typeID) {
+    public ItemType getType(int typeID) {
     	ItemType catType = db.getItemType(typeID);
     	return catType;
     }
@@ -231,7 +232,7 @@ public class ListManager implements Serializable {
     	return listCat;
     }
     
-    public String getItemTypeName(int typeID) {
+    public String getTypeName(int typeID) {
     	String typeName = db.getItemTypeName(typeID);
     	return typeName;
     }

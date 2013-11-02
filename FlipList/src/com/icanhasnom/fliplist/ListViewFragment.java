@@ -390,11 +390,11 @@ public class ListViewFragment extends Fragment {
     		//if (category.getFilterID() == 0) {
     		//	categoryType = "(C)";
     		//}
-    		String categoryTypeName = myListMan.getItemTypeName(categoryTypeID);
+    		String categoryTypeName = myListMan.getTypeName(categoryTypeID);
     		
     		Log.v("MyCatListCustomAdapter", "categoryTypeID:" + categoryTypeID);
     		Log.v("MyCatListCustomAdapter", "category.getDescription(): " + category.getDescription());
-    		Log.v("MyCatListCustomAdapter", "myListMan.getCategoryTypeName(): " + myListMan.getItemTypeName(categoryTypeID));
+    		Log.v("MyCatListCustomAdapter", "myListMan.getCategoryTypeName(): " + myListMan.getTypeName(categoryTypeID));
     		
     		holder.flist_list_text_view.setText(categoryType + " " + categoryName);
     		holder.flist_list_text_view_type.setText("(" + categoryTypeName + ")");

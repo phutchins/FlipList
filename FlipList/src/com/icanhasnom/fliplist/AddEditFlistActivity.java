@@ -63,8 +63,8 @@ public class AddEditFlistActivity extends Activity {
 		
 		myListMan = new ListManager(this);
         flistList = myListMan.getFlists();
-		filterList = myListMan.getFilterList();
-		typeList = myListMan.getItemTypeList();
+		filterList = myListMan.getFilters();
+		typeList = myListMan.getTypes();
 		myFilterPositionMap = new SparseIntArray();
 		myFilterPositionMap = buildFilterIndex(filterList);
 		myTypePositionMap = new SparseIntArray();
@@ -168,14 +168,14 @@ public class AddEditFlistActivity extends Activity {
 	}
 	
     public void addTypesToSpinner() {
-        ArrayList<ItemType> myTypeList = myListMan.getItemTypeList();
+        ArrayList<ItemType> myTypeList = myListMan.getTypes();
         typeSpinner = (Spinner) findViewById(R.id.flist_type_spinner);
         ArrayAdapter<ItemType> myTypeAdapter = new MyTypeSpinnerCustomAdapter(this, R.layout.activity_add_edit_flist, myTypeList);
         myTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeSpinner.setAdapter(myTypeAdapter);
     }
     public void addFiltersToSpinner() {
-        ArrayList<Filter> myFilterList = myListMan.getFilterList();
+        ArrayList<Filter> myFilterList = myListMan.getFilters();
         filterSpinner = (Spinner) findViewById(R.id.flist_edit_filter_spinner);
         ArrayAdapter<Filter> myFilterAdapter = new MyFilterSpinnerCustomAdapter(this, R.layout.activity_add_edit_flist, myFilterList);
         myFilterAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

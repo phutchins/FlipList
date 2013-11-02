@@ -63,8 +63,8 @@ public class AddEditFilterActivity extends Activity {
 		
 		myListMan = new ListManager(this);
         flistList = myListMan.getFlists();
-		filterList = myListMan.getFilterList();
-		typeList = myListMan.getItemTypeList();
+		filterList = myListMan.getFilters();
+		typeList = myListMan.getTypes();
 		myFilterPositionMap = new SparseIntArray();
 		myFilterPositionMap = buildFilterIndex(filterList);
 		myTypePositionMap = new SparseIntArray();
@@ -148,7 +148,7 @@ public class AddEditFilterActivity extends Activity {
 		EditText flistDesc = (EditText) findViewById(R.id.flist_edit_desc);
 		// Make this flistID a hidden text field or something to store the value
 		EditText flistID = (EditText) findViewById(R.id.flist_edit_id);
-		typeSpinner = (Spinner) findViewById(R.id.flist_type_spinner);
+		//typeSpinner = (Spinner) findViewById(R.id.flist_type_spinner);
 		filterSpinner = (Spinner) findViewById(R.id.flist_edit_filter_spinner);
 		CheckBox isVisibleBox = (CheckBox) findViewById(R.id.flist_visible_check_box);
 		isVisibleBox.setChecked(isVisible);
@@ -168,14 +168,14 @@ public class AddEditFilterActivity extends Activity {
 	}
 	
     public void addTypesToSpinner() {
-        ArrayList<ItemType> myTypeList = myListMan.getItemTypeList();
-        typeSpinner = (Spinner) findViewById(R.id.flist_type_spinner);
+        ArrayList<ItemType> myTypeList = myListMan.getTypes();
+        //typeSpinner = (Spinner) findViewById(R.id.flist_type_spinner);
         ArrayAdapter<ItemType> myTypeAdapter = new MyTypeSpinnerCustomAdapter(this, R.layout.activity_add_edit_flist, myTypeList);
         myTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeSpinner.setAdapter(myTypeAdapter);
     }
     public void addFiltersToSpinner() {
-        ArrayList<Filter> myFilterList = myListMan.getFilterList();
+        ArrayList<Filter> myFilterList = myListMan.getFilters();
         filterSpinner = (Spinner) findViewById(R.id.flist_edit_filter_spinner);
         ArrayAdapter<Filter> myFilterAdapter = new MyFilterSpinnerCustomAdapter(this, R.layout.activity_add_edit_flist, myFilterList);
         myFilterAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -445,7 +445,7 @@ public class AddEditFilterActivity extends Activity {
     	EditText editFlistDescText = (EditText) findViewById(R.id.flist_edit_desc);
     	String flistDesc = editFlistDescText.getText().toString();
     	
-    	Spinner typeSpinner = (Spinner) findViewById(R.id.flist_type_spinner);
+    	//Spinner typeSpinner = (Spinner) findViewById(R.id.flist_type_spinner);
     	Spinner filterSpinner = (Spinner) findViewById(R.id.flist_edit_filter_spinner);
     	CheckBox visibleCheckBox = (CheckBox) findViewById(R.id.flist_visible_check_box);
     	

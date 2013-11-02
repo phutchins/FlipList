@@ -148,7 +148,7 @@ public class AddEditFlistListActivity extends Activity {
     		int categoryTypeID = category.getType();
     		//String categoryDescription = category.getDescription();
     		String categoryName = category.getName();
-    		String categoryTypeName = myListMan.getItemTypeName(categoryTypeID);
+    		String categoryTypeName = myListMan.getTypeName(categoryTypeID);
 
     		holder.cat_list_text_view.setText(categoryName);
     		holder.cat_list_text_view_type.setText("(" + categoryTypeName + ")");
