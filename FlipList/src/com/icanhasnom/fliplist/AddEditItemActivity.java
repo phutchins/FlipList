@@ -123,11 +123,12 @@ public class AddEditItemActivity extends Activity {
 		return myCategoryPositionMap;
 	}
 	*/
-	public SparseIntArray buildFlistSpinnerIndex(ArrayList<Flist> myCatList) {
+	public SparseIntArray buildFlistSpinnerIndex(ArrayList<Flist> myFlistList) {
 		Integer position = 0;
 		SparseIntArray myFlistPositionMap = new SparseIntArray();
-		for (Flist myCat : myCatList) {
-			myFlistPositionMap.put(myCat.getID(), position);
+		for (Flist myFlist : myFlistList) {
+			myFlistPositionMap.put(myFlist.getID(), position);
+			Log.v("AddEditItemActivity.buildFlistSpinnerIndex()", "Position: " + position + " Flist ID: " + myFlist.getID());
 			position++;
 		}
 		return myFlistPositionMap;
@@ -138,8 +139,9 @@ public class AddEditItemActivity extends Activity {
 		return myPosition;
 	}
 	*/
-	public int getFlistSpinnerPosition(int myListCategoryID, SparseIntArray myPositionMap) {
-		int myPosition = flistPositionMap.get(myListCategoryID);
+	public int getFlistSpinnerPosition(int myFlistID, SparseIntArray myPositionMap) {
+		int myPosition = flistPositionMap.get(myFlistID);
+		Log.v("AddEditItemActivity.getFlistSpinnerPosition()", "Position for Flist ID '" + myFlistID + "' is '" + myPosition + "'");
 		return myPosition;
 	}
     public void editListItem() {
@@ -169,6 +171,8 @@ public class AddEditItemActivity extends Activity {
     	if (!currentItem.hasDueTime()) noTimeButton.setEnabled(false);
     	if (!currentItem.hasDueDate()) noDateButton.setEnabled(false);
     	if (currentItem.isCompleted()) itemCompleted.setChecked(true);
+    	
+    	initCategoryDialogOptions();
 
     	editDateButton.setText(myDatePretty);
     	editDateButton.setTag(myDate);
@@ -181,9 +185,19 @@ public class AddEditItemActivity extends Activity {
         addFlistsToSpinner();
         List<String> itemCategoryList = currentItem.getCategories();
         String itemCategoryListString = "";
-        for (String categoryID : itemCategoryList) {
-        	String categoryName = myListMan.getCategory(Integer.valueOf(categoryID)).getName();
-        	itemCategoryListString += categoryName + " ";
+        // TODO: Make the list manager always set a default category if none is selected
+        if (itemCategoryList.isEmpty()) {
+        	Log.v("AddEditItemActivity.editListItem", "No categories assigned to item");
+        } else {
+	        for (String categoryID : itemCategoryList) {
+	        	
+	        	try {
+	        	String categoryName = myListMan.getCategory(Integer.valueOf(categoryID)).getName();
+	        	itemCategoryListString += categoryName + " ";
+	        	} catch(Exception e) {
+	        		Log.v("AddEditItemActivity.editListItem()", e.toString());
+	        	}
+	        }
         }
         
         // Show current category selections
@@ -194,9 +208,9 @@ public class AddEditItemActivity extends Activity {
 
         itemCategoryListTv.setText(itemCategoryListString);
         
-        int flistSpinnerPosition = getFlistSpinnerPosition(currentItem.getID(), flistPositionMap);
+        int flistSpinnerPosition = getFlistSpinnerPosition(currentItem.getFlist(), flistPositionMap);
         flistSpinner.setSelection(flistSpinnerPosition);
-        
+        Log.v("AddEditItemActivity.editListItem()", "flistSpinnerPosition: " + flistSpinnerPosition);
 		//Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "myPosition(0): " + myCategoryPositionMap.get(0) + " myPosition(1): " + myCategoryPositionMap.get(1) + " myPosition.get(2): " + myCategoryPositionMap.get(2));
         //Log.v("AddEditItemActivity.editListItem", "****spinnerPosition: " + categorySpinnerPosition);
 
@@ -217,18 +231,35 @@ public class AddEditItemActivity extends Activity {
     }
     public CharSequence[] buildCategoryDialogOptions(ArrayList<Category> categoryList) {
     	List<String> myOptions = new ArrayList<String>();
+    
     	int i = 0;
     	for (Category category : categoryList) {
     		myOptions.add(category.getName());
+    		
     		i++;
     	}
     	final CharSequence[] myOptionsCharSequence = myOptions.toArray(new CharSequence[myOptions.size()]);
     	return myOptionsCharSequence;
     }
+    public boolean[] buildCategoryDialogSelections(ArrayList<Category> categoryList, Item myItem) {
+    	boolean[] mySettings = new boolean[categoryList.size()];
+    	List<String> itemCategories = new ArrayList<String>();
+    	itemCategories = myItem.getCategories();
+    	int i = 0;
+    	for (Category category : categoryList) {
+    		if (itemCategories.contains(category.getID())) {
+    			mySettings[i] = true;
+    		} else {
+    			mySettings[i] = false;
+    		}
+    	}
+    	return mySettings;
+    }
     public void initCategoryDialogOptions() {
     	ArrayList<Category> categoryList = myListMan.getCategories();
     	categoryDialogPositionMap = buildCategoryDialogIndex(categoryList);
     	categoryDialogOptions = buildCategoryDialogOptions(categoryList);
+    	categoryDialogSelections = buildCategoryDialogSelections(categoryList, currentItem);
     }
 
     public class CategoryButtonClickHandler implements View.OnClickListener {

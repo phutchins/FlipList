@@ -47,6 +47,10 @@ public class ListManager implements Serializable {
     	buildItemListMap();
     }
     public void updateItem(Item item) {
+    	List<String> myCategories = new ArrayList<String>();
+    	if (item.getCategoriesString() == null) {
+    		myCategories.add("0");
+    	}
     	db.updateItem(item);
     }
     public void deleteItem(Item item) {
