@@ -9,8 +9,10 @@ import java.nio.channels.FileChannel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -38,7 +40,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int DATABASE_VERSION = 70;
+	private static final int DATABASE_VERSION = 71;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
@@ -90,7 +92,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	private static final String KEY_ITEM_DESC = "desc";
 	private static final String KEY_ITEM_NOTES = "notes";
 	private static final String KEY_ITEM_FLIST = "flist";
-	private static final String KEY_ITEM_CATEGORIES = "cats";
+	private static final String KEY_ITEM_CATEGORIES = "categories";
 	private static final String KEY_ITEM_HAS_DUE_DATE = "has_due_date";
 	private static final String KEY_ITEM_HAS_DUE_TIME = "has_due_time";
 	private static final String KEY_ITEM_DUE_DATETIME = "due_datetime";
@@ -323,6 +325,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	public void addItem(Item item) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		String itemCategories = item.getCategoriesString();
+		Log.v("DatabaseHandler.addItem", "item.getCategoriesString(): " + item.getCategoriesString());
 		int hasDueDate = item.hasDueDate()? 1 : 0;
 		int hasDueTime = item.hasDueTime()? 1 : 0;
 		int isCompleted = item.isCompleted()? 1 : 0;
@@ -364,14 +367,14 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		String itemDesc = cursor.getString(2);
 		String itemNotes = cursor.getString(3);
 		Integer itemPriCat = cursor.getInt(4);
-		String itemSecCats = cursor.getString(5);   // Not used yet
+		List<String> itemCategories = new ArrayList<String>(Arrays.asList(cursor.getString(5).split(",")));
 		Integer itemHasDueDate = cursor.getInt(6);
 		Integer itemHasDueTime = cursor.getInt(7);
 		String itemDueDate = cursor.getString(8);
 		String itemCreateDate = cursor.getString(9);
 		String itemCompletedDate = cursor.getString(10);
 		
-		Item item = new Item(itemID, itemPriCat, itemSecCats, itemName, itemDesc, itemNotes, itemCreateDate, itemDueDate);
+		Item item = new Item(itemID, itemPriCat, itemCategories, itemName, itemDesc, itemNotes, itemCreateDate, itemDueDate);
 		item.setHasDueDate(itemHasDueDate);
 		item.setHasDueTime(itemHasDueTime);
 		item.setCompletedDate(itemCompletedDate);
@@ -395,7 +398,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				item.setDescription(cursor.getString(2));
 				item.setNotes(cursor.getString(3));
 				item.setFlist(cursor.getInt(4));
-				item.addCategories(cursor.getString(5));
+				List<String> myCategories = new ArrayList<String>(Arrays.asList(cursor.getString(5).split(",")));
+				item.setCategories(myCategories);
 				item.setHasDueDate(cursor.getInt(6));
 				item.setHasDueTime(cursor.getInt(7));
 				item.setDueDateTime(cursor.getString(8));
@@ -491,7 +495,10 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				item.setDescription(cursor.getString(2));
 				item.setNotes(cursor.getString(3));
 				item.setFlist(cursor.getInt(4));
-				item.addCategories(cursor.getString(5));
+				// Commented below will create a new object that can be manipulated like a normal List
+				// List<String> myCategories = new ArrayList<String>(Arrays.asList(cursor.getString(5).split(",")));
+				List<String> myCategories = Arrays.asList(cursor.getString(5).split(","));
+				item.setCategories(myCategories);
 				item.setHasDueDate(cursor.getInt(6));
 				item.setHasDueTime(cursor.getInt(7));
 				item.setDueDateTime(cursor.getString(8));
@@ -596,7 +603,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	public Flist getFlist(int id) {
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_FLISTS,  new String[] { KEY_FLIST_ID,
-				KEY_FLIST_NAME, KEY_FLIST_DESC, KEY_FLIST_VISIBLE, KEY_FLIST_TYPE, KEY_FLIST_FILTER }, KEY_FLIST_ID + "=?",
+				KEY_FLIST_NAME, KEY_FLIST_DESC, KEY_FLIST_TYPE, KEY_FLIST_VISIBLE, KEY_FLIST_FILTER }, KEY_FLIST_ID + "=?",
 				new String[] { String.valueOf(id) }, null, null, null, null);
 		if (cursor != null)
 			cursor.moveToFirst();
@@ -604,6 +611,16 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				cursor.getString(1), cursor.getString(2), cursor.getInt(3), cursor.getInt(4));
 		flist.setFilterID(cursor.getInt(5));
 		return flist;
+	}
+	public Category getCategory(int id) {
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
+				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_VISIBLE }, KEY_CAT_ID + "=?",
+				new String[] { String.valueOf(id) }, null, null, null, null);
+		if (cursor != null)
+			cursor.moveToFirst();
+		Category category = new Category(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getInt(3));
+		return category;
 	}
 	public Flist getFlistByName(String flistName) {
 		SQLiteDatabase db = this.getReadableDatabase();

@@ -102,6 +102,11 @@ public class ListManager implements Serializable {
 	public Item addItem(int flistID, String name) {
 		Item myItem = new Item(flistID, name);
 		
+		List<String> myCategories = new ArrayList<String>();
+		Flist myFlist = getFlist(flistID);
+		myCategories.add(myFlist.getDefaultCategoryIDString());
+		
+		myItem.setCategories(myCategories);
 		db.addItem(myItem);
 		buildItemListMap();
 		return myItem;
@@ -228,10 +233,13 @@ public class ListManager implements Serializable {
     	return catType;
     }
     public Flist getFlist(int flistID) {
-    	Flist listCat = db.getFlist(flistID);
-    	return listCat;
+    	Flist myFlist = db.getFlist(flistID);
+    	return myFlist;
     }
-    
+    public Category getCategory(int categoryID) {
+    	Category myCategory = db.getCategory(categoryID);
+    	return myCategory;
+    }
     public String getTypeName(int typeID) {
     	String typeName = db.getItemTypeName(typeID);
     	return typeName;

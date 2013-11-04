@@ -19,6 +19,9 @@ public class Filter {
 	public Filter(int filterID) {
 		id = filterID;
 	}
+	public Filter() {
+		//Set unique ID here
+	}
 	public int getID() {
 		return id;
 	}

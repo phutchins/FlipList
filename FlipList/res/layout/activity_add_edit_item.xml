@@ -72,6 +72,28 @@
 		            android:hint="@string/item_edit_description_text_hint" />
 		
 		    </RelativeLayout>
+		    
+		    <RelativeLayout
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_margin="@dimen/padding_medium"
+		        android:padding="@dimen/padding_small"
+		        android:background="#FFFFFF" >
+		
+		        <TextView
+		            android:id="@+id/item_edit_flist_text_textview"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:text="@string/item_edit_flist_text"
+		            android:textAppearance="?android:attr/textAppearanceMedium" />
+		
+		        <Spinner
+		            android:id="@+id/item_edit_flist_spinner"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_below="@id/item_edit_flist_text_textview" />
+		        
+		    </RelativeLayout>
 		
 		    <RelativeLayout
 		        android:layout_width="match_parent"
@@ -86,12 +108,21 @@
 		            android:layout_height="wrap_content"
 		            android:text="@string/item_edit_category_text"
 		            android:textAppearance="?android:attr/textAppearanceMedium" />
-		
-		        <Spinner
-		            android:id="@+id/item_edit_category_spinner"
+		        <TextView
+		            android:id="@+id/item_edit_category_list"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:layout_below="@id/item_edit_category_text_textview" />
+		            android:layout_below="@id/item_edit_category_text_textview"
+		            android:text="@string/item_edit_category_list"
+		            android:textAppearance="?android:attr/textAppearanceSmall" />
+		
+		        <Button
+		            android:id="@+id/item_edit_category_selection_button"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_below="@id/item_edit_category_list"
+		            android:onClick="showDatePickerDialog"
+		            android:text="@string/item_edit_category_selection_button_text" />
 		        
 		    </RelativeLayout>
 		

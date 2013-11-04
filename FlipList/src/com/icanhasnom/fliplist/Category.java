@@ -18,7 +18,6 @@ public class Category implements Serializable {
 	int catID;
 	String name;
     String description;
-    int type;
     boolean isNew = false;
     boolean showDueDate = true;
     boolean showDescription = true;
@@ -26,17 +25,15 @@ public class Category implements Serializable {
     int isVisible = 1;
     public Category() {
     }
-    public Category(int ID, String catName, String catDesc, int catType, int v) {
+    public Category(int ID, String catName, String catDesc, int v) {
     	catID = ID;
         name = catName;
         description = catDesc;
-        type = catType;
         isVisible = v;
     }
-    public Category(String catName, String catDesc, int catType, int v) {
+    public Category(String catName, String catDesc, int v) {
     	name = catName;
     	description = catDesc;
-    	type = catType;
     	isVisible = v;
     }
     public boolean showDescription() {

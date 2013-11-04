@@ -8,7 +8,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:id="@+id/cat_spinner_text"
+        android:id="@+id/spinner_text"
      />
 
 </LinearLayout>

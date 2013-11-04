@@ -2,6 +2,16 @@
 <resources>
 
     <string name="add_edit_cat_list_title">Edit Categories</string>
+    
+    <string name="add_edit_flist_default_category_text">Default Category</string>
+    <string name="add_edit_flist_default_category_spinner_text">None</string>
+    <string name="add_edit_flist_visible_check_box_text">Visible</string>
+    <string name="flist_list_text_view_header">Lists</string>
+    <string name="flist_list_text_view">CatListTextView</string>
+    <string name="flist_list_text_view_type">Type Name</string>
+    <string name="flist_list_add_button_text">+</string>
+    <string name="flist_filter_add_button_text">+</string>
+    
     <string name="category_view_fragment_title">Categories</string>
     <string name="flist_view_fragment_title">Lists</string>
     <string name="item_view_activity_title">Items</string>
@@ -24,11 +34,7 @@
     <string name="cat_list_text_view">CatListTextView</string>
     <string name="cat_list_text_view_type">Type Name</string>
     <string name="category_list_add_button_text">+</string>
-    <string name="flist_list_text_view_header">Lists</string>
-    <string name="flist_list_text_view">CatListTextView</string>
-    <string name="flist_list_text_view_type">Type Name</string>
-    <string name="flist_list_add_button_text">+</string>
-    <string name="flist_filter_add_button_text">+</string>
+
     <string name="filter_list_text_view">CatListTextView</string>
     <string name="filter_list_text_view_type">Type Name</string>
     <string name="filter_list_add_button_text">Add Filter</string>
@@ -47,13 +53,16 @@
     <string name="add_new_category_text">Add New Category</string>
     <string name="flist_category_add_button_text">+</string>
     <string name="flist_delete_button_text">Delete</string>
-    <string name="flist_visible_check_box_text">Visible</string>
+
     <string name="item_edit_title_text">Edit Item</string>
     <string name="item_edit_name_text">Name</string>
     <string name="item_edit_name_text_hint">name</string>
     <string name="item_edit_description_text">Description</string>
     <string name="item_edit_description_text_hint">description</string>
-    <string name="item_edit_category_text">Category</string>
+    <string name="item_edit_category_text">Categories</string>
+    <string name="item_edit_category_list">No Categories Selected</string>
+    <string name="item_edit_category_selection_button_text">Select Categories</string>
+    <string name="item_edit_flist_text">List</string>
     <string name="item_edit_notes_text">Notes</string>
     <string name="item_edit_notes_text_hint">notes</string>
     <string name="item_edit_save_text">Save</string>

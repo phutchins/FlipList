@@ -8,6 +8,7 @@ import java.util.*;
 import java.text.*;
 import java.io.*;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 // TODO: Set up to take more than one category
@@ -96,10 +97,10 @@ public class Item implements Serializable {
 	    createDate = getCurrentDateTime();
     	dueDateTime = getCurrentDateTime();
     }
-    public Item(int id, int fl, String cats, String n, String desc, String itemNotes, String crDate, String dueDT) throws ParseException {
+    public Item(int id, int fl, List<String> cat, String n, String desc, String itemNotes, String crDate, String dueDT) throws ParseException {
     	itemID = id;
     	flist = fl;
-        addCategories(cats);
+        setCategories(cat);
     	name = n;
         description = desc;
         notes = itemNotes;
@@ -107,20 +108,32 @@ public class Item implements Serializable {
     	dueDateTime = dueDT;
     }
     
-    // Setting Values //
-    public void setDueDateTime(String ddt) {
-    	dueDateTime = ddt;
+    
+    
+    // Identity
+    public String getName() {
+    	return name;
     }
-    public void setHasDueDate(Boolean hasDD) {
-    	hasDueDateBool = hasDD;
+    public int getID() {
+    	return itemID;
     }
-    public void setHasDueDate(int hasDD) {
-    	if (hasDD == 1) {
-    		hasDueDateBool = true;
-    	} else {
-    		hasDueDateBool = false;
-    	}
+    public void setDescription(String d) {
+        description = d;
     }
+    public void setName(String n) {
+    	name = n;
+    }
+    public void setID(int id) {
+    	itemID = id;
+    }
+    public void setNotes(String n) {
+    	notes = n;
+    }
+    
+
+    
+    
+    // Flags
     public void setCompleted(Boolean completed) {
     	isCompleted = completed;
     	if (completed) completedDate = getCurrentDateTime();
@@ -138,14 +151,12 @@ public class Item implements Serializable {
     		completedDate = null;
     	}
     }
-    public Boolean setCompletedDate(String cd) {
-    	Boolean success = false;
-    	if (cd != null && isDateTimeValid(cd)) {
-    		completedDate = cd;
-    		success = true;
-    		Log.v("Item.setCompletedDate: ", "CompletedDate: " + cd);
+    public void setHasDueDate(int hasDD) {
+    	if (hasDD == 1) {
+    		hasDueDateBool = true;
+    	} else {
+    		hasDueDateBool = false;
     	}
-    	return success;
     }
     public void setHasDueTime(Boolean hasDT) {
     	hasDueTimeBool = hasDT;
@@ -157,38 +168,68 @@ public class Item implements Serializable {
     		hasDueTimeBool = false;
     	}
     }
-    public void setCreateDate(String cd) {
-    	// Do some checking here?
-    	createDate = cd;
+    public Boolean isCompleted() {
+    	return isCompleted;
     }
-    public void setDescription(String d) {
-        description = d;
-    }
-    public void setName(String n) {
-    	name = n;
-    }
-    public void setID(int id) {
-    	itemID = id;
-    }
-    /*
-    public void addToCats(String cats) {
-    	String[] catList = cats.split(",");
-        int catListSize = catList.length;
-        for (int i = 0; i < catListSize; i++) {
-        	secondaryCats.add(catList[i]);
-        }
-    }
-    */
-    public void addCategories(String cat) {
+    
+    
+    
+    
+    
+    
+    // Membership
+    public void setCategory(String cat) {
     	categories.add(cat);
+    }
+    public void setCategories(List<String> categoryList) {
+    	categories = categoryList;
     }
     public void setFlist(int f) {
     	flist = f;
     }
-    public void setNotes(String n) {
-    	notes = n;
+    public int getFlist() {
+    	return flist;
     }
+    public List<String> getCategories() {
+        return categories;
+    }
+    public String getCategoriesString() {
+    	String categoriesString = "";
+    	for(int i = 0; i < categories.size(); i++) {
+    		categoriesString += categories.get(i);
+    		if(i != (categories.size() - 1)) {
+    			categoriesString += ",";
+    		}
+    	}
+    	//String categoriesString = TextUtils.join(categories, ',');
+    	String categoriesString2 = categories.toArray().toString();
+    	Log.v("Item.getCategoriesString()", "categoriesString: " + categoriesString);
+    	Log.v("Item.getCategoriesString()", "categoriesString2: " + categoriesString2);
+    	
+    	return categoriesString;
+    }
+    
+    
     // Time & Date
+    public void setDueDateTime(String ddt) {
+    	dueDateTime = ddt;
+    }
+    public void setHasDueDate(Boolean hasDD) {
+    	hasDueDateBool = hasDD;
+    }
+    public Boolean setCompletedDate(String cd) {
+    	Boolean success = false;
+    	if (cd != null && isDateTimeValid(cd)) {
+    		completedDate = cd;
+    		success = true;
+    		Log.v("Item.setCompletedDate: ", "CompletedDate: " + cd);
+    	}
+    	return success;
+    }
+    public void setCreateDate(String cd) {
+    	// Do some checking here?
+    	createDate = cd;
+    }
     public Boolean setDueDate(String dd) {
     	Calendar curDateCal = Calendar.getInstance();
     	Boolean success = false;
@@ -241,35 +282,22 @@ public class Item implements Serializable {
     	}
     	return success;
     }
-    
-    // Get Values //
-    public String getName() {
-    	return name;
-    }
-    public int getID() {
-    	return itemID;
-    }
     public String getCreateDate() {
         return createDate;
     }
-    public int getFlist() {
-    	return flist;
+
+    
+    
+    
+    
+    // Admin & Maintenance
+    public void rmCategory(String cat) {
+    	categories.remove(cat);
     }
-    public List<String> getCategories() {
-        return categories;
-    }
-    public Boolean isCompleted() {
-    	return isCompleted;
-    }
-    //public int isCompletedInt() {
-    //	Integer isCompletedInt = 0;
-    //	if (isCompleted) isCompletedInt = 1;
-    //	return isCompletedInt;
-    //}
-    public String getCategoriesString() {
-    	String categoriesString = categories.toArray().toString();
-    	return categoriesString;
-    }
+    
+
+
+    
     public String getDescription() {
         return description;
     }
@@ -381,8 +409,5 @@ public class Item implements Serializable {
     	return dateStr;
     }
 
-    // Remove Values
-    public void rmCategory(String cat) {
-    	categories.remove(cat);
-    }
+
 }

@@ -362,7 +362,7 @@ ListViewFragment.OnFilterSelectedListener {
         	Log.v("FlipList.onCategorySelected", "itemFragment: " + itemFragment);
         	mAdapter.notifyDataSetChanged();
         	ItemViewFragment ivf = (ItemViewFragment) ((MyFragmentPagerAdapter)mPager.getAdapter()).getFragment(ITEM_VIEW_FRAGMENT);
-        	ivf.initCat(FlipList.this, selectedFlist);
+        	ivf.initCat(this, selectedFlist);
     	} catch (Exception e) {
     		e.printStackTrace();
     		Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();

@@ -4,16 +4,19 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import android.os.Bundle;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -35,11 +38,19 @@ import android.widget.TimePicker;
 public class AddEditItemActivity extends Activity {
 	Item currentItem;
 	ListManager myListMan;
-    Spinner itemCatSpinner;
-    MyCatSpinnerCustomAdapter catSpinnerDataAdapter;
-    SparseIntArray myPositionMap;
+    Spinner categorySpinner;
+    Spinner flistSpinner;
+    MyCategorySpinnerCustomAdapter categorySpinnerDataAdapter;
+    MyFlistSpinnerCustomAdapter flistSpinnerDataAdapter;
+    //SparseIntArray myCategoryPositionMap;
+    SparseIntArray flistPositionMap;
+	SparseIntArray categoryDialogPositionMap;
 
-	ArrayList<Flist> categoryList;
+	ArrayList<Flist> flistList;
+	ArrayList<Category> categoryList;
+	
+	CharSequence[] categoryDialogOptions;
+	boolean[] categoryDialogSelections;
 
 
 	@Override
@@ -49,9 +60,14 @@ public class AddEditItemActivity extends Activity {
 		final ActionBar bar = getActionBar();
 		bar.setHomeButtonEnabled(true);
 		myListMan = new ListManager(this);
-		categoryList = myListMan.getFlists();
-		myPositionMap = new SparseIntArray();
-		myPositionMap = buildIndex(categoryList);
+		categoryList = myListMan.getCategories();
+		flistList = myListMan.getFlists();
+		//myCategoryPositionMap = new SparseIntArray();
+		//myCategoryPositionMap = buildCategorySpinnerIndex(categoryList);
+		flistPositionMap = new SparseIntArray();
+		flistPositionMap = buildFlistSpinnerIndex(flistList);
+		categoryDialogPositionMap = new SparseIntArray();
+		categoryDialogPositionMap = buildCategoryDialogIndex(categoryList);
 		
 		Bundle b = this.getIntent().getExtras();
 		if(b != null) {
@@ -82,38 +98,63 @@ public class AddEditItemActivity extends Activity {
     	return true;
     	
     }
-	
+	/*
 	public void addCategoriesToSpinner() {
-        catSpinnerDataAdapter = new MyCatSpinnerCustomAdapter(this, R.layout.activity_add_edit_item, categoryList);
-        catSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    	itemCatSpinner = (Spinner) findViewById(R.id.item_edit_category_spinner);
-        itemCatSpinner.setAdapter(catSpinnerDataAdapter);
+        categorySpinnerDataAdapter = new MyCategorySpinnerCustomAdapter(this, R.layout.activity_add_edit_item, categoryList);
+        categorySpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    	categorySpinner = (Spinner) findViewById(R.id.item_edit_category_spinner);
+        categorySpinner.setAdapter(categorySpinnerDataAdapter);
 	}
-	public SparseIntArray buildIndex(ArrayList<Flist> myCatList) {
+	*/
+	public void addFlistsToSpinner() {
+        flistSpinnerDataAdapter = new MyFlistSpinnerCustomAdapter(this, R.layout.activity_add_edit_item, flistList);
+        flistSpinnerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    	flistSpinner = (Spinner) findViewById(R.id.item_edit_flist_spinner);
+        flistSpinner.setAdapter(flistSpinnerDataAdapter);
+	}
+	/*
+	public SparseIntArray buildCategorySpinnerIndex(ArrayList<Category> myCategoryList) {
 		Integer position = 0;
-		SparseIntArray myPositionMap = new SparseIntArray();
-		for (Flist myCat : myCatList) {
-			myPositionMap.put(myCat.getID(), position);
+		SparseIntArray myCategoryPositionMap = new SparseIntArray();
+		for (Category myCategory : myCategoryList) {
+			myCategoryPositionMap.put(myCategory.getID(), position);
 			position++;
 		}
-		return myPositionMap;
+		return myCategoryPositionMap;
 	}
-	public int getPosition(int myListCategoryID, SparseIntArray myPositionMap) {
-		int myPosition = myPositionMap.get(myListCategoryID);
+	*/
+	public SparseIntArray buildFlistSpinnerIndex(ArrayList<Flist> myCatList) {
+		Integer position = 0;
+		SparseIntArray myFlistPositionMap = new SparseIntArray();
+		for (Flist myCat : myCatList) {
+			myFlistPositionMap.put(myCat.getID(), position);
+			position++;
+		}
+		return myFlistPositionMap;
+	}
+	/*
+	public int getCategorySpinnerPosition(int myFlistCategoryID, SparseIntArray myPositionMap) {
+		int myPosition = myCategoryPositionMap.get(myFlistCategoryID);
 		return myPosition;
 	}
-	
+	*/
+	public int getFlistSpinnerPosition(int myListCategoryID, SparseIntArray myPositionMap) {
+		int myPosition = flistPositionMap.get(myListCategoryID);
+		return myPosition;
+	}
     public void editListItem() {
     	EditText itemIDTv = (EditText) findViewById(R.id.item_edit_id_edittext);
     	EditText itemNameTv = (EditText) findViewById(R.id.item_edit_name_edittext);
     	CheckBox itemCompleted = (CheckBox) findViewById(R.id.item_completed_checkbox);
     	EditText itemDescTv = (EditText) findViewById(R.id.item_edit_description_edittext);
+        TextView itemCategoryListTv = (TextView) findViewById(R.id.item_edit_category_list);
 
     	EditText itemNotesTv = (EditText) findViewById(R.id.item_edit_notes_edittext);
     	Button editTimeButton = (Button) findViewById(R.id.time_edit_button);
     	Button editDateButton = (Button) findViewById(R.id.date_edit_button);
     	Button noTimeButton = (Button) findViewById(R.id.no_due_time_button);
     	Button noDateButton = (Button) findViewById(R.id.no_due_date_button);
+    	Button categorySelectionButton = (Button) findViewById(R.id.item_edit_category_selection_button);
     	
     	itemIDTv.setText(String.valueOf(currentItem.getID()));
     	itemNameTv.setText(currentItem.getName());
@@ -133,15 +174,31 @@ public class AddEditItemActivity extends Activity {
     	editDateButton.setTag(myDate);
     	editTimeButton.setText(myTimePretty);
     	editTimeButton.setTag(myTime);
+    	categorySelectionButton.setOnClickListener( new CategoryButtonClickHandler() );
+    	
         itemNotesTv.setText(currentItem.getNotes());
         
-        addCategoriesToSpinner();
+        addFlistsToSpinner();
+        List<String> itemCategoryList = currentItem.getCategories();
+        String itemCategoryListString = "";
+        for (String categoryID : itemCategoryList) {
+        	String categoryName = myListMan.getCategory(Integer.valueOf(categoryID)).getName();
+        	itemCategoryListString += categoryName + " ";
+        }
         
-        int spinnerPosition = getPosition(currentItem.getFlist(), myPositionMap);
-        itemCatSpinner.setSelection(spinnerPosition);
+        // Show current category selections
+        // Create category selector button that updates the current selections on the way out
+        //int categorySpinnerPosition = getCategorySpinnerPosition(currentItem.getCategories(), myCategoryPositionMap);
+        //categorySpinner.setSelection(categorySpinnerPosition);
         
-		Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "myPosition(0): " + myPositionMap.get(0) + " myPosition(1): " + myPositionMap.get(1) + " myPosition.get(2): " + myPositionMap.get(2));
-        Log.v("AddEditItemActivity.editListItem", "****spinnerPosition: " + spinnerPosition);
+
+        itemCategoryListTv.setText(itemCategoryListString);
+        
+        int flistSpinnerPosition = getFlistSpinnerPosition(currentItem.getID(), flistPositionMap);
+        flistSpinner.setSelection(flistSpinnerPosition);
+        
+		//Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "myPosition(0): " + myCategoryPositionMap.get(0) + " myPosition(1): " + myCategoryPositionMap.get(1) + " myPosition.get(2): " + myCategoryPositionMap.get(2));
+        //Log.v("AddEditItemActivity.editListItem", "****spinnerPosition: " + categorySpinnerPosition);
 
     	// TODO: Make this into a generic addItemsToSpinner method that I can use with the first spinner also
         //Log.v("AddEditItemActivity.editListItem", "catSpinnerDataAdapter: " + catSpinnerDataAdapter);
@@ -149,13 +206,74 @@ public class AddEditItemActivity extends Activity {
         
 
     }
+    public SparseIntArray buildCategoryDialogIndex(ArrayList<Category> categoryList) {
+    	int position = 0;
+    	SparseIntArray categoryMap = new SparseIntArray();
+    	for(Category category : categoryList) {
+    		categoryMap.put(position, category.getID());
+    		position++;
+    	}
+    	return categoryMap;
+    }
+    public CharSequence[] buildCategoryDialogOptions(ArrayList<Category> categoryList) {
+    	List<String> myOptions = new ArrayList<String>();
+    	int i = 0;
+    	for (Category category : categoryList) {
+    		myOptions.add(category.getName());
+    		i++;
+    	}
+    	final CharSequence[] myOptionsCharSequence = myOptions.toArray(new CharSequence[myOptions.size()]);
+    	return myOptionsCharSequence;
+    }
+    public void initCategoryDialogOptions() {
+    	ArrayList<Category> categoryList = myListMan.getCategories();
+    	categoryDialogPositionMap = buildCategoryDialogIndex(categoryList);
+    	categoryDialogOptions = buildCategoryDialogOptions(categoryList);
+    }
+
+    public class CategoryButtonClickHandler implements View.OnClickListener {
+    	public void onClick( View view ) {
+    		initCategoryDialogOptions();
+    		showDialog( 0 );
+    	}
+    }
+	@Override
+	protected Dialog onCreateDialog( int id ) {
+		return 
+				new AlertDialog.Builder( this )
+		.setTitle( "Categories" )
+		.setMultiChoiceItems( categoryDialogOptions, categoryDialogSelections, new CategoryDialogSelectionClickHandler() )
+		.setPositiveButton( "OK", new CategoryDialogButtonClickHandler() )
+		.create();
+	}
+	public class CategoryDialogSelectionClickHandler implements DialogInterface.OnMultiChoiceClickListener {
+		public void onClick( DialogInterface dialog, int clicked, boolean selected) {
+			Log.i("AddEditItemActivity.CategoryDialogSelectionClickHandler", categoryDialogOptions[clicked] + " selected: " + selected);
+		}
+	}
+	public class CategoryDialogButtonClickHandler implements DialogInterface.OnClickListener {
+		public void onClick(DialogInterface dialog, int clicked)  {
+			switch( clicked )
+			{
+			case DialogInterface.BUTTON_POSITIVE:
+				printSelectedCategories();
+				break;
+			}
+		}
+	}
+    protected void printSelectedCategories() {
+    	for( int i = 0; i < categoryDialogOptions.length; i++) {
+    		Log.i("AddEditItemActivity.printSelectedCategories()", categoryDialogOptions[ i ] + " selected: " + categoryDialogSelections[ i ]);
+    	}
+    }
+
     public void itemEditSaveButtonAction(View view) {
     	EditText itemIDTv = (EditText) findViewById(R.id.item_edit_id_edittext);
     	EditText itemNameTv = (EditText) findViewById(R.id.item_edit_name_edittext);
     	CheckBox itemCompleted = (CheckBox) findViewById(R.id.item_completed_checkbox);
     	EditText itemDescTv = (EditText) findViewById(R.id.item_edit_description_edittext);
-    	// TODO: Where does this spinner come from? Is this to set the category or getting the category (list) that it was created from
-    	Spinner itemCategorySpinner = (Spinner) findViewById(R.id.item_edit_category_spinner);
+    	List<String> dialogCategories = new ArrayList<String>();
+
     	EditText itemNotesTv = (EditText) findViewById(R.id.item_edit_notes_edittext);
     	Button itemDueTimeBtn = (Button) findViewById(R.id.time_edit_button);
     	Button itemDueDateBtn = (Button) findViewById(R.id.date_edit_button);
@@ -163,7 +281,8 @@ public class AddEditItemActivity extends Activity {
     	int itemID = Integer.parseInt(itemIDTv.getText().toString());
     	String itemName = itemNameTv.getText().toString();
     	String itemDesc = itemDescTv.getText().toString();
-    	Flist itemFlist = (Flist) itemCategorySpinner.getItemAtPosition(itemCategorySpinner.getSelectedItemPosition());
+    	Flist itemFlist = (Flist) flistSpinner.getItemAtPosition(flistSpinner.getSelectedItemPosition());
+
     	int itemFlistID = itemFlist.getID();
     	String itemNotes = itemNotesTv.getText().toString();
     	String itemDueTime = (String) itemDueTimeBtn.getTag();
@@ -174,6 +293,16 @@ public class AddEditItemActivity extends Activity {
     	myItem.setName(itemName);
     	myItem.setDescription(itemDesc);
     	myItem.setFlist(itemFlistID);
+    	for (int i = 0; i < categoryDialogOptions.length; i++) {
+    		if (categoryDialogSelections[i]) {
+    			// Adding empty string to force the int to be a string. Maybe I should create an addCategoryID function
+    			// or just handle all categories as int's until we get to the DB layer
+    			//myItem.addCategory("" + categoryDialogPositionMap.get(i));
+    			dialogCategories.add("" + categoryDialogPositionMap.get(i));
+    			Log.v("AddEditItemActivity.itemEditSaveButtonAction", "Adding category " + myListMan.getCategory(categoryDialogPositionMap.get(i)).getName() + " to item " + myItem.getName());
+    		}
+    	}
+    	myItem.setCategories(dialogCategories);
     	myItem.setNotes(itemNotes);
     	myItem.setDueTime(itemDueTime);
     	myItem.setCompleted(itemCompleted.isChecked());
@@ -320,17 +449,17 @@ public class AddEditItemActivity extends Activity {
         newFragment.show(getFragmentManager(), "datePicker");
     }
     
-    private class MyCatSpinnerCustomAdapter extends ArrayAdapter<Flist> {
+    private class MyCategorySpinnerCustomAdapter extends ArrayAdapter<Category> {
      	 
-    	private ArrayList<Flist> categoryList;
+    	private ArrayList<Category> categoryList;
     	private Activity activity;
     	LayoutInflater inflater;
     	//Map<Integer, Integer> myPositionMap = new HashMap<Integer, Integer>();
 
     	 
-    	public MyCatSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<Flist> objects) {
+    	public MyCategorySpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<Category> objects) {
     		super(activitySpinner, textViewResourceId, objects);
-    		this.categoryList = (ArrayList<Flist>) objects;
+    		this.categoryList = (ArrayList<Category>) objects;
     		this.activity = activitySpinner;
     		inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     		//Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "Initializing myPositionMap");
@@ -349,19 +478,68 @@ public class AddEditItemActivity extends Activity {
     	public View getCustomView(int position, View convertView, ViewGroup parent) {
     		ViewHolder holder;
     		if (convertView == null) {
-    			convertView = inflater.inflate(R.layout.activity_main_cat_spinner, null);
+    			convertView = inflater.inflate(R.layout.spinner_view, null);
     			holder = new ViewHolder();
-    			holder.catName = (TextView) convertView.findViewById(R.id.cat_spinner_text);
+    			holder.catName = (TextView) convertView.findViewById(R.id.spinner_text);
     			convertView.setTag(holder);
     		} else {
     			holder = (ViewHolder) convertView.getTag();
     		}
-    		Flist category = categoryList.get(position);
+    		Category category = categoryList.get(position);
     		
 
 			Log.v("AddEditItemActivity.catSpinnerCustomAdapter", "Adding CatID: " + category.getID() + " with position " + position);
     		holder.catName.setText(category.getName());
     		holder.catName.setTag(category);
+    		//Log.v("AddEditItemActivity.catSpinnerCustomAdapter", "System.identifyHashCode(): " + this);
+    		//Log.v("AddEditItemActivity.MyCatspinnerCustomAdapter (2)", "myPositionMap: " + myPositionMap.toString());
+    		//Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "myPosition(0): " + myPositionMap.get(0) + " myPosition(1): " + myPositionMap.get(1) + " myPosition.get(2): " + myPositionMap.get(2));
+    		return convertView;
+    	}
+    	 
+	}
+    private class MyFlistSpinnerCustomAdapter extends ArrayAdapter<Flist> {
+    	 
+    	private ArrayList<Flist> flistList;
+    	private Activity activity;
+    	LayoutInflater inflater;
+    	//Map<Integer, Integer> myPositionMap = new HashMap<Integer, Integer>();
+
+    	 
+    	public MyFlistSpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<Flist> objects) {
+    		super(activitySpinner, textViewResourceId, objects);
+    		this.flistList = (ArrayList<Flist>) objects;
+    		this.activity = activitySpinner;
+    		inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    		//Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "Initializing myPositionMap");
+    		
+    	}
+
+		private class ViewHolder {
+    		TextView flistName;
+    	}
+    	public View getDropDownView(int position, View convertView, ViewGroup parent) {
+    		return getCustomView(position, convertView, parent);
+    	}
+    	public View getView(int position, View convertView, ViewGroup parent) {
+    		return getCustomView(position, convertView, parent);
+    	}
+    	public View getCustomView(int position, View convertView, ViewGroup parent) {
+    		ViewHolder holder;
+    		if (convertView == null) {
+    			convertView = inflater.inflate(R.layout.spinner_view, null);
+    			holder = new ViewHolder();
+    			holder.flistName = (TextView) convertView.findViewById(R.id.spinner_text);
+    			convertView.setTag(holder);
+    		} else {
+    			holder = (ViewHolder) convertView.getTag();
+    		}
+    		Flist flist = flistList.get(position);
+    		
+
+			Log.v("AddEditItemActivity.catSpinnerCustomAdapter", "Adding CatID: " + flist.getID() + " with position " + position);
+    		holder.flistName.setText(flist.getName());
+    		holder.flistName.setTag(flist);
     		//Log.v("AddEditItemActivity.catSpinnerCustomAdapter", "System.identifyHashCode(): " + this);
     		//Log.v("AddEditItemActivity.MyCatspinnerCustomAdapter (2)", "myPositionMap: " + myPositionMap.toString());
     		//Log.v("AddEditItemActivity.MyCatSpinnerCustomAdapter", "myPosition(0): " + myPositionMap.get(0) + " myPosition(1): " + myPositionMap.get(1) + " myPosition.get(2): " + myPositionMap.get(2));

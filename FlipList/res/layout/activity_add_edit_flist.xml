@@ -73,17 +73,38 @@
 		        android:padding="@dimen/padding_small"
 		        android:background="#FFFFFF" >
 				<CheckedTextView
-			        android:id="@+id/checkedTextView3"
+			        android:id="@+id/add_edit_flist_type_text"
 			        android:layout_width="wrap_content"
 			        android:layout_height="wrap_content"
 			        android:layout_alignParentLeft="true"
 			        android:text="@string/text_view_flist_type_text" />
 			    <Spinner
-			        android:id="@+id/flist_type_spinner"
+			        android:id="@+id/add_edit_flist_type_spinner"
 			        android:layout_width="wrap_content"
 			        android:layout_height="wrap_content"
 			        android:layout_alignParentLeft="true"
-			        android:layout_below="@+id/checkedTextView3" />
+			        android:layout_below="@+id/add_edit_flist_type_text" />
+			
+			</RelativeLayout>
+			<RelativeLayout
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_margin="@dimen/padding_medium"
+		        android:padding="@dimen/padding_small"
+		        android:background="#FFFFFF" >
+				<CheckedTextView
+			        android:id="@+id/add_edit_flist_default_category_text"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_alignParentLeft="true"
+			        android:text="@string/add_edit_flist_default_category_text" />
+			    <Spinner
+			        android:id="@+id/add_edit_flist_default_category_spinner"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_alignParentLeft="true"
+			        android:text="@string/add_edit_flist_default_category_spinner_text"
+			        android:layout_below="@+id/add_edit_flist_default_category_text" />
 			
 			</RelativeLayout>
 			<RelativeLayout
@@ -93,11 +114,11 @@
 		        android:padding="@dimen/padding_small"
 		        android:background="#FFFFFF" >
 				<CheckBox
-			        android:id="@+id/flist_visible_check_box"
+			        android:id="@+id/add_edit_flist_visible_check_box"
 			        android:layout_width="wrap_content"
 			        android:layout_height="wrap_content"
 			        android:layout_alignParentLeft="true"
-			        android:text="@string/flist_visible_check_box_text" />
+			        android:text="@string/add_edit_flist_visible_check_box_text" />
 			</RelativeLayout>
 			<RelativeLayout
 		        android:layout_width="match_parent"
@@ -106,16 +127,16 @@
 		        android:padding="@dimen/padding_small"
 		        android:background="#FFFFFF" >
 							    <TextView
-			        android:id="@+id/flist_filter_text"
+			        android:id="@+id/add_edit_flist_filter_text"
 			        android:layout_width="wrap_content"
 			        android:layout_height="wrap_content"
 			        android:text="@string/flist_filter_text"
 			        android:textAppearance="?android:attr/textAppearanceMedium" />
 			    <Spinner
-			        android:id="@+id/flist_edit_filter_spinner"
+			        android:id="@+id/add_edit_flist_filter_spinner"
 			        android:layout_width="wrap_content"
 			        android:layout_height="wrap_content"
-			        android:layout_below="@+id/flist_filter_text" />
+			        android:layout_below="@+id/add_edit_flist_filter_text" />
 			
 
 			</RelativeLayout>

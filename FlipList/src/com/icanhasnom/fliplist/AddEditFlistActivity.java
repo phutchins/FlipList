@@ -39,13 +39,16 @@ public class AddEditFlistActivity extends Activity {
 	ListManager myListMan;
 	ArrayList<Flist> flistList;
 	ArrayList<Filter> filterList;
+	ArrayList<Category> categoryList;
 	ArrayList<ItemType> typeList;
 	SparseIntArray myFilterPositionMap;
 	SparseIntArray myTypePositionMap;
+	SparseIntArray myCategoryPositionMap;
 	ActionBar actionBar;
 	
-	Spinner typeSpinner;
+	Spinner defaultCategorySpinner;
 	Spinner filterSpinner;
+	Spinner typeSpinner;
 	MyTypeSpinnerCustomAdapter adapter;
 	
 	// Tasks for ActivityResult
@@ -64,11 +67,11 @@ public class AddEditFlistActivity extends Activity {
 		myListMan = new ListManager(this);
         flistList = myListMan.getFlists();
 		filterList = myListMan.getFilters();
-		typeList = myListMan.getTypes();
+		categoryList = myListMan.getCategories();
 		myFilterPositionMap = new SparseIntArray();
 		myFilterPositionMap = buildFilterIndex(filterList);
 		myTypePositionMap = new SparseIntArray();
-		myTypePositionMap = buildTypeIndex(typeList);
+		myTypePositionMap = buildCategoryIndex(categoryList);
 		setupActionBar();
 
 		Bundle b = this.getIntent().getExtras();
@@ -102,17 +105,17 @@ public class AddEditFlistActivity extends Activity {
     	currentFlist = newFlist;
     	editFlist(newFlist);
 	}
-	public SparseIntArray buildTypeIndex(ArrayList<ItemType> myTypeList) {
+	public SparseIntArray buildCategoryIndex(ArrayList<Category> myCategoryList) {
 		Integer position = 0;
 		SparseIntArray myPositionMap = new SparseIntArray();
-		for (ItemType myCat : myTypeList) {
-			myPositionMap.put(myCat.getID(), position);
+		for (Category myCategory : myCategoryList) {
+			myPositionMap.put(myCategory.getID(), position);
 			position++;
 		}
 		return myPositionMap;
 	}
-	public int getTypePosition(int myTypeID, SparseIntArray positionMap) {
-		int myPosition = positionMap.get(myTypeID);
+	public int getCategoryPosition(int myCategoryID, SparseIntArray positionMap) {
+		int myPosition = positionMap.get(myCategoryID);
 		return myPosition;
 	}
 	public SparseIntArray buildFilterIndex(ArrayList<Filter> myFilterList) {
@@ -142,22 +145,24 @@ public class AddEditFlistActivity extends Activity {
     	} else {
     		isVisible = flist.isVisible();
     	}
+    	Log.v("AddEditFlistActivity.editFlist", "flist.isVisible: " + flist.isVisible());
 
 		// Get all of the View Objects
 		EditText flistName = (EditText) findViewById(R.id.flist_edit_name);
 		EditText flistDesc = (EditText) findViewById(R.id.flist_edit_desc);
 		// Make this catID a hidden text field or something to store the value
 		EditText flistID = (EditText) findViewById(R.id.flist_edit_id);
-		typeSpinner = (Spinner) findViewById(R.id.flist_type_spinner);
-		filterSpinner = (Spinner) findViewById(R.id.flist_edit_filter_spinner);
-		CheckBox isVisibleBox = (CheckBox) findViewById(R.id.flist_visible_check_box);
+		defaultCategorySpinner = (Spinner) findViewById(R.id.add_edit_flist_default_category_spinner);
+		filterSpinner = (Spinner) findViewById(R.id.add_edit_flist_filter_spinner);
+		CheckBox isVisibleBox = (CheckBox) findViewById(R.id.add_edit_flist_visible_check_box);
 		isVisibleBox.setChecked(isVisible);
 		
 		// Populate type spinner and select the categories type (will be default if new)
-		addTypesToSpinner();
-		typeSpinner.setSelection(flist.getType());
+		addCategoriesToSpinner();
 		addFiltersToSpinner();
+		addTypesToSpinner();
 		filterSpinner.setSelection(getFilterPosition(flist.getFilterID(), myFilterPositionMap));
+		defaultCategorySpinner.setSelection(flist.getDefaultCategoryID());
 		if (isNew) {
 		} else {
 			flistName.setText(flist.getName());
@@ -167,21 +172,27 @@ public class AddEditFlistActivity extends Activity {
 		currentFlist = flist;
 	}
 	
+    public void addCategoriesToSpinner() {
+        ArrayList<Category> myCategoryList = myListMan.getCategories();
+        defaultCategorySpinner = (Spinner) findViewById(R.id.add_edit_flist_default_category_spinner);
+        ArrayAdapter<Category> myCategorySpinnerAdapter = new MyCategorySpinnerCustomAdapter(this, R.layout.activity_add_edit_flist, myCategoryList);
+        myCategorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        defaultCategorySpinner.setAdapter(myCategorySpinnerAdapter);
+    }
     public void addTypesToSpinner() {
         ArrayList<ItemType> myTypeList = myListMan.getTypes();
-        typeSpinner = (Spinner) findViewById(R.id.flist_type_spinner);
-        ArrayAdapter<ItemType> myTypeAdapter = new MyTypeSpinnerCustomAdapter(this, R.layout.activity_add_edit_flist, myTypeList);
-        myTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        typeSpinner.setAdapter(myTypeAdapter);
+        typeSpinner = (Spinner) findViewById(R.id.add_edit_flist_type_spinner);
+        ArrayAdapter<ItemType> myTypeSpinnerAdapter = new MyTypeSpinnerCustomAdapter(this, R.layout.activity_add_edit_flist, myTypeList);
+        myTypeSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        typeSpinner.setAdapter(myTypeSpinnerAdapter);
     }
     public void addFiltersToSpinner() {
         ArrayList<Filter> myFilterList = myListMan.getFilters();
-        filterSpinner = (Spinner) findViewById(R.id.flist_edit_filter_spinner);
+        filterSpinner = (Spinner) findViewById(R.id.add_edit_flist_filter_spinner);
         ArrayAdapter<Filter> myFilterAdapter = new MyFilterSpinnerCustomAdapter(this, R.layout.activity_add_edit_flist, myFilterList);
         myFilterAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         filterSpinner.setAdapter(myFilterAdapter);
     }
-    
     public class MyTypeSpinnerCustomAdapter extends ArrayAdapter<ItemType>{
     	private Activity activity;
     	private ArrayList<ItemType> myTypes;
@@ -229,6 +240,57 @@ public class AddEditFlistActivity extends Activity {
     		holder.typeName.setText(myTypes.get(position).getName());
     		holder.typeName.setTag(type);
     		Log.v("TypeSpinner", myTypes.get(position).getName());
+    		return convertView;
+    	}
+    }
+    
+    public class MyCategorySpinnerCustomAdapter extends ArrayAdapter<Category>{
+    	private Activity activity;
+    	private ArrayList<Category> myCategories;
+    	LayoutInflater inflater;
+    	
+    	public MyCategorySpinnerCustomAdapter(Activity activitySpinner, int textViewResourceId, ArrayList<Category> myCategories) {
+    		super(activitySpinner, textViewResourceId, myCategories);
+    		this.activity = activitySpinner;
+    		this.myCategories = myCategories;
+    		inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    	}
+    	private class ViewHolder {
+    		TextView categoryName;
+    	}
+    	public int getCount() {
+    		return myCategories.size();
+    	}
+    	public Category getItem(int position) {
+    		return myCategories.get(position);
+    	}
+    	public long getItemId(int position) {
+    		return position;
+    	}
+    	
+    	public View getDropDownView(int position, View convertView, ViewGroup parent) {
+    		return getCustomView(position, convertView, parent);
+    	}
+    	public View getView(int position, View convertView, ViewGroup parent) {
+    		return getCustomView(position, convertView, parent);
+    	}
+    	
+    	public View getCustomView(int position, View convertView, ViewGroup parent) {
+    		ViewHolder holder;
+    		if (convertView == null) {
+    			convertView = inflater.inflate(R.layout.spinner_view, null);
+    			holder = new ViewHolder();
+    			holder.categoryName = (TextView) convertView.findViewById(R.id.spinner_text);
+    			convertView.setTag(holder);
+    		} else {
+    			holder = (ViewHolder) convertView.getTag();
+    		}
+    		//TextView label = (TextView) convertView.findViewById(R.id.type_spinner_text);
+    		Category category = myCategories.get(position);
+    		holder.categoryName.setTextColor(Color.BLACK);
+    		holder.categoryName.setText(myCategories.get(position).getName());
+    		holder.categoryName.setTag(category);
+    		//Log.v("defaultCategorySpinner", myCategories.get(position).getName());
     		return convertView;
     	}
     }
@@ -283,102 +345,6 @@ public class AddEditFlistActivity extends Activity {
     		return convertView;
     	}
     }
-	
-    //public void addItemsOnEditList() {
-    //	// Populate the Category List
-    //	catListDataAdapter = new MyCatListCustomAdapter(this, R.layout.activity_add_edit_cat_list, categoryList);
-    //	ListView listView = (ListView) findViewById(R.id.itemAddEditList);
-    //	listView.setAdapter(catListDataAdapter);
-    //	
-    //	// Set up the onClick event for each of the list items
-    //	listView.setOnItemClickListener(new OnItemClickListener() {
-    //		public void onItemClick(AdapterView<?> parent, View view,
-    //		int position, long id) {
-    //			// When clicked, show a toast with the TextView text
-    //			Category category = (Category) parent.getItemAtPosition(position);
-    //			Toast.makeText(getApplicationContext(),
-    //					"Clicked on Row: " + category.getDescription(), 
-    //					Toast.LENGTH_LONG).show();
-    //			addEditCategory(category);
-    //		}
-    //	});
-    //}
-    /*
-    private class MyCatListCustomAdapter extends ArrayAdapter<Category> {
-   	 
-    	private ArrayList<Category> categoryList;
-    	 
-    	public MyCatListCustomAdapter(Context context, int textViewResourceId, ArrayList<Category> categoryList) {
-    		super(context, textViewResourceId, categoryList);
-    		this.categoryList = new ArrayList<Category>();
-    		this.categoryList.addAll(categoryList);
-    	}
-    	
-    	private class ViewHolder {
-    		TextView cat_list_text_view;
-    		TextView cat_list_text_view_type;
-    	}
-    	 
-    	@Override
-    	public View getView(int position, View convertView, ViewGroup parent) {
-
-    		ViewHolder holder = null;
-    		Log.v("ConvertView", String.valueOf(position));
-    		Log.v("AddEditCatActivity", "convertView" + convertView);
-    	 
-    		if (convertView == null) {
-    			LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    			// TODO: Should I set null to parent? It errors if I do but I can't call the one below if i do.
-    			convertView = vi.inflate(R.layout.add_edit_layout, null);
-    	 
-    			holder = new ViewHolder();
-    			holder.cat_list_text_view = (TextView) convertView.findViewById(R.id.cat_list_text_view);
-    			holder.cat_list_text_view_type = (TextView) convertView.findViewById(R.id.cat_list_text_view_type);
-
-    			convertView.setTag(holder);
-    			
-    			View.OnClickListener categoryClickListener;
-    			categoryClickListener = new View.OnClickListener() {  
-    				public void onClick(View v) {  
-    					// Use this onClick to send the user to the edit screen for the clicked category
-    					TextView tv = (TextView) v;
-    					Category lc = (Category) tv.getTag();
-    					Log.v("AddEditCatActivity", "categoryClickListener - made it here");
-    					// TODO: Probably only need one of these
-    					currentCategory = lc;
-    					//addEditCategory(lc);
-    				}  
-    			};
-    	 
-    			holder.cat_list_text_view.setOnClickListener( categoryClickListener );  
-    			holder.cat_list_text_view.setOnClickListener( categoryClickListener );
-    	   } 
-    	   else {
-    	    holder = (ViewHolder) convertView.getTag();
-    		}
-    	 
-    		Category category = categoryList.get(position);
-    		// TODO: Make a function in ListManager to get and hold the category type names in memory
-    		int categoryTypeID = category.getType();
-    		//String categoryDescription = category.getDescription();
-    		String categoryName = category.getName();
-    		String categoryTypeName = myListMan.getCategoryTypeName(categoryTypeID);
-    		
-    		Log.v("MyCatListCustomAdapter", "categoryTypeID:" + categoryTypeID);
-    		Log.v("MyCatListCustomAdapter", "category.getDescription(): " + category.getDescription());
-    		Log.v("MyCatListCustomAdapter", "myListMan.getCategoryTypeName(): " + myListMan.getCategoryTypeName(categoryTypeID));
-    		
-    		holder.cat_list_text_view.setText(categoryName);
-    		holder.cat_list_text_view_type.setText("(" + categoryTypeName + ")");
-    		holder.cat_list_text_view.setTag(category);
-    		// TODO: Link this to type type editing activity later
-    		holder.cat_list_text_view_type.setTag(category);
-    	 
-    		return convertView;
-    	}
-    	 
-	}
-	*/
 
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.
@@ -406,7 +372,7 @@ public class AddEditFlistActivity extends Activity {
     		mySaveFlistButtonAction(findViewById(android.R.id.content));
     		break;
     	case R.id.action_delete_item:
-    		myDeleteCatButtonAction(findViewById(android.R.id.content));
+    		myDeleteFlistButtonAction(findViewById(android.R.id.content));
     		break;
     	case R.id.action_cancel_item:
     		finish();
@@ -416,7 +382,7 @@ public class AddEditFlistActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	public void myDeleteCatButtonAction(View view) {
+	public void myDeleteFlistButtonAction(View view) {
 		boolean success = false;
 		EditText editCategoryIdNumber = (EditText) findViewById(R.id.flist_edit_id); 
 		int flistID = Integer.parseInt(editCategoryIdNumber.getText().toString());
@@ -445,9 +411,10 @@ public class AddEditFlistActivity extends Activity {
     	EditText editFlistDescText = (EditText) findViewById(R.id.flist_edit_desc);
     	String flistDesc = editFlistDescText.getText().toString();
     	
-    	Spinner typeSpinner = (Spinner) findViewById(R.id.flist_type_spinner);
-    	Spinner filterSpinner = (Spinner) findViewById(R.id.flist_edit_filter_spinner);
-    	CheckBox visibleCheckBox = (CheckBox) findViewById(R.id.flist_visible_check_box);
+    	Spinner typeSpinner = (Spinner) findViewById(R.id.add_edit_flist_type_spinner);
+    	Spinner filterSpinner = (Spinner) findViewById(R.id.add_edit_flist_filter_spinner);
+    	Spinner defaultCategorySpinner = (Spinner) findViewById(R.id.add_edit_flist_default_category_spinner);
+    	CheckBox visibleCheckBox = (CheckBox) findViewById(R.id.add_edit_flist_visible_check_box);
     	
     	flistType = (ItemType) typeSpinner.getItemAtPosition(typeSpinner.getSelectedItemPosition());
     	int flistTypeID = flistType.getID();
@@ -458,6 +425,8 @@ public class AddEditFlistActivity extends Activity {
     	
     	Flist myFlist = new Flist(flistName, flistDesc, flistTypeID, isVisibleInt);
     	myFlist.setFilterID(filterSpinner.getSelectedItemPosition());
+    	myFlist.setType(typeSpinner.getSelectedItemPosition());
+    	myFlist.setDefaultCategoryID(defaultCategorySpinner.getSelectedItemPosition());
 
     	if (currentFlist.isNew()) {
     		int newflistID = myListMan.addFlist(myFlist);

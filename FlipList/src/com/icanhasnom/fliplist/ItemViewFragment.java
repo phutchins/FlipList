@@ -362,9 +362,11 @@ public class ItemViewFragment extends Fragment {
     		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
     			Item item = (Item) parent.getItemAtPosition(position);
     			editListItem(item);
+    			/*
     			Toast.makeText(activity,
     					"Clicked on Row: " + item.getName(), 
     					Toast.LENGTH_LONG).show();
+    					*/
     		}
     	});
     }
@@ -419,9 +421,9 @@ public class ItemViewFragment extends Fragment {
     	public View getCustomView(int position, View convertView, ViewGroup parent) {
     		ViewHolder holder;
     		if (convertView == null) {
-    			convertView = inflater.inflate(R.layout.activity_main_cat_spinner, null);
+    			convertView = inflater.inflate(R.layout.spinner_view, null);
     			holder = new ViewHolder();
-    			holder.catName = (TextView) convertView.findViewById(R.id.cat_spinner_text);
+    			holder.catName = (TextView) convertView.findViewById(R.id.spinner_text);
     			convertView.setTag(holder);
     		} else {
     			holder = (ViewHolder) convertView.getTag();

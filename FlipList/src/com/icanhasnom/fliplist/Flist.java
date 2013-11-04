@@ -23,6 +23,7 @@ public class Flist implements Serializable {
     boolean showDueDate = true;
     boolean showDescription = true;
     int filterID = 0;
+    int defaultCategoryID = 0;
     int isVisible = 1;
     public Flist() {
     }
@@ -102,6 +103,15 @@ public class Flist implements Serializable {
 	}
 	public void setVisible(int v) {
 		isVisible = v;
+	}
+	public int getDefaultCategoryID() {
+		return defaultCategoryID;
+	}
+	public String getDefaultCategoryIDString() {
+		return String.valueOf(defaultCategoryID);
+	}
+	public void setDefaultCategoryID(int categoryID) {
+		defaultCategoryID = categoryID;
 	}
 	public int getFilterID() {
 		// TODO Auto-generated method stub
