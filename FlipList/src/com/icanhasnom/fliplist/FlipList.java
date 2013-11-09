@@ -187,14 +187,8 @@ ListViewFragment.OnFilterSelectedListener {
 		myListMan = new ListManager(this);
 		
 		init(savedInstanceState);
-        
-        setContentView(R.layout.fragment_pager);
-        
-        mAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
-        Fragment testFrag = mAdapter.getItem(ITEM_VIEW_FRAGMENT);
-        Log.v("FlipList.onCreate", "testFrag: " + testFrag);
-        mPager = (ViewPager) findViewById(R.id.pager);
-        mPager.setAdapter(mAdapter);
+        initFragments();
+
         
 		//loadPref();
         Log.v("FlipList.onCreate", "defaultCatID: " + defaultCatID);
@@ -216,6 +210,19 @@ ListViewFragment.OnFilterSelectedListener {
             }
         });
         */
+    }
+    public void initFragments() {
+        
+        
+        mAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
+        Fragment testFrag = mAdapter.getItem(ITEM_VIEW_FRAGMENT);
+        Log.v("FlipList.onCreate", "testFrag: " + testFrag);
+        
+        setContentView(R.layout.fragment_pager);
+        
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager.setAdapter(mAdapter);
+ 
     }
     public void init(Bundle savedInstanceState) {
         if(savedInstanceState != null) {
@@ -358,6 +365,10 @@ ListViewFragment.OnFilterSelectedListener {
     public void onFlistSelected(int selectedFlist) {
     	Log.v("FlipList.onFlistSelected", "selectedFlist: " + selectedFlist);
     	try {
+    		if (mAdapter == null) {
+    			initFragments();
+    			Toast.makeText(this,  "Ran initFragments because mAdapter was null",  Toast.LENGTH_LONG).show();
+    		}
     		setCurrentPagerItem(ITEM_VIEW_FRAGMENT);
         	Log.v("FlipList.onCategorySelected", "itemFragment: " + itemFragment);
         	mAdapter.notifyDataSetChanged();

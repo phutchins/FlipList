@@ -300,7 +300,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	    	//compareDateCal.add(Calendar.MINUTE, -delayInt);
 			//compareDate = sdfDateTime.format(compareDateCal.getTime());
 			//String dateTimeCompare = "datetime('now','-" + delayInt + " minute')";
-	    	prefQueryStringValues = "(" + KEY_ITEM_IS_COMPLETED + "=? OR (" + KEY_ITEM_COMPLETED_DATE + " >= datetime('now',?) AND " + KEY_ITEM_IS_COMPLETED + " =?))";
+	    	prefQueryStringValues = "(" + KEY_ITEM_IS_COMPLETED + "=? OR (" + KEY_ITEM_COMPLETED_DATE + " >= datetime('now',?,'utc') AND " + KEY_ITEM_IS_COMPLETED + " =?))";
 	    	prefQueryStringValueArgs = "0;-" + delayInt + " minutes;1";
 		}
 		// Show all items always
