@@ -365,8 +365,7 @@ ListViewFragment.OnFilterSelectedListener {
     public void onFlistSelected(int selectedFlist) {
     	Log.v("FlipList.onFlistSelected", "selectedFlist: " + selectedFlist);
     	try {
-    		if (mAdapter == null) {
-    			initFragments();
+    		if (((MyFragmentPagerAdapter) mPager.getAdapter()).getFragment(ITEM_VIEW_FRAGMENT) == null) {
     			Toast.makeText(this,  "Ran initFragments because mAdapter was null",  Toast.LENGTH_LONG).show();
     		}
     		setCurrentPagerItem(ITEM_VIEW_FRAGMENT);
