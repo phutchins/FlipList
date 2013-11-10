@@ -22,10 +22,6 @@
     <packaging>pom</packaging>
     <name>FlipList</name>
 
-    <modules>
-        <module>FlipList</module>
-    </modules>
-
     <url>http://code.google.com/p/fliplist</url>
     <inceptionYear>2013</inceptionYear>
     <properties>
