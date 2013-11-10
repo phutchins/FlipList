@@ -71,12 +71,15 @@ public class ItemViewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fragVal = getArguments() != null ? getArguments().getInt("val") : 1;
+        
+        layoutView = inflater.inflate(R.layout.fragment_item_list_layout, container, false);
         //initObjs(activity);
 		//initFrag(activity);
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        layoutView = inflater.inflate(R.layout.fragment_item_list_layout, container, false);
+        //layoutView = inflater.inflate(R.layout.fragment_item_list_layout, container, false);
+        
         //otherView = layoutView.findViewById(R.id.)
         //catSpinner = (Spinner) layoutView.findViewById(R.id.list_spinner);
 
@@ -160,6 +163,9 @@ public class ItemViewFragment extends Fragment {
         //Log.v("ItemViewFragment.addItemsOnSpinner", "myItemView: " + myItemView);
         Log.v("ItemViewFragment.addItemsOnSpinner", "THIS: " + this);
         Log.v("ItemViewFragment.addItemsOnSpinner", "R.id.viewpager: " + R.id.pager);
+        
+        // TODO: Fix this, something here is null
+
         flistSpinner = (Spinner) layoutView.findViewById(R.id.flist_spinner);
         //catSpinner = (Spinner) myActivity.findViewById(R.id.list_spinner);
 
