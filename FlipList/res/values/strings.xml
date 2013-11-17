@@ -34,6 +34,7 @@
     <string name="cat_list_text_view">CatListTextView</string>
     <string name="cat_list_text_view_type">Type Name</string>
     <string name="category_list_add_button_text">+</string>
+    <string name="item_add_button_text">+</string>
 
     <string name="filter_list_text_view">CatListTextView</string>
     <string name="filter_list_text_view_type">Type Name</string>

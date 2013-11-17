@@ -72,13 +72,13 @@ public class ItemViewFragment extends Fragment {
         super.onCreate(savedInstanceState);
         fragVal = getArguments() != null ? getArguments().getInt("val") : 1;
         
-        layoutView = inflater.inflate(R.layout.fragment_item_list_layout, container, false);
+        //layoutView = inflater.inflate(R.layout.fragment_item_list_layout, container, false);
         //initObjs(activity);
 		//initFrag(activity);
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //layoutView = inflater.inflate(R.layout.fragment_item_list_layout, container, false);
+        layoutView = inflater.inflate(R.layout.fragment_item_list_layout, container, false);
         
         //otherView = layoutView.findViewById(R.id.)
         //catSpinner = (Spinner) layoutView.findViewById(R.id.list_spinner);

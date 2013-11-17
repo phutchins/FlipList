@@ -121,7 +121,6 @@ import android.widget.Toast;
 // TODO: Break preferences out to its own class (PreferencesHelper?)
 // TODO: Move database clear on upgrade to a function and only do this once we have a DB upgrade function set up also
 
-
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class FlipList extends FragmentActivity implements 
 ListViewFragment.OnCategoryChangedListener, 
