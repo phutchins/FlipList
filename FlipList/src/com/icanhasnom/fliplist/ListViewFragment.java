@@ -105,7 +105,7 @@ public class ListViewFragment extends Fragment {
     	}
     	// Always refresh the list when coming back from child activity
 		refreshList();
-    	Log.v("CategoryViewFragment.onActivityResult", "requestCode: " + requestCode + " resultCode: " + resultCode);
+    	//Log.v("CategoryViewFragment.onActivityResult", "requestCode: " + requestCode + " resultCode: " + resultCode);
     	super.onActivityResult(requestCode, resultCode, data);
     	mFlistCallback.onFlistChanged(1);
     	mCategoryCallback.onCategoryChanged(1);
@@ -172,7 +172,7 @@ public class ListViewFragment extends Fragment {
     	});
     	listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
     		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-    			Log.v("Long clicked", "pos" + " " + position);
+    			//Log.v("Long clicked", "pos" + " " + position);
     			Flist flist = (Flist) parent.getItemAtPosition(position);
     			editFlist(view, flist.getID());
     			return true;
@@ -206,7 +206,7 @@ public class ListViewFragment extends Fragment {
     	});
     	listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
     		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-    			Log.v("Long clicked", "pos" + " " + position);
+    			//Log.v("Long clicked", "pos" + " " + position);
     			Flist category = (Flist) parent.getItemAtPosition(position);
     			editCategory(view, category.getID());
     			return true;
@@ -240,7 +240,7 @@ public class ListViewFragment extends Fragment {
     	});
     	listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
     		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-    			Log.v("Long clicked", "pos" + " " + position);
+    			//Log.v("Long clicked", "pos" + " " + position);
     			Filter filter = (Filter) parent.getItemAtPosition(position);
     			editFilter(view, filter.getID());
     			return true;
@@ -392,9 +392,9 @@ public class ListViewFragment extends Fragment {
     		//}
     		String categoryTypeName = myListMan.getTypeName(categoryTypeID);
     		
-    		Log.v("MyCatListCustomAdapter", "categoryTypeID:" + categoryTypeID);
-    		Log.v("MyCatListCustomAdapter", "category.getDescription(): " + category.getDescription());
-    		Log.v("MyCatListCustomAdapter", "myListMan.getCategoryTypeName(): " + myListMan.getTypeName(categoryTypeID));
+    		//Log.v("MyCatListCustomAdapter", "categoryTypeID:" + categoryTypeID);
+    		//Log.v("MyCatListCustomAdapter", "category.getDescription(): " + category.getDescription());
+    		//Log.v("MyCatListCustomAdapter", "myListMan.getCategoryTypeName(): " + myListMan.getTypeName(categoryTypeID));
     		
     		holder.flist_list_text_view.setText(categoryType + " " + categoryName);
     		holder.flist_list_text_view_type.setText("(" + categoryTypeName + ")");

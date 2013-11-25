@@ -294,8 +294,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		if (prefRemoveCompletedItems.equals("1")) {
 			Integer delayInt = Integer.valueOf(prefRemoveCompletedItemsDelay);
 			//SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-			Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "prefRemoveCompletedItemsDelay: " + prefRemoveCompletedItemsDelay);
-			Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "delayInt: " + delayInt);
+			//Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "prefRemoveCompletedItemsDelay: " + prefRemoveCompletedItemsDelay);
+			//Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "delayInt: " + delayInt);
 	    	// TODO: make this use the result from prefRemoveCompletedItemsDelay preference as a negative number
 	    	//compareDateCal.add(Calendar.MINUTE, -delayInt);
 			//compareDate = sdfDateTime.format(compareDateCal.getTime());
@@ -325,7 +325,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	public void addItem(Item item) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		String itemCategories = item.getCategoriesString();
-		Log.v("DatabaseHandler.addItem", "item.getCategoriesString(): " + item.getCategoriesString());
+		//Log.v("DatabaseHandler.addItem", "item.getCategoriesString(): " + item.getCategoriesString());
 		int hasDueDate = item.hasDueDate()? 1 : 0;
 		int hasDueTime = item.hasDueTime()? 1 : 0;
 		int isCompleted = item.isCompleted()? 1 : 0;
@@ -343,11 +343,11 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_ITEM_IS_COMPLETED, isCompleted);
 		values.put(KEY_ITEM_COMPLETED_DATE,  item.getCompletedDate());
 		
-		Log.v("DatabaseHandler.addItem", "Adding Item " + item.getName() + " to the DB");
+		//Log.v("DatabaseHandler.addItem", "Adding Item " + item.getName() + " to the DB");
 		//Log.v("DatabaseHandler.addItem", "item.getDueDateTime(): " + item.getDueDateTime());
-		Log.v("DatabaseHandler.addItem", " *item info: " + item.getName() + "," + item.getDescription() + "," + item.getNotes() + "," 
-		+ item.getFlist() + "," + itemCategories + "," + item.getCreateDate() + "," + hasDueDate + "," + hasDueTime
-		+ item.getDueDateTime());
+		//Log.v("DatabaseHandler.addItem", " *item info: " + item.getName() + "," + item.getDescription() + "," + item.getNotes() + "," 
+		//+ item.getFlist() + "," + itemCategories + "," + item.getCreateDate() + "," + hasDueDate + "," + hasDueTime
+		//+ item.getDueDateTime());
 		
 		db.insert(TABLE_ITEMS, null, values);
 		db.close();
@@ -436,8 +436,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		//Log.v("DatabaseHandler.getItemList", "filterID: " + filterID);
 		// Filter ID 0 means use preferences as there is no filter applied
 		//filterID = 1;
-		Log.v("DatabaseHandler.getItemList", "prefQueryStringValues: " + prefQueryStringValues);
-		Log.v("DatabaseHandler.getItemList", "prefQueryStringValueArgs: " + prefQueryStringValueArgs);
+		//Log.v("DatabaseHandler.getItemList", "prefQueryStringValues: " + prefQueryStringValues);
+		//Log.v("DatabaseHandler.getItemList", "prefQueryStringValueArgs: " + prefQueryStringValueArgs);
 		if (filterID == 0) {
 			if (!prefQueryStringValues.isEmpty()) {
 				// No filter so show all completed items in the selected category
@@ -448,7 +448,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				dbValues = KEY_ITEM_FLIST + "=?";
 				dbValueArgs = String.valueOf(flistID);
 			}
-			Log.v("DatabaseHandler.getItemList", "USING DEFAULTS - dbValues: " + dbValues + " dbValueArgs: " + dbValueArgs);
+			//Log.v("DatabaseHandler.getItemList", "USING DEFAULTS - dbValues: " + dbValues + " dbValueArgs: " + dbValueArgs);
 		} else {
 			// Get the selected filter and do not use defaults or preferences
 			// TODO: use something like myFilter.getQuery(catID) to build and return the full query
@@ -572,7 +572,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	public int addFlist(Flist flist) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
-		Log.v("DatabaseHandler.addFlist", "Adding Flist " + flist.getName() + " Desc: " + flist.getDescription() + " Type: " + flist.getType() + " Visible: " + flist.getVisible() + "Filter: " + flist.getFilterID());
+		//Log.v("DatabaseHandler.addFlist", "Adding Flist " + flist.getName() + " Desc: " + flist.getDescription() + " Type: " + flist.getType() + " Visible: " + flist.getVisible() + "Filter: " + flist.getFilterID());
 		values.put(KEY_FLIST_NAME, flist.getName());
 		values.put(KEY_FLIST_DESC, flist.getDescription());
 		values.put(KEY_FLIST_TYPE, flist.getType());

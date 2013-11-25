@@ -38,7 +38,7 @@ public class ListManager implements Serializable {
     public transient DatabaseHandler db;
     public ListManager(Context context) {
     	db = new DatabaseHandler(context);
-		Log.v("ListManager.constructor", "3) context: " + context);
+		//Log.v("ListManager.constructor", "3) context: " + context);
 		updateListManagerState();
     }
     public void updateListManagerState() {
@@ -97,7 +97,7 @@ public class ListManager implements Serializable {
     	// TODO: Merge updateObjCategory into this? Maybe make addUpdateObjCategory() which does 
     	//       a check to see if it exists and updates it if it already exists and adds it if
     	//       it doesn't.
-    	Log.v("ListManager.addFlist", "Adding Flist: " + flist.getName());
+    	//Log.v("ListManager.addFlist", "Adding Flist: " + flist.getName());
     	Integer newFlistID = db.addFlist(flist);
     	buildItemListMap();
     	populateFlistList();

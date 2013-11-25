@@ -190,9 +190,9 @@ ListViewFragment.OnFilterSelectedListener {
 
         
 		//loadPref();
-        Log.v("FlipList.onCreate", "defaultCatID: " + defaultCatID);
-		Log.v("FlipList.onCreate", "2) this: " + this);
-		Log.v("FlipList.onCreate", "Fragment Tag (2): " + getFragmentTag(2));
+        //Log.v("FlipList.onCreate", "defaultCatID: " + defaultCatID);
+		//Log.v("FlipList.onCreate", "2) this: " + this);
+		//Log.v("FlipList.onCreate", "Fragment Tag (2): " + getFragmentTag(2));
 		
         // Watch for button clicks.
 		/*
@@ -215,7 +215,7 @@ ListViewFragment.OnFilterSelectedListener {
         
         mAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
         Fragment testFrag = mAdapter.getItem(ITEM_VIEW_FRAGMENT);
-        Log.v("FlipList.onCreate", "testFrag: " + testFrag);
+        //Log.v("FlipList.onCreate", "testFrag: " + testFrag);
         
         setContentView(R.layout.fragment_pager);
         
@@ -226,7 +226,7 @@ ListViewFragment.OnFilterSelectedListener {
     public void init(Bundle savedInstanceState) {
         if(savedInstanceState != null) {
         	restoreState(savedInstanceState);
-        	Log.v("FlipList.onCreate", "Restoring saved instance state");
+        	//Log.v("FlipList.onCreate", "Restoring saved instance state");
         } else {
         	loadPref();
         }
@@ -283,7 +283,7 @@ ListViewFragment.OnFilterSelectedListener {
     }
     public void restoreState(Bundle savedInstanceState) {
     	myListMan = (ListManager) savedInstanceState.getSerializable("ListManager");
-    	Log.v("FlipList.restoreState", "Restored ListManager!");
+    	//Log.v("FlipList.restoreState", "Restored ListManager!");
     }
     
     @Override
@@ -325,7 +325,7 @@ ListViewFragment.OnFilterSelectedListener {
     
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		Log.v("FlipList.onActivityResult", "requestCode: " + requestCode + " resultCode: " + resultCode);
+		//Log.v("FlipList.onActivityResult", "requestCode: " + requestCode + " resultCode: " + resultCode);
     	if (requestCode == 0) {
         	loadPref();
     	}
@@ -340,7 +340,7 @@ ListViewFragment.OnFilterSelectedListener {
     		ItemViewFragment itemViewFragment = (ItemViewFragment) mAdapter.getItem(1);
     		itemViewFragment.refreshPage(this);
     		
-            Log.v("FlipList.onActivityResult", "Got Result Code -1, currentCategoryID: " + currentFlistID + " currentCategory.getName(): " + currentFlist.getName());
+            //Log.v("FlipList.onActivityResult", "Got Result Code -1, currentCategoryID: " + currentFlistID + " currentCategory.getName(): " + currentFlist.getName());
     	} else if (requestCode == 1 && resultCode == RESULT_DELETED) {
     		loadPref();
     	} else if (requestCode == 1 && resultCode == RESULT_CANCELED) {
@@ -368,7 +368,7 @@ ListViewFragment.OnFilterSelectedListener {
     			Toast.makeText(this,  "Ran initFragments because mAdapter was null",  Toast.LENGTH_LONG).show();
     		}
     		setCurrentPagerItem(ITEM_VIEW_FRAGMENT);
-        	Log.v("FlipList.onCategorySelected", "itemFragment: " + itemFragment);
+        	//Log.v("FlipList.onCategorySelected", "itemFragment: " + itemFragment);
         	mAdapter.notifyDataSetChanged();
         	ItemViewFragment ivf = (ItemViewFragment) ((MyFragmentPagerAdapter)mPager.getAdapter()).getFragment(ITEM_VIEW_FRAGMENT);
         	ivf.initCat(this, selectedFlist);
@@ -381,7 +381,7 @@ ListViewFragment.OnFilterSelectedListener {
     	Log.v("FlipList.onCategorySelected", "selectedCat: " + selectedCat);
     	try {
     		setCurrentPagerItem(ITEM_VIEW_FRAGMENT);
-        	Log.v("FlipList.onCategorySelected", "itemFragment: " + itemFragment);
+        	//Log.v("FlipList.onCategorySelected", "itemFragment: " + itemFragment);
         	mAdapter.notifyDataSetChanged();
         	ItemViewFragment ivf = (ItemViewFragment) ((MyFragmentPagerAdapter)mPager.getAdapter()).getFragment(ITEM_VIEW_FRAGMENT);
         	ivf.initCat(FlipList.this, selectedCat);
@@ -394,7 +394,7 @@ ListViewFragment.OnFilterSelectedListener {
     	Log.v("FlipList.onFilterSelected", "selectedFilter: " + selectedFilter);
     	try {
     		setCurrentPagerItem(ITEM_VIEW_FRAGMENT);
-        	Log.v("FlipList.onFilterSelected", "itemFragment: " + itemFragment);
+        	//Log.v("FlipList.onFilterSelected", "itemFragment: " + itemFragment);
         	mAdapter.notifyDataSetChanged();
         	ItemViewFragment ivf = (ItemViewFragment) ((MyFragmentPagerAdapter)mPager.getAdapter()).getFragment(ITEM_VIEW_FRAGMENT);
         	ivf.initCat(FlipList.this, selectedFilter);
@@ -445,8 +445,8 @@ ListViewFragment.OnFilterSelectedListener {
     private void loadPref(){
     	mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         defaultCatID = Integer.parseInt(mySharedPreferences.getString(getString(R.string.default_flist_key), getString(R.integer.default_flist_default)));
-        Log.v("FlipList.loadPref", "this:  " + this);
-        Log.v("FlipList.loadPref", "Loaded Pref from mySharedPreferences, defaultCatID: " + defaultCatID);
+        //Log.v("FlipList.loadPref", "this:  " + this);
+        //Log.v("FlipList.loadPref", "Loaded Pref from mySharedPreferences, defaultCatID: " + defaultCatID);
 
         prefShowItemDescriptionGlobal = mySharedPreferences.getBoolean(getString(R.string.show_description_global_key), getResources().getBoolean(R.bool.show_description_global_default));
         prefShowDueDateGlobal = mySharedPreferences.getBoolean(getString(R.string.show_due_date_global_key), getResources().getBoolean(R.bool.show_due_date_global_default));
@@ -455,7 +455,7 @@ ListViewFragment.OnFilterSelectedListener {
         //defaultCatID = mySharedPreferences.getInt("current_category_id", 0);
         if (currentFlistID == null) currentFlistID = defaultCatID;
         currentFlist = myListMan.getFlist(currentFlistID);
-        Log.v("FlipList.loadPrefs", "(1) Setting currentCategory to " + currentFlist.getName());
+        //Log.v("FlipList.loadPrefs", "(1) Setting currentCategory to " + currentFlist.getName());
     }
     /**
     public class SpinnerActivity extends Activity implements OnItemSelectedListener {

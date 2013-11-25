@@ -22,13 +22,13 @@ public class ListPreferenceManager {
 
     public ListPreferenceManager(Context c) {
     	context = c;
-    	Log.v("ListPreferenceManager.loadPrefs", "context: " + context);
+    	//Log.v("ListPreferenceManager.loadPrefs", "context: " + context);
     	loadPrefs();
     }
     private void loadPrefs(){
     	mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         defaultFlistID = Integer.parseInt(mySharedPreferences.getString(context.getString(R.string.default_flist_key), context.getString(R.integer.default_flist_default)));
-        Log.v("FlipList.loadPref", "defaultFlistID: " + defaultFlistID);
+        //Log.v("FlipList.loadPref", "defaultFlistID: " + defaultFlistID);
 
         ShowItemDescriptionGlobal = mySharedPreferences.getBoolean(context.getString(R.string.show_description_global_key), context.getResources().getBoolean(R.bool.show_description_global_default));
         ShowDueDateGlobal = mySharedPreferences.getBoolean(context.getString(R.string.show_due_date_global_key), context.getResources().getBoolean(R.bool.show_due_date_global_default));

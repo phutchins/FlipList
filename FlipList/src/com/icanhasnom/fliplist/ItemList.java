@@ -50,4 +50,10 @@ public class ItemList implements Serializable {
     public void removeListItem(Item li) {
         myItemList.remove(li);
     }
+    public int size() {
+    	return myItemList.size();
+    }
+    public Item get(int position) {
+    	return myItemList.get(position);
+    }
 }
