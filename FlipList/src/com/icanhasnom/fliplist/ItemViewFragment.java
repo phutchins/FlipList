@@ -98,6 +98,12 @@ public class ItemViewFragment extends Fragment {
     	}
 
     }
+    public void onResume() {
+    	// Refresh fragment when user returns to it
+    	super.onResume();
+    	addItemsOnSpinner(activity);
+    	addItemsOnList(myItemList);
+    }
     public void refreshPage(Activity myActivity) {
     	addItemsOnSpinner(myActivity);
     	addItemsOnList(myItemList);
