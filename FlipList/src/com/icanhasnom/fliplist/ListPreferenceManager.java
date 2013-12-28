@@ -10,13 +10,14 @@ import android.util.Log;
 public class ListPreferenceManager {
     SharedPreferences mySharedPreferences;
     
-	int defaultFlistID;
+
 	Boolean ShowItemDescriptionGlobal;
 	Boolean ShowDueDateGlobal;
 	Integer RemoveCompletedItems;
     Integer RemoveCompletedItemsDelay;
     // Category currentCategory;
-    Integer currentFlistID;
+    private int currentFlistID;
+	private int defaultFlistID;
     
     Context context;
 
@@ -38,6 +39,31 @@ public class ListPreferenceManager {
         currentFlistID = mySharedPreferences.getInt("current_flist_id", 0);
         //if (currentCategoryID == null) currentCategoryID = defaultCatID;
     }
+    public void setDefaultFlistID(int flistID) {
+    	defaultFlistID = flistID;
+    	SharedPreferences.Editor prefEditor = mySharedPreferences.edit();
+    	prefEditor.putInt("default_flist_id", flistID);
+    	prefEditor.commit();
+    }
+    public void setCurrentFlistID(int flistID) {
+    	currentFlistID = flistID;
+    	SharedPreferences.Editor prefEditor = mySharedPreferences.edit();
+    	prefEditor.putInt("current_flist_id", flistID);
+    	prefEditor.commit();
+    	
+    }
+    public int getCurrentFlistID() {
+    	return currentFlistID;
+    }
+    public int getDefaultFlistID() {
+    	return defaultFlistID;
+    }
+    /*
+     *      mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+    		SharedPreferences.Editor prefEditor = mySharedPreferences.edit();
+    		prefEditor.putInt("current_category_id", currentFlist.getID());
+    		prefEditor.commit();
+     */
 }
 
 

@@ -39,13 +39,11 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
 	private static final int DATABASE_VERSION = 72;
 	
 	// Database Name
 	private static final String DATABASE_NAME = "fliplist";
-	
-	
+
     String currentDBPath = "/data/"+ "com.icanhasnom.fliplist" +"/databases/" + DATABASE_NAME;
     String backupDBPath = "/FlipList/" + DATABASE_NAME;
     
@@ -350,7 +348,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		//+ item.getDueDateTime());
 		
 		db.insert(TABLE_ITEMS, null, values);
-		db.close();
+		//db.close();
 	}
 	public Item getItem(int id) throws NumberFormatException, ParseException {
 		SQLiteDatabase db = this.getReadableDatabase();
@@ -378,6 +376,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		item.setHasDueDate(itemHasDueDate);
 		item.setHasDueTime(itemHasDueTime);
 		item.setCompletedDate(itemCompletedDate);
+		//db.close();
 		// return item
 		return item;
 	}
@@ -410,7 +409,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				itemList.add(item);
 			} while (cursor.moveToNext());
 		}
-		db.close();
+		//db.close();
 		return itemList;
 	}
 	public ItemList getItemList(int flistID) {
@@ -433,11 +432,11 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		
 		Flist myFlist = getFlist(flistID);
 		int filterID = myFlist.getFilterID();
-		//Log.v("DatabaseHandler.getItemList", "filterID: " + filterID);
+		Log.v("DatabaseHandler.getItemList", "filterID: " + filterID);
 		// Filter ID 0 means use preferences as there is no filter applied
 		//filterID = 1;
-		//Log.v("DatabaseHandler.getItemList", "prefQueryStringValues: " + prefQueryStringValues);
-		//Log.v("DatabaseHandler.getItemList", "prefQueryStringValueArgs: " + prefQueryStringValueArgs);
+		Log.v("DatabaseHandler.getItemList", "prefQueryStringValues: " + prefQueryStringValues);
+		Log.v("DatabaseHandler.getItemList", "prefQueryStringValueArgs: " + prefQueryStringValueArgs);
 		if (filterID == 0) {
 			if (!prefQueryStringValues.isEmpty()) {
 				// No filter so show all completed items in the selected category
@@ -448,7 +447,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				dbValues = KEY_ITEM_FLIST + "=?";
 				dbValueArgs = String.valueOf(flistID);
 			}
-			//Log.v("DatabaseHandler.getItemList", "USING DEFAULTS - dbValues: " + dbValues + " dbValueArgs: " + dbValueArgs);
+			Log.v("DatabaseHandler.getItemList", "USING DEFAULTS - dbValues: " + dbValues + " dbValueArgs: " + dbValueArgs);
 		} else {
 			// Get the selected filter and do not use defaults or preferences
 			// TODO: use something like myFilter.getQuery(catID) to build and return the full query
@@ -509,6 +508,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				//Log.v("DatabaseHandler.getItemList", "Got Item: " + cursor.getString(1) + " from Category: " + myCat.getName() + " - createDate: " + cursor.getString(9) + " dueDateTime: " + cursor.getString(8) + " isCompleted: " + cursor.getString(10) + " completedDate: " + cursor.getString(11));
 			} while (cursor.moveToNext());
 		}
+		//db.close();
 		// return contact list
 		return itemList;
 	}
@@ -531,12 +531,14 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				myFilter.setFilterByCategory(filterByCategory);
 			} while (cursor.moveToNext());
 		}
+		//db.close();
 		return myFilter;
 	}
 	public int getItemsCount() {
 		String countQuery = "SELECT * FROM " + TABLE_ITEMS;
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.rawQuery(countQuery, null);
+		//db.close();
 		// return count
 		return cursor.getCount();
 	}
@@ -558,14 +560,16 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		values.put(KEY_ITEM_DUE_DATETIME, item.getDueDateTime());
 		values.put(KEY_ITEM_IS_COMPLETED, isCompleted);
 		values.put(KEY_ITEM_COMPLETED_DATE, item.getCompletedDate());
-		return db.update(TABLE_ITEMS, values, KEY_ITEM_ID + " = ?",
+		int returnVal = db.update(TABLE_ITEMS, values, KEY_ITEM_ID + " = ?",
 				new String[] { String.valueOf(item.getID()) });
+		//db.close();
+		return returnVal;
 	}
 	public void deleteItem(Item item) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		db.delete(TABLE_ITEMS, KEY_ITEM_ID + " = ?",
 				new String[] { String.valueOf(item.getID()) });
-		db.close();
+		//db.close();
 	}
 	
 	// Categories
@@ -610,6 +614,9 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		Flist flist = new Flist(cursor.getInt(0),
 				cursor.getString(1), cursor.getString(2), cursor.getInt(3), cursor.getInt(4));
 		flist.setFilterID(cursor.getInt(5));
+		cursor.close();
+		// TODO This db.close breaks everything!!!! Why!?
+		//db.close();
 		return flist;
 	}
 	public Category getCategory(int id) {
@@ -620,6 +627,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		if (cursor != null)
 			cursor.moveToFirst();
 		Category category = new Category(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getInt(3));
+		db.close();
 		return category;
 	}
 	public Flist getFlistByName(String flistName) {
@@ -633,6 +641,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		
 		Flist flist = new Flist(Integer.parseInt(cursor.getString(0)),
 				cursor.getString(1), cursor.getString(2), Integer.parseInt(cursor.getString(3)), Integer.parseInt(cursor.getString(4)));
+		db.close();
 		return flist;
 	}
 	public ItemType getItemType(int typeID) {
@@ -640,6 +649,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		Cursor cursor = db.query(TABLE_ITEM_TYPES, new String[] { KEY_TYPE_ID, KEY_TYPE_NAME, KEY_TYPE_DESC }, KEY_TYPE_ID
 				+ "=?", new String[] { String.valueOf(typeID) }, null, null, null, null);
 		ItemType myItemType = new ItemType(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getString(2));
+		db.close();
 		return myItemType;
 	}
 	public ArrayList<Flist> getAllFlists() {
@@ -692,6 +702,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				flistList.add(flist);
 			} while (cursor.moveToNext());
 		}
+		db.close();
 		return flistList;
 	}
 	public ArrayList<Category> getCategories() {
@@ -717,6 +728,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				categoryList.add(category);
 			} while (cursor.moveToNext());
 		}
+		db.close();
 		return categoryList;
 	}
 	/*
@@ -783,7 +795,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		Cursor cursor = db.rawQuery(countQuery, null);
 		int count = cursor.getCount();
 		cursor.close();
-		
+		//db.close();
 		// return count
 		return count;
 	}
@@ -811,6 +823,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		ContentValues values = new ContentValues();
 		values.put(KEY_FLIST_VISIBLE, isVisible);
 		db.update(TABLE_FLISTS, values, KEY_FLIST_VISIBLE + " = " + isVisible, null);
+		db.close();
 	}
 	public void unHideFlist(int flistId) {
 		int isVisible = 1;
@@ -818,6 +831,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		ContentValues values = new ContentValues();
 		values.put(KEY_FLIST_VISIBLE, isVisible);
 		db.update(TABLE_FLISTS, values, KEY_FLIST_VISIBLE + " = " + isVisible, null);
+		db.close();
 	}
 	public int updateFlist(Flist flist) {
 		SQLiteDatabase db = this.getWritableDatabase();
@@ -833,7 +847,9 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		// updating row
 		//return db.update(TABLE_CATEGORIES, values, KEY_CAT_ID + " = ?",
 		//		new String[] { String.valueOf(category.getID()) });
-		return db.update(TABLE_FLISTS, values, KEY_FLIST_ID + " = " + keyID, null);
+		int returnVal = db.update(TABLE_FLISTS, values, KEY_FLIST_ID + " = " + keyID, null);
+		db.close();
+		return returnVal;
 	}
 	public boolean deleteFlist(int flistID) {
 		int rowsDeleted = 0;
@@ -865,7 +881,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				filterList.add(filter);
 			} while (cursor.moveToNext());
 		}
-		db.close();
+		//db.close();
 		return filterList;
 	}
 	
@@ -896,6 +912,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		if (cursor != null)
 			cursor.moveToFirst();
 		String itemTypeName = cursor.getString(1);
+		//db.close();
 		return itemTypeName;
 	}
 
@@ -933,32 +950,33 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	// Backup & Restore
 	public void exportDB(){
 		File sd = Environment.getExternalStorageDirectory();
-	      	File data = Environment.getDataDirectory();
-	       FileChannel source=null;
-	       FileChannel destination=null;
+	    File data = Environment.getDataDirectory();
+	    FileChannel source=null;
+	    FileChannel destination=null;
 
-	       // Use one of these to set timestamp on DB Backup File
-	       Time now = new Time();
-	       now.setToNow();
+	    // Use one of these to set timestamp on DB Backup File
+	    Time now = new Time();
+	    now.setToNow();
 	       
-	       SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-	       String currentDateandTime = sdf.format(new Date(0));
+	    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+	    String currentDateandTime = sdf.format(new Date(0));
 	       
-	     //File backupDB = new File(sd, backupDBPath);
-	       File currentDB = new File(data, currentDBPath);
-	       File backupDB = new File(sd, backupDBPath + "-" + "123456");
-	       try {
-	            source = new FileInputStream(currentDB).getChannel();
-	            destination = new FileOutputStream(backupDB).getChannel();
-	            destination.transferFrom(source, 0, source.size());
-	            source.close();
-	            destination.close();
-	            Toast.makeText(context, "DB Exported!", Toast.LENGTH_LONG).show();
-	        } catch(IOException e) {
-	        	e.printStackTrace();
-	            Toast.makeText(context, "Export Failed!", Toast.LENGTH_LONG).show();
-	            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
-	        }
+	    //File backupDB = new File(sd, backupDBPath);
+	    File currentDB = new File(data, currentDBPath);
+	    // TODO: Set DB backup filename to reflect current date time string that can be parsed for user readability
+	    File backupDB = new File(sd, backupDBPath + "-" + "123456");
+	    try {
+	        source = new FileInputStream(currentDB).getChannel();
+	        destination = new FileOutputStream(backupDB).getChannel();
+	        destination.transferFrom(source, 0, source.size());
+	        source.close();
+	        destination.close();
+	        Toast.makeText(context, "DB Exported!", Toast.LENGTH_LONG).show();
+	    } catch(IOException e) {
+	        e.printStackTrace();
+	        Toast.makeText(context, "Export Failed!", Toast.LENGTH_LONG).show();
+	        Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+	    }
 	}
 	
 	private String getAppDir() {
@@ -994,6 +1012,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		alert.show();
 	}
 	
+	// TODO: Should this be happening like this?
 	private SQLiteDatabase getDatabase() {
 		SQLiteDatabase db = this.getWritableDatabase();
 		return db;
@@ -1019,7 +1038,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
                         Toast.LENGTH_LONG).show();
                 return;
             }
-            // closing current db
+            // TODO: closing current db (is this right??)
             getDatabase().close();
             try {
                 File data = Environment.getDataDirectory();

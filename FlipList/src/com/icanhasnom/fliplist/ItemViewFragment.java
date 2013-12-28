@@ -37,7 +37,7 @@ public class ItemViewFragment extends Fragment {
 	int defaultFlistID;
 	int currentFlistID;
 	Flist currentFlist;
-	ListPreferenceManager prefMan;
+	ListPreferenceManager myPrefMan;
 	ItemList myItemList;
     ArrayList<Flist> flistList;
     ArrayList<Item> myListItems;
@@ -75,19 +75,22 @@ public class ItemViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         layoutView = inflater.inflate(R.layout.fragment_item_list_layout, container, false);
 		initFrag(activity);
-		currentItemList = myListMan.getItemList(defaultFlistID);
+		// TODO: Make this use currentFlistID ?
+		Log.v("ItemViewFragment.onCreateView", "Ran initFrag and using defaultFlistID");
+		currentItemList = myListMan.getItemList(myPrefMan.getCurrentFlistID());
         return layoutView;
     }
     public void initObjs(Activity myActivity) {
-		prefMan = new ListPreferenceManager(myActivity);
+    	// Only use the prefMan for ItemView settings
+		myPrefMan = new ListPreferenceManager(myActivity);
 		myListMan = new ListManager(myActivity);
     }
     public void initFrag(Activity myActivity) {
     	initObjs(myActivity);
     	myItemList = getItemList(currentFlistID);
-		currentFlistID = prefMan.currentFlistID;
-		defaultFlistID = prefMan.defaultFlistID;
-		//Log.v("ItemViewFragment.initFrag", "currentFlistID: " + currentFlistID);
+		currentFlistID = myPrefMan.getCurrentFlistID();
+		defaultFlistID = myPrefMan.getDefaultFlistID();
+		Log.v("ItemViewFragment.initFrag", "currentFlistID: " + currentFlistID);
 		currentFlist = getFlistObj(currentFlistID);
 		
     	addItemsOnSpinner(myActivity);
@@ -111,6 +114,7 @@ public class ItemViewFragment extends Fragment {
     public void initCat(Activity myActivity, int fl) {
     	initObjs(myActivity);
     	currentFlist = myListMan.getFlist(fl);
+    	myPrefMan.setCurrentFlistID(currentFlist.getID());
     	myItemList = getItemList(fl);
     	addItemsOnSpinner(myActivity); 
     	addItemsOnList(myItemList);
@@ -142,7 +146,8 @@ public class ItemViewFragment extends Fragment {
 	// and add another spinner or tab on the fragment to switch between the three
     public void addItemsOnSpinner(Activity myActivity) {
         flistList = myListMan.getFlists();
-        //Log.v("ItemViewFragment.addItemsOnSpinner", "layoutView: " + layoutView);
+        Log.v("ItemViewFragment.addItemsOnSpinner", "layoutView: " + layoutView);
+        Log.v("ItemViewFragment.addItemsOnSpinner", "R.id.flist_spinner: " + R.id.flist_spinner);
         //Log.v("ItemViewFragment.addItemsOnSpinner", "myActivity: " + myActivity);
         //View myItemView = this.findViewById(R.layout.fragment_item_list_layout);
         //Log.v("ItemViewFragment.addItemsOnSpinner", "myItemView: " + myItemView);
@@ -195,6 +200,7 @@ public class ItemViewFragment extends Fragment {
     	listView.setAdapter(itemListDataAdapter);
     	//itemListTitle.setText(currentFlist.getName());
     	
+    	// TODO - Is this needed?
     	listView.setOnItemClickListener(new OnItemClickListener() {
     		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
     			Item item = (Item) parent.getItemAtPosition(position);
@@ -297,7 +303,7 @@ public class ItemViewFragment extends Fragment {
     		Boolean showInfo = false;
     		//Log.v("ItemListActivity.MyCustomAdapter", "currentFlist.showDueDate(): " + currentFlist.showDueDate());
     		//Log.v("ItemListActivity.MyCustomAdapter", "prefMan.showDueDateGlobal: " + prefMan.ShowDueDateGlobal);
-    		if (currentFlist.showDueDate() && prefMan.ShowDueDateGlobal) {
+    		if (currentFlist.showDueDate() && myPrefMan.ShowDueDateGlobal) {
     			if (item.hasDueTime() == true) {
     				infoString = "Due: " + item.getDueDatePretty() + " @ " + item.getDueTimePretty();
     				showInfo = true;
@@ -306,7 +312,7 @@ public class ItemViewFragment extends Fragment {
     				showInfo = true;
     			}
     		}
-	    	if (currentFlist.showDescription() && prefMan.ShowItemDescriptionGlobal) {
+	    	if (currentFlist.showDescription() && myPrefMan.ShowItemDescriptionGlobal) {
 	    		if (!item.getDescription().isEmpty()) {
 	    			infoString = infoString + " (" + item.getDescription() + ")";
 	    			showInfo = true;
@@ -327,12 +333,14 @@ public class ItemViewFragment extends Fragment {
 
     public class SpinnerActivity extends Activity implements OnItemSelectedListener {
     	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-    		Flist catSelected = (Flist) parent.getItemAtPosition(pos);
-    		currentFlist = catSelected;
-        	mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
-    		SharedPreferences.Editor prefEditor = mySharedPreferences.edit();
-    		prefEditor.putInt("current_category_id", currentFlist.getID());
-    		prefEditor.commit();
+    		Flist flistSelected = (Flist) parent.getItemAtPosition(pos);
+    		currentFlist = flistSelected;
+    		// TODO: Move this to ListPreferenceManager
+        	//mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+    		//SharedPreferences.Editor prefEditor = mySharedPreferences.edit();
+    		//prefEditor.putInt("current_category_id", currentFlist.getID());
+    		//prefEditor.commit();
+    		myPrefMan.setCurrentFlistID(currentFlist.getID());
     		addItemsOnList();
     	}
     	public void onNothingSelected(AdapterView<?> parent) {
@@ -340,9 +348,10 @@ public class ItemViewFragment extends Fragment {
     	}
     }
     public void addItemsOnList()  {
+    	// TODO: Get this catID from preference manager for current category
     	int catID = currentFlist.getID();
 		currentItemList = myListMan.getItemList(catID);
-		//Log.v("ItemViewFragment.addItemsOnList", "catID: " + catID );
+		Log.v("ItemViewFragment.addItemsOnList", "Current catID: " + catID );
 		//Log.v("ItemViewFragment.addItemsonList", "currentItemList: " + currentItemList);
 		currentListItems = currentItemList.getListItems();
     	itemListDataAdapter = new MyCustomAdapter(activity, R.layout.activity_item_list_view, currentListItems);

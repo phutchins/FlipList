@@ -34,10 +34,12 @@ public class ListManager implements Serializable {
     //public int completedCatID = 1;
     public int archiveCategory = 1;
     public Flist currentCategory;
+    public ListPreferenceManager myPrefMan;
     
     public transient DatabaseHandler db;
     public ListManager(Context context) {
     	db = new DatabaseHandler(context);
+    	myPrefMan = new ListPreferenceManager(context);
 		//Log.v("ListManager.constructor", "3) context: " + context);
 		updateListManagerState();
     }
@@ -53,6 +55,17 @@ public class ListManager implements Serializable {
     	}
     	db.updateItem(item);
     }
+    /*
+    public int getCurrentFlistID() {
+    	int currentFlistID;
+    	currentFlistID = myPrefMan.currentFlistID;
+    	return currentFlistID;
+    }
+    public int getDefaultFlistID() {
+    	int defaultFlistID;
+    	defaultFlistID = myPrefMan.defaultFlistID;
+    	return defaultFlistID;
+    } */
     public void deleteItem(Item item) {
     	db.deleteItem(item);
     }
