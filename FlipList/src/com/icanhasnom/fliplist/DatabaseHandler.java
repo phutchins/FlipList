@@ -434,7 +434,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		int filterID = myFlist.getFilterID();
 		Log.v("DatabaseHandler.getItemList", "filterID: " + filterID);
 		// Filter ID 0 means use preferences as there is no filter applied
-		//filterID = 1;
 		Log.v("DatabaseHandler.getItemList", "prefQueryStringValues: " + prefQueryStringValues);
 		Log.v("DatabaseHandler.getItemList", "prefQueryStringValueArgs: " + prefQueryStringValueArgs);
 		if (filterID == 0) {
@@ -479,12 +478,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		//Log.v("DatabaseHandler.getItemList", "DEFAULTS - dbValueArgs: " + dbValueArgs);
 		
 		Cursor cursor = db.query(TABLE_ITEMS, dbColumns, dbValues, dbValueArgsArray, dbGroupBy, dbHaving, dbOrderBy);
-		//Cursor cursor = db.rawQuery(dbQuery , null);
-		
-		//Cursor cursor = db.query(TABLE_ITEMS, new String[] { KEY_ITEM_ID, KEY_ITEM_NAME, 
-		//		KEY_ITEM_DESC, KEY_ITEM_NOTES, KEY_ITEM_PRIMARY_CAT, KEY_ITEM_SECONDARY_CATS, 
-		//		KEY_ITEM_HAS_DUE_DATE, KEY_ITEM_HAS_DUE_TIME, KEY_ITEM_DUE_DATETIME, KEY_ITEM_CREATE_DATE, KEY_ITEM_IS_COMPLETED }, 
-		//		KEY_ITEM_PRIMARY_CAT + "=?", new String[] { String.valueOf(catID) }, null, null, null, null);
 		
 		if (cursor.moveToFirst()) {
 			do {
@@ -508,8 +501,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				//Log.v("DatabaseHandler.getItemList", "Got Item: " + cursor.getString(1) + " from Category: " + myCat.getName() + " - createDate: " + cursor.getString(9) + " dueDateTime: " + cursor.getString(8) + " isCompleted: " + cursor.getString(10) + " completedDate: " + cursor.getString(11));
 			} while (cursor.moveToNext());
 		}
-		//db.close();
-		// return contact list
+		db.close();
+		// return item list
 		return itemList;
 	}
 	public Filter getFilter(int filterID) {

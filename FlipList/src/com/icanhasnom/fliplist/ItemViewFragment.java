@@ -75,13 +75,10 @@ public class ItemViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         layoutView = inflater.inflate(R.layout.fragment_item_list_layout, container, false);
 		initFrag(activity);
-		// TODO: Make this use currentFlistID ?
-		Log.v("ItemViewFragment.onCreateView", "Ran initFrag and using defaultFlistID");
 		currentItemList = myListMan.getItemList(myPrefMan.getCurrentFlistID());
         return layoutView;
     }
     public void initObjs(Activity myActivity) {
-    	// Only use the prefMan for ItemView settings
 		myPrefMan = new ListPreferenceManager(myActivity);
 		myListMan = new ListManager(myActivity);
     }
@@ -90,7 +87,7 @@ public class ItemViewFragment extends Fragment {
     	myItemList = getItemList(currentFlistID);
 		currentFlistID = myPrefMan.getCurrentFlistID();
 		defaultFlistID = myPrefMan.getDefaultFlistID();
-		Log.v("ItemViewFragment.initFrag", "currentFlistID: " + currentFlistID);
+		//Log.v("ItemViewFragment.initFrag", "currentFlistID: " + currentFlistID);
 		currentFlist = getFlistObj(currentFlistID);
 		
     	addItemsOnSpinner(myActivity);
@@ -104,10 +101,11 @@ public class ItemViewFragment extends Fragment {
     public void onResume() {
     	// Refresh fragment when user returns to it
     	super.onResume();
-    	addItemsOnSpinner(activity);
-    	addItemsOnList(myItemList);
+    	refreshPage(activity);
     }
     public void refreshPage(Activity myActivity) {
+    	currentFlist = myListMan.getFlist(myPrefMan.getCurrentFlistID());
+    	myItemList = getItemList(currentFlist.getID());
     	addItemsOnSpinner(myActivity);
     	addItemsOnList(myItemList);
     }
