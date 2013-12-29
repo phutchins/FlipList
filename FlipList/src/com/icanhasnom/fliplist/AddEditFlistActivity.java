@@ -435,7 +435,7 @@ public class AddEditFlistActivity extends Activity {
     	} else {
     		int flistID = Integer.parseInt(editFlistIdNumber.getText().toString());
     		myFlist.setID(flistID);
-    		myListMan.updateObjFlist(myFlist);
+    		myListMan.updateFlist(myFlist);
     	}
     	
     	Intent intent = new Intent();

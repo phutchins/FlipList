@@ -335,11 +335,6 @@ public class ItemViewFragment extends Fragment {
     	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
     		Flist flistSelected = (Flist) parent.getItemAtPosition(pos);
     		currentFlist = flistSelected;
-    		// TODO: Move this to ListPreferenceManager
-        	//mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
-    		//SharedPreferences.Editor prefEditor = mySharedPreferences.edit();
-    		//prefEditor.putInt("current_category_id", currentFlist.getID());
-    		//prefEditor.commit();
     		myPrefMan.setCurrentFlistID(currentFlist.getID());
     		addItemsOnList();
     	}
@@ -348,10 +343,9 @@ public class ItemViewFragment extends Fragment {
     	}
     }
     public void addItemsOnList()  {
-    	// TODO: Get this catID from preference manager for current category
-    	int catID = currentFlist.getID();
+    	int catID = myPrefMan.getCurrentFlistID();
 		currentItemList = myListMan.getItemList(catID);
-		Log.v("ItemViewFragment.addItemsOnList", "Current catID: " + catID );
+		//Log.v("ItemViewFragment.addItemsOnList", "Current catID: " + catID );
 		//Log.v("ItemViewFragment.addItemsonList", "currentItemList: " + currentItemList);
 		currentListItems = currentItemList.getListItems();
     	itemListDataAdapter = new MyCustomAdapter(activity, R.layout.activity_item_list_view, currentListItems);

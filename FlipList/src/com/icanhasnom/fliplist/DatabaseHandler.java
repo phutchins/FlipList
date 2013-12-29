@@ -539,7 +539,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.rawQuery(countQuery, null);
 		//db.close();
-		// return count
 		return cursor.getCount();
 	}
 	public int updateItem(Item item) {
@@ -654,7 +653,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	}
 	public ArrayList<Flist> getAllFlists() {
 		ArrayList<Flist> flistList = new ArrayList<Flist>();
-		// Select All Query
 		String selectQuery = "SELECT * FROM " + TABLE_FLISTS;
 		
 		SQLiteDatabase db = this.getReadableDatabase();
@@ -679,8 +677,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	}
 	public ArrayList<Flist> getFlists() {
 		ArrayList<Flist> flistList = new ArrayList<Flist>();
-		// Select All Query
-		//String selectQuery = "SELECT * FROM " + TABLE_CATEGORIES;
 		String isVisible = "1";
 		String noFilter = "0";
 		SQLiteDatabase db = this.getReadableDatabase();
@@ -707,8 +703,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	}
 	public ArrayList<Category> getCategories() {
 		ArrayList<Category> categoryList = new ArrayList<Category>();
-		// Select All Query
-		//String selectQuery = "SELECT * FROM " + TABLE_CATEGORIES;
 		String isVisible = "1";
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
@@ -721,9 +715,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 				category.setID(Integer.parseInt(cursor.getString(0)));
 				category.setName(cursor.getString(1));
 				category.setDescription(cursor.getString(2));
-				//category.setType(Integer.parseInt(cursor.getString(3)));
 				category.setVisible(cursor.getInt(3));
-				//category.setFilterID(cursor.getInt(5));
 				// Adding category to list
 				categoryList.add(category);
 			} while (cursor.moveToNext());
@@ -731,64 +723,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		db.close();
 		return categoryList;
 	}
-	/*
-	public ArrayList<Filter> getFilters() {
-		ArrayList<Filter> filterList = new ArrayList<Flist>();
-		// Select All Query
-		//String selectQuery = "SELECT * FROM " + TABLE_CATEGORIES;
-		String isVisible = "1";
-		String noFilter = "0";
-		SQLiteDatabase db = this.getReadableDatabase();
-		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
-				KEY_CAT_NAME, KEY_CAT_DESC, KEY_CAT_TYPE, KEY_CAT_VISIBLE, KEY_CAT_FILTER }, KEY_CAT_VISIBLE + "=?"
-				+ " AND " + KEY_CAT_FILTER + "=?",
-				new String[] { isVisible, noFilter }, null, null, null, null);
-		// looping through all rows and adding to list
-		if (cursor.moveToFirst()) {
-			do {
-				Flist category = new Flist();
-				category.setID(Integer.parseInt(cursor.getString(0)));
-				category.setName(cursor.getString(1));
-				category.setDescription(cursor.getString(2));
-				category.setType(Integer.parseInt(cursor.getString(3)));
-				category.setVisible(Integer.parseInt(cursor.getString(4)));
-				category.setFilterID(cursor.getInt(5));
-				// Adding category to list
-				categoryList.add(category);
-			} while (cursor.moveToNext());
-		}
-		return categoryList;
-	}
-	*/
-	/*
-	public ArrayList<Flist> getLists() {
-		ArrayList<Flist> flistList = new ArrayList<Flist>();
-		// Select All Query
-		//String selectQuery = "SELECT * FROM " + TABLE_CATEGORIES;
-		String isVisible = "1";
-		String noFilter = "0";
-		SQLiteDatabase db = this.getReadableDatabase();
-		Cursor cursor = db.query(TABLE_CATEGORIES,  new String[] { KEY_CAT_ID,
-				KEY_FLIST_NAME, KEY_FLIST_DESC, KEY_FLIST_TYPE, KEY_CAT_VISIBLE, KEY_FLIST_FILTER }, KEY_FLIST_VISIBLE + "=?"
-				+ " AND " + KEY_FLIST_FILTER + ">?",
-				new String[] { isVisible, noFilter }, null, null, null, null);
-		// looping through all rows and adding to list
-		if (cursor.moveToFirst()) {
-			do {
-				Flist flist = new Flist();
-				flist.setID(Integer.parseInt(cursor.getString(0)));
-				flist.setName(cursor.getString(1));
-				flist.setDescription(cursor.getString(2));
-				flist.setType(Integer.parseInt(cursor.getString(3)));
-				flist.setVisible(Integer.parseInt(cursor.getString(4)));
-				flist.setFilterID(cursor.getInt(5));
-				// Adding category to list
-				flistList.add(flist);
-			} while (cursor.moveToNext());
-		}
-		return flistList;
-	}
-	*/
 	public int getFlistsCount() {
 		String countQuery = "SELECT * FROM " + TABLE_FLISTS;
 		SQLiteDatabase db = this.getReadableDatabase();
@@ -799,24 +733,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		// return count
 		return count;
 	}
-	/*
-	public int getFlistID(String catName) {
-		// Fix this DB query to pull cat id using the name
-		String catIdQuery = "SELECT * FROM " + TABLE_FLISTS + " WHERE " + KEY_FLIST_NAME + " = 'Default'";
-		SQLiteDatabase db = this.getReadableDatabase();
-		Cursor cursor = db.rawQuery(catIdQuery, null);
-		int catID = 0;
-		if (cursor != null)
-			cursor.moveToFirst();
-		try {
-			catID = Integer.parseInt(cursor.getString(0));
-		} catch (CursorIndexOutOfBoundsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return catID;
-	}
-	*/
 	public void hideFlist(int flistID) {
 		int isVisible = 0;
 		SQLiteDatabase db = this.getWritableDatabase();
@@ -915,37 +831,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		//db.close();
 		return itemTypeName;
 	}
-
-	
-	// Settings
-	/*
-	public int getDefaultFlistID() {
-		SQLiteDatabase db = this.getReadableDatabase();
-		
-		Cursor cursor = db.query(TABLE_SETTINGS, new String[] { KEY_SETTING_NAME, 
-				KEY_SETTING_VAL1 }, KEY_SETTING_NAME + "=?",
-				new String[] { String.valueOf("defaultCategory") }, null, null, null, null);
-		if (cursor != null)
-			cursor.moveToFirst();
-		return Integer.parseInt(cursor.getString(1));
-	}
-	public int getDefaultTypeID() {
-		SQLiteDatabase db = this.getReadableDatabase();
-		Cursor cursor = db.query(TABLE_SETTINGS, new String[] { KEY_SETTING_NAME,
-				KEY_SETTING_VAL1 }, KEY_SETTING_NAME + "=?",
-				new String[] { String.valueOf("defaultType") }, null, null, null, null);
-		if (cursor != null)
-			cursor.moveToFirst();
-		return Integer.parseInt(cursor.getString(1));
-	}
-	public void setCompletedCategory(int completedCatID) {
-		SQLiteDatabase db = this.getWritableDatabase();
-		String completedSettingName = "completedCategory";
-		ContentValues values = new ContentValues();
-		values.put(KEY_SETTING_VAL1, completedCatID);
-		db.update(TABLE_SETTINGS, values, KEY_SETTING_NAME + " = " + completedSettingName, null);
-	}
-	 */
 	
 	// Backup & Restore
 	public void exportDB(){
