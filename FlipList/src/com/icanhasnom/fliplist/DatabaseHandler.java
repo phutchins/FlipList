@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -290,6 +291,12 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		}
 		// Remove completed items after delay
 		if (prefRemoveCompletedItems.equals("1")) {
+			Date now = new Date();
+			TimeZone tz = Calendar.getInstance().getTimeZone();
+			String tzName = tz.getDisplayName(tz.inDaylightTime(now), TimeZone.SHORT);
+			//dateTimeDBTest();
+			tzName = "localtime";
+			// TODO: need to store times as UTC and only display times as local so compares work when moving between time zones...
 			Integer delayInt = Integer.valueOf(prefRemoveCompletedItemsDelay);
 			//SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 			//Log.v("DatabaseHandler.getQueryValuesFromPrefs()", "prefRemoveCompletedItemsDelay: " + prefRemoveCompletedItemsDelay);
@@ -298,7 +305,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	    	//compareDateCal.add(Calendar.MINUTE, -delayInt);
 			//compareDate = sdfDateTime.format(compareDateCal.getTime());
 			//String dateTimeCompare = "datetime('now','-" + delayInt + " minute')";
-	    	prefQueryStringValues = "(" + KEY_ITEM_IS_COMPLETED + "=? OR (" + KEY_ITEM_COMPLETED_DATE + " >= datetime('now',?,'utc') AND " + KEY_ITEM_IS_COMPLETED + " =?))";
+	    	prefQueryStringValues = "(" + KEY_ITEM_IS_COMPLETED + "=? OR (" + KEY_ITEM_COMPLETED_DATE + " >= datetime('now',?,'" + tzName + "') AND " + KEY_ITEM_IS_COMPLETED + " =?))";
 	    	prefQueryStringValueArgs = "0;-" + delayInt + " minutes;1";
 		}
 		// Show all items always
@@ -411,6 +418,14 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 		}
 		//db.close();
 		return itemList;
+	}
+	public void dateTimeDBTest() {
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor cursor = db.rawQuery("SELECT datetime('now','localtime')", null);
+		cursor.moveToFirst();
+		String dateString = cursor.getString(0);
+		Toast.makeText(context, "DateTest: " + dateString, Toast.LENGTH_LONG).show();
+		db.close();
 	}
 	public ItemList getItemList(int flistID) {
 		ItemList itemList = new ItemList(flistID);
@@ -831,18 +846,12 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 	    File data = Environment.getDataDirectory();
 	    FileChannel source=null;
 	    FileChannel destination=null;
+	    
+	    String currentDateAndTime = new SimpleDateFormat("yyyMMddhhmm").format(new Date());
+	    //Log.v("DatabaseHandler.exportDB", "currentDateandTime: " + currentDateAndTime);
 
-	    // Use one of these to set timestamp on DB Backup File
-	    Time now = new Time();
-	    now.setToNow();
-	       
-	    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-	    String currentDateandTime = sdf.format(new Date(0));
-	       
-	    //File backupDB = new File(sd, backupDBPath);
 	    File currentDB = new File(data, currentDBPath);
-	    // TODO: Set DB backup filename to reflect current date time string that can be parsed for user readability
-	    File backupDB = new File(sd, backupDBPath + "-" + "123456");
+	    File backupDB = new File(sd, backupDBPath + "-" + currentDateAndTime);
 	    try {
 	        source = new FileInputStream(currentDB).getChannel();
 	        destination = new FileOutputStream(backupDB).getChannel();

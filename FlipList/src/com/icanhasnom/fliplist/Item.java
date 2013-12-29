@@ -21,7 +21,6 @@ public class Item implements Serializable {
 	public int itemID;
 	public String name;
 	public String description = "";
-	Calendar myCal = Calendar.getInstance();
     public String dueDateTime;
     public String createDate;
     public int flist;
@@ -32,16 +31,26 @@ public class Item implements Serializable {
     public boolean isCompleted = false;
     public String completedDate = null;
     
+    TimeZone tz = TimeZone.getDefault();
+	Calendar myCal = Calendar.getInstance(tz);
+    
 	SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 	SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.US);
 	SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 	SimpleDateFormat sdfDateTimePretty = new SimpleDateFormat("MMMM dd, hh:mm aa", Locale.US);
 	SimpleDateFormat sdfTimePretty = new SimpleDateFormat("hh:mm aa", Locale.US);
-	SimpleDateFormat sdfDatePretty = new SimpleDateFormat("MMMM dd", Locale.US);
+	SimpleDateFormat sdfDatePretty = new SimpleDateFormat("MMMM dd", Locale.US);	
     
     // Constructors
     // TODO: Do i need this many?
     public Item() {
+    	sdfDateTime.setTimeZone(tz);
+    	sdfTime.setTimeZone(tz);
+    	sdfDate.setTimeZone(tz);
+    	sdfDateTimePretty.setTimeZone(tz);
+    	sdfTimePretty.setTimeZone(tz);
+    	sdfDatePretty.setTimeZone(tz);
+    	
     	dueDateTime = getCurrentDateTime();
 	    createDate = getCurrentDateTime();
     }
@@ -172,11 +181,6 @@ public class Item implements Serializable {
     	return isCompleted;
     }
     
-    
-    
-    
-    
-    
     // Membership
     public void setCategory(String cat) {
     	categories.add(cat);
@@ -231,15 +235,15 @@ public class Item implements Serializable {
     	createDate = cd;
     }
     public Boolean setDueDate(String dd) {
-    	Calendar curDateCal = Calendar.getInstance();
+    	Calendar curDateCal = Calendar.getInstance(tz);
     	Boolean success = false;
-    	SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+    	
     	try {
 			curDateCal.setTime(sdfDateTime.parse(dueDateTime));
 		} catch (ParseException e1) {
 			e1.printStackTrace();
 		}
-    	Calendar newDateCal = Calendar.getInstance();
+    	Calendar newDateCal = Calendar.getInstance(tz);
     	if (dd != null && isDateValid(dd)) {
 	    	try {
 				newDateCal.setTime(sdfDate.parse(dd));
@@ -256,7 +260,7 @@ public class Item implements Serializable {
     	return success;
     }
     public Boolean setDueTime(String dt) {
-    	Calendar curTimeCal = Calendar.getInstance();
+    	Calendar curTimeCal = Calendar.getInstance(tz);
     	Boolean success = false;
 
     	try {
@@ -264,7 +268,7 @@ public class Item implements Serializable {
 		} catch (ParseException e1) {
 			e1.printStackTrace();
 		}
-    	Calendar newTimeCal = Calendar.getInstance();
+    	Calendar newTimeCal = Calendar.getInstance(tz);
     	if (dt != null && isTimeValid(dt)) {
 	    	try {
 
